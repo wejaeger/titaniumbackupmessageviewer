@@ -149,6 +149,13 @@ public interface IMessage extends Comparable<IMessage>
    Date getMessageDate();
 
    /**
+    * Get the properly formatted date of the message.
+    *
+    * @return the formatted message date.
+    */
+   String getFormattedMessageDate();
+
+   /**
     * Set the message address.
     *
     * @param strAddress the address of the message.
@@ -156,9 +163,24 @@ public interface IMessage extends Comparable<IMessage>
    void setMessageAddress(final String strAddress);
 
    /**
+    * Set the service center this message came from.
+    *
+    * @param strServiceCenter the service center or {@code null} or empty if
+    *        not known.
+    */
+   void setServiceCenter(final String strServiceCenter);
+
+   /**
     * Get the Address of the message.
     *
     * @return the address.
     */
    String getMessageAddress();
+
+   /**
+    * Get the service center this message came from.
+    *
+    * @return the service center or {@code null} or empty  if not known.
+    */
+   String getServiceCenter();
 }

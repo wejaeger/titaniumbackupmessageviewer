@@ -57,7 +57,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.EtchedBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  * Main class and window for this application.
@@ -75,14 +74,14 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 public class TitaniumBackupMessageViewer
 {
    private JFrame m_ReaderFrame;
-   private JTextField m_OffsetField;
    private JTextField m_MessageFileLocationField;
    private JTextField m_ContactsDBFileLocationField;
    private JTextField m_NumberSMSField;
    private JTextField m_ExportFileField;
    private MessageViewer m_MessageViewer;
    private JList<MessageThread> m_ThreadListBox;
-   private JFileChooser m_FileChooser;
+   private JFileChooser m_MessageFileChooser;
+   private JFileChooser m_ContactsDatabaseChooser;
    private JFileChooser m_SaveChooser;
    private AndroidMessageReader m_Reader;
 
@@ -136,9 +135,11 @@ public class TitaniumBackupMessageViewer
       m_ReaderFrame.setBounds(100, 100, 700, 550);
       m_ReaderFrame.setDefaultCloseOperation(3);
 
-      m_FileChooser = new JFileChooser();
-      final FileNameExtensionFilter filter = new FileNameExtensionFilter("Message & Compressed Message files", "xml", "gz");
-      m_FileChooser.setFileFilter(filter);
+      m_MessageFileChooser = new JFileChooser();
+      m_MessageFileChooser.setFileFilter(new TitaniumBackupMessageFileNameFilter());
+
+      m_ContactsDatabaseChooser = new JFileChooser();
+      m_ContactsDatabaseChooser.setFileFilter(new TitaniumBackupContactsFileNameFilter());
 
       m_SaveChooser = new JFileChooser();
 
@@ -172,13 +173,6 @@ public class TitaniumBackupMessageViewer
 
       mnHelp.add(mntmAboutAndroidMessageReader);
 
-      final JLabel lblHoursOffsetFor = new JLabel("Hours offset for received SMS:");
-      lblHoursOffsetFor.setFont(new Font("Tahoma", 0, 11));
-
-      m_OffsetField = new JTextField();
-      m_OffsetField.setText("0");
-      m_OffsetField.setColumns(5);
-
       m_MessageFileLocationField = new JTextField();
       m_MessageFileLocationField.setEditable(false);
 
@@ -208,6 +202,7 @@ public class TitaniumBackupMessageViewer
             chooseMessageFileAction();
          }
       });
+     chooseMessageFileButton.setToolTipText("You can open the commpressd (.gz) or plain (.xml) message file");
 
       final JButton chooseContactsDBButton = new JButton("Choose Contacts Database file");
       chooseContactsDBButton.addActionListener(new ActionListener()
@@ -218,6 +213,7 @@ public class TitaniumBackupMessageViewer
             chooseContactsDBAction();
          }
       });
+      chooseContactsDBButton.setToolTipText("You can open the archived (.tar.gz) or the plain (.db) contacts database");
 
       final JLabel lblNumberOfSms = new JLabel("Number of SMS:");
 
@@ -234,6 +230,7 @@ public class TitaniumBackupMessageViewer
             loadAction();
          }
       });
+      loadButton.setToolTipText("Hit this button to actually load the choosen message file and the optionally choosen contacts database");
 
       final JScrollPane scrollPane_1 = new JScrollPane();
       final JScrollPane scrollPane = new JScrollPane();
@@ -275,10 +272,6 @@ public class TitaniumBackupMessageViewer
                               .addGroup(groupLayout.createSequentialGroup()
                                       .addGap(7)
                                       .addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                                              .addGroup(groupLayout.createSequentialGroup()
-                                                      .addComponent(lblHoursOffsetFor)
-                                                      .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                      .addComponent(m_OffsetField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                                               .addGroup(GroupLayout.Alignment.TRAILING, groupLayout.createSequentialGroup()
                                                       .addComponent(m_MessageFileLocationField, GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE)
                                                       .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
@@ -317,10 +310,6 @@ public class TitaniumBackupMessageViewer
               groupLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
               .addGroup(groupLayout.createSequentialGroup()
                       .addGap(10)
-                      .addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                              .addComponent(lblHoursOffsetFor)
-                              .addComponent(m_OffsetField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                      .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
                       .addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                               .addComponent(m_MessageFileLocationField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                               .addComponent(chooseMessageFileButton))
@@ -388,24 +377,22 @@ public class TitaniumBackupMessageViewer
 
    private void chooseMessageFileAction()
    {
-      final int iRet = m_FileChooser.showOpenDialog(m_ReaderFrame);
+      final int iRet = m_MessageFileChooser.showOpenDialog(m_ReaderFrame);
 
       if (iRet == 0)
-         m_MessageFileLocationField.setText(m_FileChooser.getSelectedFile().getAbsolutePath());
+         m_MessageFileLocationField.setText(m_MessageFileChooser.getSelectedFile().getAbsolutePath());
    }
 
    private void chooseContactsDBAction()
    {
-      final int iRet = m_FileChooser.showOpenDialog(m_ReaderFrame);
+      final int iRet = m_ContactsDatabaseChooser.showOpenDialog(m_ReaderFrame);
 
       if (iRet == 0)
-         m_ContactsDBFileLocationField.setText(m_FileChooser.getSelectedFile().getAbsolutePath());
+         m_ContactsDBFileLocationField.setText(m_ContactsDatabaseChooser.getSelectedFile().getAbsolutePath());
    }
 
    private void loadAction()
    {
-      final int iTimeOffset = Integer.parseInt(m_OffsetField.getText()) * 3600000;
-
       if (!m_MessageFileLocationField.getText().equals("..."))
       {
          InputStream is = null;
@@ -429,7 +416,7 @@ public class TitaniumBackupMessageViewer
             else
                contactsDBFile = null;
 
-            iRet = m_Reader.loadMessages(is, contactsDBFile, iTimeOffset);
+            iRet = m_Reader.loadMessages(is, contactsDBFile);
 
             if (iRet != 0)
             {
@@ -519,7 +506,7 @@ public class TitaniumBackupMessageViewer
 
    private void aboutAction()
    {
-      JOptionPane.showMessageDialog(m_ReaderFrame, "Android Message Reader\nv0.1 - 2015-02-15\nBy Werner Jäger");
+      JOptionPane.showMessageDialog(m_ReaderFrame, "Android Message Reader\nv0.9.1 - 2015-02-26\nBy Werner Jäger");
    }
 
    private void exportSelectedAction()

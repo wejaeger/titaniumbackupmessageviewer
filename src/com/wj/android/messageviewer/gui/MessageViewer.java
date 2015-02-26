@@ -153,7 +153,7 @@ public class MessageViewer extends JPanel
       if (null != message.getMessageBox())
       {
          // append message info date/zime sent/received
-         final SMSMessage messageInfo = new SMSMessage(message.getMessageAddress(), message.getMessageDate(), message.getMessageDate().toString(), message.getMessageBox(), 0);
+         final SMSMessage messageInfo = new SMSMessage(message.getServiceCenter(), message.getMessageAddress(), message.getMessageDate(), message.getFormattedMessageDate(), message.getMessageBox());
 
          final ArrowBubble b;
          if (message.getMessageBox() == IMessage.MessageBox.SENT)

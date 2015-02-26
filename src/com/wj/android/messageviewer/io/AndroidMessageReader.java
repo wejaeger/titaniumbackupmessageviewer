@@ -80,7 +80,6 @@ public class AndroidMessageReader
    final private SimpleDateFormat m_DateFmt;
    final private List<MessageThread> m_ThreadList;
    private SQLLiteContactsReader m_ContactReader;
-   private int m_iTimeOffset;
    private int m_iNumberOfSMS;
 
    /**
@@ -101,17 +100,15 @@ public class AndroidMessageReader
     * @param is the message file input stream to read from.
     *        Must not be {@code null}.
     * @param contactsDB the SQLLite contact database file or {@code null}.
-    * @param iTimeOffset added to the stored GMT time in date attributes.
     * @return the error code 0 meaning success.
     */
-   public int loadMessages(final InputStream is, final File contactsDB, final int iTimeOffset)
+   public int loadMessages(final InputStream is, final File contactsDB)
    {
       int iErorror = 1;
 
       if (is != null)
       {
          m_ThreadList.clear();
-         m_iTimeOffset = iTimeOffset;
          m_iNumberOfSMS = 0;
 
          if (null == m_ContactReader)
@@ -146,19 +143,20 @@ public class AndroidMessageReader
 
                   for (int j = 0; j < messages.getLength(); j++)
                   {
-                     final Element            messageElement = (Element)messages.item(j);
-                     final String             strTagName     = messageElement.getTagName();
-                     final IMessage.MessageBox msgBox        = IMessage.MessageBox.fromString(messageElement.getAttribute("msgBox"));
+                     final Element             messageElement   = (Element)messages.item(j);
+                     final String              strTagName       = messageElement.getTagName();
+                     final String              strServiceCenter = messageElement.getAttribute("serviceCenter");
+                     final IMessage.MessageBox msgBox           = IMessage.MessageBox.fromString(messageElement.getAttribute("msgBox"));
 
                      final IMessage message;
                      switch(strTagName)
                      {
                         case "sms":
-                           message = elementToMessage(msgBox, strAddress, messageElement);
+                           message = elementToMessage(msgBox, strServiceCenter, strAddress, messageElement);
                            break;
 
                         case "mms":
-                           message = elementToMMSMessage(msgBox, messageElement);
+                           message = elementToMMSMessage(msgBox, strServiceCenter, messageElement);
                            break;
 
                         default:
@@ -261,7 +259,7 @@ public class AndroidMessageReader
       return(m_iNumberOfSMS);
    }
 
-   private IMessage elementToMessage(final IMessage.MessageBox msgBox, final String strAddress, final Element element) throws ParseException, UnsupportedEncodingException
+   private IMessage elementToMessage(final IMessage.MessageBox msgBox, final String strServiceCenter, final String strAddress, final Element element) throws ParseException, UnsupportedEncodingException
    {
       final IMessage msg;
 
@@ -279,7 +277,7 @@ public class AndroidMessageReader
             else
                strBody = element.getFirstChild().getNodeValue();
 
-            msg = new SMSMessage(strAddress, date, strBody, msgBox, m_iTimeOffset);
+            msg = new SMSMessage(strServiceCenter, strAddress, date, strBody, msgBox);
          }
          else
             msg = null;
@@ -290,7 +288,7 @@ public class AndroidMessageReader
       return(msg);
    }
 
-   private IMessage elementToMMSMessage(final IMessage.MessageBox msgBox, final Element element) throws ParseException, UnsupportedEncodingException
+   private IMessage elementToMMSMessage(final IMessage.MessageBox msgBox, final String strServiceCenter, final Element element) throws ParseException, UnsupportedEncodingException
    {
       final MMSMessage msg;
 
@@ -301,12 +299,12 @@ public class AndroidMessageReader
 
          if (hasSMILPart(parts))
          {
-            msg = new SMILMessage(parts, strAddress, m_DateFmt.parse(element.getAttribute("date")), msgBox, m_iTimeOffset);
+            msg = new SMILMessage(parts, strServiceCenter, strAddress, m_DateFmt.parse(element.getAttribute("date")), msgBox);
             msg.setSubject(element.getAttribute("subject"));
          }
          else
          {
-            msg = new MMSMessage(parts, strAddress, m_DateFmt.parse(element.getAttribute("date")), msgBox, m_iTimeOffset);
+            msg = new MMSMessage(parts, strServiceCenter, strAddress, m_DateFmt.parse(element.getAttribute("date")), msgBox);
             msg.setSubject(element.getAttribute("subject"));
          }
       }
@@ -320,7 +318,7 @@ public class AndroidMessageReader
    {
       if (null != contactsDB)
       {
-         if (contactsDB.getName().endsWith(".gz") || contactsDB.getName().endsWith("tar"))
+         if (contactsDB.getName().endsWith(".tar.gz") || contactsDB.getName().endsWith("tar"))
          {
             final String strTempDir = System.getProperty("java.io.tmpdir");
             final File contactsTempDir = new File(strTempDir, "titaniumBackupMessageViewerContacts");
