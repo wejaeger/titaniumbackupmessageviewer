@@ -63,13 +63,14 @@ public class SMILMessage extends MMSMessage
     *
     * @param parts the parts of this message.
     * @param strAddress the message address.
+    * @param strServiceCenter the service center the message came from or
+    *        {@code null} if not known
     * @param date the message date.
     * @param msgBox the message box of the message.
-    * @param iTimeOffset the time offset.
     */
-   public SMILMessage(final List<IMMSMessagePart> parts, final String strAddress, final Date date, final IMessage.MessageBox msgBox, final int iTimeOffset)
+   public SMILMessage(final List<IMMSMessagePart> parts, final String strServiceCenter, final String strAddress, final Date date, final IMessage.MessageBox msgBox)
    {
-      super(parts, strAddress, date, msgBox, iTimeOffset);
+      super(parts, strServiceCenter, strAddress, date, msgBox);
 
       m_OrderedParts = new ArrayList<>();
       m_PartsMap = new HashMap<>(parts.size());

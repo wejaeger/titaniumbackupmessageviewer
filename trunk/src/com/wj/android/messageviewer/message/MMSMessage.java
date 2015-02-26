@@ -52,13 +52,14 @@ public class MMSMessage extends SMSMessage
     *
     * @param parts the parts of this message.
     * @param strAddress the message address.
+    * @param strServiceCenter the service center the message came from or
+    *        {@code null} if not known
     * @param date the message date.
     * @param msgBox the message box of the message.
-    * @param iTimeOffset the time offset.
     */
-   public MMSMessage(final List<IMMSMessagePart> parts, final String strAddress, final Date date, final MessageBox msgBox, final int iTimeOffset)
+   public MMSMessage(final List<IMMSMessagePart> parts, final String strServiceCenter, final String strAddress, final Date date, final MessageBox msgBox)
    {
-      super(strAddress, date, null, msgBox, iTimeOffset);
+      super(strServiceCenter, strAddress, date, null, msgBox);
 
       m_Parts = parts;
       m_strMessageText = null;

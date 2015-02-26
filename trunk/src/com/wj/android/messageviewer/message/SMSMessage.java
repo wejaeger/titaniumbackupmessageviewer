@@ -23,7 +23,9 @@
  */
 package com.wj.android.messageviewer.message;
 
+import java.text.DateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 /**
  * The {@code SMSMessage} class represents a Short Message without a
@@ -38,11 +40,38 @@ import java.util.Date;
  */
 public class SMSMessage implements IMessage
 {
+   private static final class AddressInfo
+   {
+      /**
+       * Constructs a {@code AddressInfo} object.
+       *
+       * Prevent instantiation of this class.
+       */
+      private AddressInfo()
+      {
+      }
+
+      private static TimeZone toTimeZone(final String strAddress)
+      {
+         TimeZone tz = TimeZone.getDefault();
+
+         if (null != strAddress)
+         {
+            if (strAddress.startsWith("+63"))
+               tz = TimeZone.getTimeZone("Asia/Manila");
+         }
+
+         return(tz);
+      }
+   }
+
    private String m_strMessageText;
    private MessageBox m_msgBox;
    private Date m_MessageDate;
    private String m_strMessageAddress;
+   private String m_strServiceCenter;
 
+   final private static DateFormat DATEFORMATTER = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.LONG);
    /**
     * Creates new {@code SMSMessage}.
     */
@@ -52,21 +81,23 @@ public class SMSMessage implements IMessage
       m_MessageDate = new Date();
       m_strMessageText = "";
       m_strMessageAddress = "";
-   }
+      m_strServiceCenter = null;
+    }
 
    /**
     * Creates new {@code SMSMessage}.
     *
+    * @param strServiceCenter
     * @param strAddress the message address.
     * @param date the message date.
     * @param strBody the message text.
     * @param msgBox the message box of the message.
-    * @param iTimeOffset the time offset.
     */
-   public SMSMessage(final String strAddress, final Date date, final String strBody, final MessageBox msgBox, final int iTimeOffset)
+   public SMSMessage(final String strServiceCenter, final String strAddress, final Date date, final String strBody, final MessageBox msgBox)
    {
       m_strMessageAddress = strAddress;
-      m_MessageDate = new Date(date.getTime() + iTimeOffset); // date.add(offset);
+      m_strServiceCenter = strServiceCenter;
+      m_MessageDate = date;
       m_strMessageText = strBody;
       m_msgBox = msgBox;
    }
@@ -108,6 +139,19 @@ public class SMSMessage implements IMessage
    }
 
    @Override
+   public String getFormattedMessageDate()
+   {
+      final TimeZone tz = AddressInfo.toTimeZone(m_strServiceCenter == null || m_strServiceCenter.trim().isEmpty() ? m_strMessageAddress : m_strServiceCenter);
+
+      if (null != tz)
+         DATEFORMATTER.setTimeZone(tz);
+      else
+         DATEFORMATTER.setTimeZone(TimeZone.getDefault());
+
+      return(DATEFORMATTER.format(getMessageDate()));
+   }
+
+   @Override
    public void setMessageAddress(final String strAddress)
    {
       m_strMessageAddress = strAddress;
@@ -120,9 +164,21 @@ public class SMSMessage implements IMessage
    }
 
    @Override
+   final public void setServiceCenter(final String strServiceCenter)
+   {
+      m_strServiceCenter = strServiceCenter;
+   }
+
+   @Override
+   final public String getServiceCenter()
+   {
+      return(m_strServiceCenter);
+   }
+
+   @Override
    public String toString()
    {
-      return (getMessageBox() + ": " + getMessageDate().toString() + ":  " + getMessageText());
+      return(getMessageBox() + ": " + getFormattedMessageDate() + ":  " + getMessageText());
    }
 
    @Override
@@ -130,5 +186,4 @@ public class SMSMessage implements IMessage
    {
       return(getMessageDate().compareTo(msg.getMessageDate()));
    }
-
 }
