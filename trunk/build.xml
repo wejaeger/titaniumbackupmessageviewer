@@ -71,14 +71,33 @@
 
     -->
 
+   <property name="project.name" value="Titanium Backup Message Viewer" />
+   <property name="version.num" value="0.9.1" />
+   <tstamp>
+      <format property="version.dat" pattern="yyyy-MM-dd" />
+   </tstamp>
+
+
    <!-- provide a path where executable distros should be saved  -->
    <property name="release.dir" value="${basedir}/release"/>
    <!-- provide a base name for your executable. -->
    <property name="standalone.jar.name" value="AndroidMessageReader"/>
 
+   <target name="-pre-jar" >
+      <propertyfile file="${src.dir}/com/wj/android/messageviewer/resources/application.properties">
+         <entry key="project.name" value="${project.name}"/>
+         <entry key="version.num" value="${version.num}"/>
+         <entry key="version.dat" value="${version.dat}"/>
+      </propertyfile>
+   </target>
+
    <import file="one-jar-ant-task.xml" />
    <target name="dist-all" depends="jar" description="Bundles a stand-alone OneJAR distribution">
         <echo>Bundling: OneJAR is composing ${standalone.jar.name}-all.jar</echo>
+        <tstamp>
+           <format property="NOW" pattern="yyyy-MM-dd HH:mm:ss z" />
+        </tstamp>
+
         <one-jar destfile="${dist.jar.dir}/${standalone.jar.name}-all.jar" update="true">
             <manifest>
               <attribute name="Manifest-Version" value="1.0"/>
@@ -86,7 +105,13 @@
               <attribute name="Main-Class" value="com.simontuffs.onejar.Boot"/>
               <attribute name="Class-Path" value="lib/commons-compress-1.9.jar lib/sqlite-jdbc-3.8.6.jar"/>
               <attribute name="One-Jar-Main-Class" value="com.wj.android.messageviewer.gui.TitaniumBackupMessageViewer"/>
-            </manifest>
+              <attribute name="Bundle-Name" value="${project.name}" />
+              <attribute name="Bundle-Version" value="${version.num}" />
+              <attribute name="Bundle-Date" value="${NOW}" />
+              <!--<attribute name="Bundle-Revision" value="${svna.version}" />-->
+              <attribute name="Implementation-Title" value="${project.name}" />
+              <attribute name="Implementation-Version" value="${version.num}" />
+              </manifest>
             <main>
                 <fileset dir="${build.classes.dir}/" />
             </main>
