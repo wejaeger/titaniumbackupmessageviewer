@@ -26,8 +26,11 @@ package com.wj.android.messageviewer.gui;
 import com.wj.android.messageviewer.message.IMessage;
 import com.wj.android.messageviewer.io.AndroidMessageReader;
 import com.wj.android.messageviewer.message.MessageThread;
+import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -36,11 +39,16 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Properties;
 import java.util.zip.GZIPInputStream;
 import javax.swing.AbstractListModel;
 import javax.swing.GroupLayout;
-import javax.swing.JButton;
+import javax.swing.ImageIcon;
+import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -54,7 +62,11 @@ import javax.swing.JTextField;
 import javax.swing.LayoutStyle;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.WindowConstants;
 import javax.swing.border.EtchedBorder;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -73,17 +85,23 @@ import javax.swing.event.ListSelectionListener;
  */
 public class TitaniumBackupMessageViewer
 {
+   final private static String RESOURCEPATH = "/com/wj/android/messageviewer/resources/";
+
+   // various keys for application.properties
+   private static final String VERSION = "version.num";
+   private static final String DATE = "version.dat";
+   private static final String TITLE = "project.name";
+
    private JFrame m_ReaderFrame;
-   private JTextField m_MessageFileLocationField;
-   private JTextField m_ContactsDBFileLocationField;
    private JTextField m_NumberSMSField;
-   private JTextField m_ExportFileField;
-   private MessageViewer m_MessageViewer;
-   private JList<MessageThread> m_ThreadListBox;
    private JFileChooser m_MessageFileChooser;
    private JFileChooser m_ContactsDatabaseChooser;
    private JFileChooser m_SaveChooser;
+   private JList<MessageThread> m_ThreadListBox;
+   private MessageViewer m_MessageViewer;
    private AndroidMessageReader m_Reader;
+   private String m_strMessageFileLocation;
+   private String m_strContactsDBFileLocation;
 
    /**
     * Creates new {@code GUI}.
@@ -103,7 +121,8 @@ public class TitaniumBackupMessageViewer
     * Launch the application and display the main window.
     *
     * @param asArgs the first optional argument is the full path to the message
-    *               file to open at start up.
+    *               file to open at start up., the second optional argument is
+    *               the full path to a contacts database file.
     */
    public static void main(final String[] asArgs)
    {
@@ -133,18 +152,62 @@ public class TitaniumBackupMessageViewer
       m_ReaderFrame = new JFrame();
       m_ReaderFrame.setTitle("Android Message Reader");
       m_ReaderFrame.setBounds(100, 100, 700, 550);
-      m_ReaderFrame.setDefaultCloseOperation(3);
-
-      m_MessageFileChooser = new JFileChooser();
-      m_MessageFileChooser.setFileFilter(new TitaniumBackupMessageFileNameFilter());
-
-      m_ContactsDatabaseChooser = new JFileChooser();
-      m_ContactsDatabaseChooser.setFileFilter(new TitaniumBackupContactsFileNameFilter());
-
-      m_SaveChooser = new JFileChooser();
+      m_ReaderFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
       final JMenuBar menuBar = new JMenuBar();
       m_ReaderFrame.setJMenuBar(menuBar);
+
+      setFrameIcon();
+
+      m_MessageFileChooser = new JFileChooser();
+      m_MessageFileChooser.setDialogTitle("Open message file");
+      m_MessageFileChooser.setFileFilter(new TitaniumBackupMessageFileNameFilter());
+      m_MessageFileChooser.setApproveButtonToolTipText("You can open the commpressd (.gz) or plain (.xml) message file");
+
+
+      m_ContactsDatabaseChooser = new JFileChooser();
+      m_ContactsDatabaseChooser.setDialogTitle("Open contacts database");
+      m_ContactsDatabaseChooser.setFileFilter(new TitaniumBackupContactsFileNameFilter());
+      m_ContactsDatabaseChooser.setApproveButtonToolTipText("You can open the archived (.tar.gz) or the plain (.db) contacts database");
+
+      m_SaveChooser = new JFileChooser();
+
+      final JMenu mnFile = new JMenu("File");
+      menuBar.add(mnFile);
+
+      final JMenuItem mntmOpen = new JMenuItem("Open ...");
+      mntmOpen.addActionListener(new ActionListener()
+      {
+         @Override
+         public void actionPerformed(final ActionEvent evt)
+         {
+            chooseMessageFileAction();
+         }
+      });
+      mnFile.add(mntmOpen);
+
+      final JMenuItem mntmExportSelected = new JMenuItem("Export selected messages ...");
+      mntmExportSelected.addActionListener(new ActionListener()
+      {
+         @Override
+         public void actionPerformed(final ActionEvent evt)
+         {
+            exportSelectedAction();
+         }
+      });
+      mnFile.add(mntmExportSelected);
+
+      final JMenuItem mntmExportAll = new JMenuItem("Export all messages ...");
+      mntmExportAll.addActionListener(new ActionListener()
+      {
+         @Override
+         public void actionPerformed(final ActionEvent evt)
+         {
+            exportAllAction();
+         }
+      });
+      mnFile.add(mntmExportAll);
+
 
       final JMenu mnHelp = new JMenu("Help");
       menuBar.add(mnHelp);
@@ -158,7 +221,6 @@ public class TitaniumBackupMessageViewer
             helpAction();
          }
       });
-
       mnHelp.add(mntmHelp);
 
       final JMenuItem mntmAboutAndroidMessageReader = new JMenuItem("About Android Message Reader");
@@ -170,50 +232,17 @@ public class TitaniumBackupMessageViewer
             aboutAction();
          }
       });
-
       mnHelp.add(mntmAboutAndroidMessageReader);
 
-      m_MessageFileLocationField = new JTextField();
-      m_MessageFileLocationField.setEditable(false);
-
       if (null != strMessageFileName && !strMessageFileName.trim().isEmpty())
-         m_MessageFileLocationField.setText(strMessageFileName);
+         m_strMessageFileLocation = strMessageFileName;
       else
-         m_MessageFileLocationField.setText("...");
-
-      m_MessageFileLocationField.setColumns(10);
-
-      m_ContactsDBFileLocationField = new JTextField();
-      m_ContactsDBFileLocationField.setEditable(false);
+         m_strMessageFileLocation = "...";
 
       if (null != strContactsDBFileName && !strContactsDBFileName.trim().isEmpty())
-         m_ContactsDBFileLocationField.setText(strContactsDBFileName);
+         m_strContactsDBFileLocation = strContactsDBFileName;
       else
-         m_ContactsDBFileLocationField.setText("...");
-
-      m_ContactsDBFileLocationField.setColumns(10);
-
-      final JButton chooseMessageFileButton = new JButton("Choose Message File");
-      chooseMessageFileButton.addActionListener(new ActionListener()
-      {
-         @Override
-         public void actionPerformed(final ActionEvent evt)
-         {
-            chooseMessageFileAction();
-         }
-      });
-     chooseMessageFileButton.setToolTipText("You can open the commpressd (.gz) or plain (.xml) message file");
-
-      final JButton chooseContactsDBButton = new JButton("Choose Contacts Database file");
-      chooseContactsDBButton.addActionListener(new ActionListener()
-      {
-         @Override
-         public void actionPerformed(final ActionEvent evt)
-         {
-            chooseContactsDBAction();
-         }
-      });
-      chooseContactsDBButton.setToolTipText("You can open the archived (.tar.gz) or the plain (.db) contacts database");
+         m_strContactsDBFileLocation = "...";
 
       final JLabel lblNumberOfSms = new JLabel("Number of SMS:");
 
@@ -221,48 +250,9 @@ public class TitaniumBackupMessageViewer
       m_NumberSMSField.setEditable(false);
       m_NumberSMSField.setColumns(10);
 
-      final JButton loadButton = new JButton("Load!");
-      loadButton.addActionListener(new ActionListener()
-      {
-         @Override
-         public void actionPerformed(final ActionEvent evt)
-         {
-            loadAction();
-         }
-      });
-      loadButton.setToolTipText("Hit this button to actually load the choosen message file and the optionally choosen contacts database");
-
-      final JScrollPane scrollPane_1 = new JScrollPane();
-      final JScrollPane scrollPane = new JScrollPane();
-      scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-
-      final JLabel lblNewLabel = new JLabel("Use the options below to export the SMS to a text file. You can either export the selected thread, or all:");
-      lblNewLabel.setFont(new Font("Tahoma", 0, 12));
-
-      m_ExportFileField = new JTextField();
-      m_ExportFileField.setText("...");
-      m_ExportFileField.setEditable(false);
-      m_ExportFileField.setColumns(10);
-
-      final JButton exportSelectedButton = new JButton("Export Selected");
-      exportSelectedButton.addActionListener(new ActionListener()
-      {
-         @Override
-         public void actionPerformed(final ActionEvent evt)
-         {
-            exportSelectedAction();
-         }
-      });
-
-      final JButton exportButton = new JButton("Export All");
-      exportButton.addActionListener(new ActionListener()
-      {
-         @Override
-         public void actionPerformed(final ActionEvent evt)
-         {
-            exportAllAction();
-         }
-      });
+      final JScrollPane scrollPaneThread = new JScrollPane();
+      final JScrollPane scrollPaneMessages = new JScrollPane();
+      scrollPaneMessages.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
       final GroupLayout groupLayout = new GroupLayout(m_ReaderFrame.getContentPane());
       groupLayout.setHorizontalGroup(
@@ -272,71 +262,35 @@ public class TitaniumBackupMessageViewer
                               .addGroup(groupLayout.createSequentialGroup()
                                       .addGap(7)
                                       .addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                                              .addGroup(GroupLayout.Alignment.TRAILING, groupLayout.createSequentialGroup()
-                                                      .addComponent(m_MessageFileLocationField, GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE)
-                                                      .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                                                      .addComponent(chooseMessageFileButton, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))
-                                              .addGroup(GroupLayout.Alignment.TRAILING, groupLayout.createSequentialGroup()
-                                                      .addComponent(m_ContactsDBFileLocationField, GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE)
-                                                      .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                                                      .addComponent(chooseContactsDBButton, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))
                                               .addGroup(groupLayout.createSequentialGroup()
-                                                      .addComponent(scrollPane_1, GroupLayout.PREFERRED_SIZE, 188, GroupLayout.PREFERRED_SIZE)
+                                                      .addComponent(scrollPaneThread, GroupLayout.PREFERRED_SIZE, 188, GroupLayout.PREFERRED_SIZE)
                                                       .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                      .addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 520, Short.MAX_VALUE))))
+                                                      .addComponent(scrollPaneMessages, GroupLayout.DEFAULT_SIZE, 520, Short.MAX_VALUE))))
                               .addGroup(groupLayout.createSequentialGroup()
                                       .addContainerGap()
                                       .addComponent(lblNumberOfSms)
                                       .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                                       .addComponent(m_NumberSMSField, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE)
                                       .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 444, Short.MAX_VALUE)
-                                      .addComponent(loadButton, GroupLayout.PREFERRED_SIZE, 116, GroupLayout.PREFERRED_SIZE)
-                                      .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)))
-                      .addGap(5))
-              .addGroup(groupLayout.createSequentialGroup()
-                      .addContainerGap()
-                      .addComponent(m_ExportFileField, GroupLayout.DEFAULT_SIZE, 506, Short.MAX_VALUE)
-                      .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                      .addComponent(exportSelectedButton)
-                      .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                      .addComponent(exportButton)
-                      .addContainerGap())
-              .addGroup(groupLayout.createSequentialGroup()
-                      .addContainerGap()
-                      .addComponent(lblNewLabel)
-                      .addContainerGap(129, Short.MAX_VALUE)));
+                                      .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)))));
+
 
       groupLayout.setVerticalGroup(
               groupLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
               .addGroup(groupLayout.createSequentialGroup()
                       .addGap(10)
-                      .addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                              .addComponent(m_MessageFileLocationField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                              .addComponent(chooseMessageFileButton))
-                      .addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                              .addComponent(m_ContactsDBFileLocationField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                              .addComponent(chooseContactsDBButton))
                       .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
                       .addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                               .addComponent(lblNumberOfSms)
-                              .addComponent(m_NumberSMSField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                              .addComponent(loadButton))
+                              .addComponent(m_NumberSMSField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                       .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
                       .addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                              .addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE)
-                              .addComponent(scrollPane_1, GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE))
-                      .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                      .addComponent(lblNewLabel)
-                      .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                      .addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                              .addComponent(m_ExportFileField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                              .addComponent(exportButton)
-                              .addComponent(exportSelectedButton))
-                      .addContainerGap()));
+                              .addComponent(scrollPaneMessages, GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE)
+                              .addComponent(scrollPaneThread, GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE))));
 
       m_MessageViewer = new MessageViewer();
-      scrollPane.setViewportView(m_MessageViewer);
-      scrollPane.getVerticalScrollBar().setUnitIncrement(10);
+      scrollPaneMessages.setViewportView(m_MessageViewer);
+      scrollPaneMessages.getVerticalScrollBar().setUnitIncrement(10);
 
       m_ThreadListBox = new JList<>();
       m_ThreadListBox.setFont(new Font("Arial Unicode MS", 0, 12));
@@ -349,7 +303,7 @@ public class TitaniumBackupMessageViewer
          }
       });
 
-      scrollPane_1.setViewportView(m_ThreadListBox);
+      scrollPaneThread.setViewportView(m_ThreadListBox);
       m_ThreadListBox.setModel(new AbstractListModel<MessageThread>()
       {
          final MessageThread thread = new MessageThread("Threads load here...", "");
@@ -379,21 +333,29 @@ public class TitaniumBackupMessageViewer
    {
       final int iRet = m_MessageFileChooser.showOpenDialog(m_ReaderFrame);
 
-      if (iRet == 0)
-         m_MessageFileLocationField.setText(m_MessageFileChooser.getSelectedFile().getAbsolutePath());
+      if (JFileChooser.APPROVE_OPTION == iRet)
+      {
+         m_strMessageFileLocation = m_MessageFileChooser.getSelectedFile().getAbsolutePath();
+         chooseContactsDBAction();
+      }
    }
 
    private void chooseContactsDBAction()
    {
+      m_ContactsDatabaseChooser.setCurrentDirectory(m_MessageFileChooser.getCurrentDirectory());
+
       final int iRet = m_ContactsDatabaseChooser.showOpenDialog(m_ReaderFrame);
 
-      if (iRet == 0)
-         m_ContactsDBFileLocationField.setText(m_ContactsDatabaseChooser.getSelectedFile().getAbsolutePath());
+      if (JFileChooser.APPROVE_OPTION == iRet)
+      {
+         m_strContactsDBFileLocation = m_ContactsDatabaseChooser.getSelectedFile().getAbsolutePath();
+         loadAction();
+      }
    }
 
    private void loadAction()
    {
-      if (!m_MessageFileLocationField.getText().equals("..."))
+      if (!m_strMessageFileLocation.equals("..."))
       {
          InputStream is = null;
          int iRet = 0;
@@ -401,16 +363,15 @@ public class TitaniumBackupMessageViewer
 
          try
          {
-            final String strMessageFilePath = m_MessageFileLocationField.getText();
-            final File messageFile = new File(strMessageFilePath);
+            final File messageFile = new File(m_strMessageFileLocation);
 
-            if (strMessageFilePath.endsWith(".gz"))
+            if (m_strMessageFileLocation.endsWith(".gz"))
                is = new GZIPInputStream(new FileInputStream(messageFile));
             else
                is = new FileInputStream(messageFile);
 
             final File contactsDBFile;
-            final String strContactsDBFileName = m_ContactsDBFileLocationField.getText();
+            final String strContactsDBFileName = m_strContactsDBFileLocation;
             if (null != strContactsDBFileName && !strContactsDBFileName.trim().isEmpty() && !strContactsDBFileName.equals("..."))
                contactsDBFile= new File(strContactsDBFileName);
             else
@@ -442,6 +403,9 @@ public class TitaniumBackupMessageViewer
                m_ThreadListBox.setEnabled(true);
                m_NumberSMSField.setText(Integer.toString(m_Reader.getNumberOfSMS()));
                m_MessageViewer.clear();
+
+               if (0 < m_Reader.getNumberOfSMS())
+                  m_ThreadListBox.setSelectedIndex(0);
             }
          }
          catch (FileNotFoundException ex)
@@ -506,12 +470,56 @@ public class TitaniumBackupMessageViewer
 
    private void aboutAction()
    {
-      JOptionPane.showMessageDialog(m_ReaderFrame, "Android Message Reader\nv0.9.1 - 2015-02-26\nBy Werner Jäger");
+      final StringBuffer strText = new StringBuffer("<html><body><center><h4>");
+      strText.append(getApplicationProperty(TITLE));
+      strText.append("</h4></center>");
+      strText.append("<center><h5>");
+      strText.append(getApplicationProperty(VERSION));
+      strText.append(" (");
+      strText.append(getApplicationProperty(DATE));
+      strText.append(")</h5></center>");
+      strText.append("<p><center>View messages from your Android device in a conversation like style.</center></p>");
+      strText.append("<p><center>Copyright &copy; ");
+      strText.append(getApplicationProperty(DATE).substring(0, 4));
+      strText.append(" Werner Jaeger</center></p>");
+      strText.append("<p><center>For more information please visit</center>");
+      strText.append("<center><a href=\"https://sourceforge.net/projects/titaniumbackupmessageviewer/\">sourceforge.net/projects/titaniumbackupmessageviewer</a></center></p>");
+      strText.append("</body></html>");
+
+      final JEditorPane textPane = new JEditorPane();
+      final UIManager ui =new UIManager();
+      textPane.setContentType("text/html");
+      textPane.setEditable(false);
+      textPane.setText(strText.toString());
+      textPane.setBackground((Color)ui.get("OptionPane.background"));
+      textPane.addHyperlinkListener(new HyperlinkListener()
+      {
+         @Override
+         public void hyperlinkUpdate(final HyperlinkEvent evt)
+         {
+            if (HyperlinkEvent.EventType.ACTIVATED == evt.getEventType())
+            {
+               if(Desktop.isDesktopSupported())
+               {
+                  try
+                  {
+                     Desktop.getDesktop().browse(evt.getURL().toURI());
+                  }
+                  catch (final IOException | URISyntaxException e)
+                  {
+                     ;
+                  }
+               }
+            }
+         }
+      });
+
+      JOptionPane.showMessageDialog(m_ReaderFrame, textPane, "About", JOptionPane.INFORMATION_MESSAGE, getDialogIcon());
    }
 
    private void exportSelectedAction()
    {
-      if ((!m_MessageFileLocationField.getText().equals("...")) && (m_ThreadListBox.isEnabled()))
+      if ((!m_strMessageFileLocation.equals("...")) && (m_ThreadListBox.isEnabled()))
       {
          if (m_ThreadListBox.getSelectedIndex() == -1)
          {
@@ -526,17 +534,10 @@ public class TitaniumBackupMessageViewer
             final int iRet = m_SaveChooser.showSaveDialog(m_ReaderFrame);
             if (iRet == 0)
             {
-               final File saveFile = m_SaveChooser.getSelectedFile();
-               m_ExportFileField.setText(saveFile.getAbsolutePath());
-
-               if (m_Reader.exportThreadMessages(saveFile, m_ThreadListBox.getSelectedIndex()))
-               {
+               if (m_Reader.exportThreadMessages(m_SaveChooser.getSelectedFile(), m_ThreadListBox.getSelectedIndex()))
                   JOptionPane.showMessageDialog(m_ReaderFrame, "Messages with selected threads exported successfully!");
-               }
                else
-               {
                   JOptionPane.showMessageDialog(m_ReaderFrame, "Failed to export selected messages!");
-               }
             }
          }
       }
@@ -546,7 +547,7 @@ public class TitaniumBackupMessageViewer
 
    private void exportAllAction()
    {
-      if ((!m_MessageFileLocationField.getText().equals("...")) && (m_ThreadListBox.isEnabled()))
+      if ((!m_strMessageFileLocation.equals("...")) && (m_ThreadListBox.isEnabled()))
       {
          m_SaveChooser.setDialogTitle("Choose a file to save as...");
          m_SaveChooser.setDialogType(1);
@@ -555,20 +556,51 @@ public class TitaniumBackupMessageViewer
          final int iRet = m_SaveChooser.showSaveDialog(m_ReaderFrame);
          if (iRet == 0)
          {
-            final File saveFile = m_SaveChooser.getSelectedFile();
-            m_ExportFileField.setText(saveFile.getAbsolutePath());
-
-            if (m_Reader.exportAllMessages(saveFile))
-            {
+            if (m_Reader.exportAllMessages(m_SaveChooser.getSelectedFile()))
                JOptionPane.showMessageDialog(m_ReaderFrame, "All messages exported successfully!");
-            }
             else
                JOptionPane.showMessageDialog(m_ReaderFrame, "Failed to export all messages!");
          }
       }
       else
-      {
          JOptionPane.showMessageDialog(m_ReaderFrame, "Load messages first!");
+   }
+
+   private void setFrameIcon()
+   {
+      final String[] astrIcons = {"app-icon32.png", "app-icon48.png", "app-icon64.png"};
+      final List<Image> icons = new ArrayList<>(5);
+
+      for (final String astrIcon : astrIcons)
+      {
+         final ImageIcon icon = new ImageIcon(getClass().getResource(RESOURCEPATH + astrIcon));
+         icons.add(icon.getImage());
       }
+      m_ReaderFrame.setIconImages(icons);
+//      m_ReaderFrame.setIconImage(icons.get(0));
+   }
+
+   private ImageIcon getDialogIcon()
+   {
+      return(new ImageIcon(getClass().getResource(RESOURCEPATH + "app-icon32.png")));
+   }
+
+   private static String getApplicationProperty(final String strKey)
+   {
+      final Properties appProps = new Properties();
+
+      String strVal;
+
+      try
+      {
+         appProps.load(TitaniumBackupMessageViewer.class.getResourceAsStream("/com/wj/android/messageviewer/resources/application.properties"));
+         strVal = appProps.getProperty(strKey, "");
+      }
+      catch (final IOException e)
+      {
+         strVal = "";
+      }
+
+      return(strVal);
    }
 }
