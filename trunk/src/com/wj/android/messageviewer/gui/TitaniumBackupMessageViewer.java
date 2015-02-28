@@ -26,8 +26,11 @@ package com.wj.android.messageviewer.gui;
 import com.wj.android.messageviewer.message.IMessage;
 import com.wj.android.messageviewer.io.AndroidMessageReader;
 import com.wj.android.messageviewer.message.MessageThread;
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Desktop;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Image;
@@ -46,7 +49,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.zip.GZIPInputStream;
 import javax.swing.AbstractListModel;
-import javax.swing.GroupLayout;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
@@ -59,8 +63,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.LayoutStyle;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
@@ -97,6 +99,8 @@ public class TitaniumBackupMessageViewer
    private JFileChooser m_MessageFileChooser;
    private JFileChooser m_ContactsDatabaseChooser;
    private JFileChooser m_SaveChooser;
+   private JScrollPane m_ScrollPaneThread;
+   private JScrollPane m_ScrollPaneMessages;
    private JList<MessageThread> m_ThreadListBox;
    private MessageViewer m_MessageViewer;
    private AndroidMessageReader m_Reader;
@@ -150,7 +154,7 @@ public class TitaniumBackupMessageViewer
       m_Reader = new AndroidMessageReader();
 
       m_ReaderFrame = new JFrame();
-      m_ReaderFrame.setTitle("Android Message Reader");
+      m_ReaderFrame.setTitle(getApplicationProperty(TITLE));
       m_ReaderFrame.setBounds(100, 100, 700, 550);
       m_ReaderFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
@@ -249,53 +253,17 @@ public class TitaniumBackupMessageViewer
       m_NumberSMSField = new JTextField();
       m_NumberSMSField.setEditable(false);
       m_NumberSMSField.setColumns(10);
-
-      final JScrollPane scrollPaneThread = new JScrollPane();
-      final JScrollPane scrollPaneMessages = new JScrollPane();
-      scrollPaneMessages.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-
-      final GroupLayout groupLayout = new GroupLayout(m_ReaderFrame.getContentPane());
-      groupLayout.setHorizontalGroup(
-              groupLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-              .addGroup(groupLayout.createSequentialGroup()
-                      .addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                              .addGroup(groupLayout.createSequentialGroup()
-                                      .addGap(7)
-                                      .addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                                              .addGroup(groupLayout.createSequentialGroup()
-                                                      .addComponent(scrollPaneThread, GroupLayout.PREFERRED_SIZE, 188, GroupLayout.PREFERRED_SIZE)
-                                                      .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                      .addComponent(scrollPaneMessages, GroupLayout.DEFAULT_SIZE, 520, Short.MAX_VALUE))))
-                              .addGroup(groupLayout.createSequentialGroup()
-                                      .addContainerGap()
-                                      .addComponent(lblNumberOfSms)
-                                      .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                      .addComponent(m_NumberSMSField, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE)
-                                      .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 444, Short.MAX_VALUE)
-                                      .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)))));
-
-
-      groupLayout.setVerticalGroup(
-              groupLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-              .addGroup(groupLayout.createSequentialGroup()
-                      .addGap(10)
-                      .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                      .addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                              .addComponent(lblNumberOfSms)
-                              .addComponent(m_NumberSMSField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                      .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                      .addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                              .addComponent(scrollPaneMessages, GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE)
-                              .addComponent(scrollPaneThread, GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE))));
+      m_NumberSMSField.setBorder(BorderFactory.createEmptyBorder());
 
       m_MessageViewer = new MessageViewer();
-      scrollPaneMessages.setViewportView(m_MessageViewer);
-      scrollPaneMessages.getVerticalScrollBar().setUnitIncrement(10);
+      m_ScrollPaneMessages = new JScrollPane(m_MessageViewer);
+      m_ScrollPaneMessages.getVerticalScrollBar().setUnitIncrement(10);
 
-      m_ThreadListBox = new JList<>();
+      m_ThreadListBox = new MessageThreadList(300);
       m_ThreadListBox.setFont(new Font("Arial Unicode MS", 0, 12));
       m_ThreadListBox.addListSelectionListener(new ListSelectionListener()
       {
+         /** @inherited */
          @Override
          public void valueChanged(final ListSelectionEvent evt)
          {
@@ -303,7 +271,7 @@ public class TitaniumBackupMessageViewer
          }
       });
 
-      scrollPaneThread.setViewportView(m_ThreadListBox);
+      m_ScrollPaneThread = new JScrollPane(m_ThreadListBox);
       m_ThreadListBox.setModel(new AbstractListModel<MessageThread>()
       {
          final MessageThread thread = new MessageThread("Threads load here...", "");
@@ -323,7 +291,27 @@ public class TitaniumBackupMessageViewer
 
       m_ThreadListBox.setEnabled(false);
       m_ThreadListBox.setBorder(new EtchedBorder(1, null, null));
-      m_ReaderFrame.getContentPane().setLayout(groupLayout);
+
+      final Box h1Box = Box.createHorizontalBox();
+      h1Box.add(Box.createVerticalStrut(lblNumberOfSms.getPreferredSize().height * 4));
+      h1Box.add(lblNumberOfSms);
+      h1Box.add(Box.createHorizontalStrut(10));
+      h1Box.add(m_NumberSMSField);
+      h1Box.setMaximumSize(h1Box.getPreferredSize());
+      h1Box.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+      final Box h2Box = Box.createHorizontalBox();
+      h2Box.add(m_ScrollPaneThread);
+      h2Box.add(Box.createHorizontalStrut(10));
+      h2Box.add(m_ScrollPaneMessages);
+      h2Box.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+      m_ReaderFrame.add(h1Box, BorderLayout.PAGE_START);
+      m_ReaderFrame.add(h2Box, BorderLayout.CENTER);
+
+      m_ScrollPaneThread.setMinimumSize(new Dimension(100,  100));
+      m_ScrollPaneThread.setMaximumSize(new Dimension(m_ThreadListBox.getPreferredSize().width, Short.MAX_VALUE));
+      m_ScrollPaneMessages.setMinimumSize(new Dimension(300, 100));
 
       if (null != strMessageFileName)
          loadAction();
@@ -407,7 +395,8 @@ public class TitaniumBackupMessageViewer
                if (0 < m_Reader.getNumberOfSMS())
                   m_ThreadListBox.setSelectedIndex(0);
             }
-         }
+            m_ScrollPaneThread.setPreferredSize(m_ThreadListBox.getPreferredSize());
+       }
          catch (FileNotFoundException ex)
          {
             iRet = -1;
@@ -458,7 +447,6 @@ public class TitaniumBackupMessageViewer
             {
                m_MessageViewer.setScroll(true);
                m_MessageViewer.scrollRectToVisible(new Rectangle(0, 0, 0, 0));
-//               m_MessageViewer.invalidate();;
             }
          });
       }
@@ -487,11 +475,10 @@ public class TitaniumBackupMessageViewer
       strText.append("</body></html>");
 
       final JEditorPane textPane = new JEditorPane();
-      final UIManager ui =new UIManager();
       textPane.setContentType("text/html");
       textPane.setEditable(false);
       textPane.setText(strText.toString());
-      textPane.setBackground((Color)ui.get("OptionPane.background"));
+      textPane.setBackground((Color)UIManager.get("OptionPane.background"));
       textPane.addHyperlinkListener(new HyperlinkListener()
       {
          @Override
@@ -528,7 +515,7 @@ public class TitaniumBackupMessageViewer
          else
          {
             m_SaveChooser.setDialogTitle("Choose a file to save as...");
-            m_SaveChooser.setDialogType(1);
+            m_SaveChooser.setDialogType(JFileChooser.SAVE_DIALOG);
             m_SaveChooser.setSelectedFile(new File("AndroidSelectedMessagesExport.txt"));
 
             final int iRet = m_SaveChooser.showSaveDialog(m_ReaderFrame);
@@ -550,7 +537,7 @@ public class TitaniumBackupMessageViewer
       if ((!m_strMessageFileLocation.equals("...")) && (m_ThreadListBox.isEnabled()))
       {
          m_SaveChooser.setDialogTitle("Choose a file to save as...");
-         m_SaveChooser.setDialogType(1);
+         m_SaveChooser.setDialogType(JFileChooser.SAVE_DIALOG);
          m_SaveChooser.setSelectedFile(new File("AndroidAllMessagesExport.txt"));
 
          final int iRet = m_SaveChooser.showSaveDialog(m_ReaderFrame);
@@ -577,7 +564,6 @@ public class TitaniumBackupMessageViewer
          icons.add(icon.getImage());
       }
       m_ReaderFrame.setIconImages(icons);
-//      m_ReaderFrame.setIconImage(icons.get(0));
    }
 
    private ImageIcon getDialogIcon()
@@ -593,7 +579,7 @@ public class TitaniumBackupMessageViewer
 
       try
       {
-         appProps.load(TitaniumBackupMessageViewer.class.getResourceAsStream("/com/wj/android/messageviewer/resources/application.properties"));
+         appProps.load(TitaniumBackupMessageViewer.class.getResourceAsStream(RESOURCEPATH + "application.properties"));
          strVal = appProps.getProperty(strKey, "");
       }
       catch (final IOException e)

@@ -40,7 +40,7 @@ import javax.swing.filechooser.FileFilter;
  *
  * @author <a href="mailto:werner.jaeger@t-systems.com">Werner Jaeger</a>
  */
-public class TitaniumBackupContactsFileNameFilter extends FileFilter
+class TitaniumBackupContactsFileNameFilter extends FileFilter
 {
    final static Pattern NAMEPATTERN = Pattern.compile("contacts2\\.db|com\\.android\\.providers\\.contacts\\-[0-9]{8}\\-[0-9]{6}\\.tar\\.gz", Pattern.CASE_INSENSITIVE);
 

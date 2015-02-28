@@ -33,7 +33,7 @@ import java.awt.Polygon;
  *
  * @author Werner Jaeger
  */
-public class RightArrowBubble extends ArrowBubble
+class RightArrowBubble extends ArrowBubble
 {
    /**
     * Creates new {@code RightArrowBubble}.
