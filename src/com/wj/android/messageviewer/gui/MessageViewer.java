@@ -41,7 +41,7 @@ import javax.swing.JPanel;
  *
  * @author Werner Jaeger
  */
-public class MessageViewer extends JPanel
+class MessageViewer extends JPanel
 {
    private static final int VGAP = 20;
    private static final int LEFT_MARGIN = 10;
@@ -217,9 +217,9 @@ public class MessageViewer extends JPanel
    public Dimension getPreferredSize()
    {
       if (m_fScroll)
-         PREFERREDSIZE.setSize(m_iWidth, m_iHeight);
+         PREFERREDSIZE.setSize(Math.max(m_iWidth, 0), m_iHeight);
       else
-         PREFERREDSIZE.setSize(m_iWidth, 0);
+         PREFERREDSIZE.setSize(Math.max(m_iWidth, 0), 0);
 
       return(PREFERREDSIZE);
    }

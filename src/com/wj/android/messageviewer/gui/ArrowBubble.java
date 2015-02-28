@@ -42,7 +42,7 @@ import java.awt.geom.RoundRectangle2D;
  *
  * @author Werner Jaeger
  */
-public abstract class ArrowBubble
+abstract class ArrowBubble
 {
    /**
     * What kind of arrow bubble.

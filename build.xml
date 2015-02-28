@@ -120,7 +120,7 @@
             </lib>
         </one-jar>
         <echo level="info">adding execute permission to ${dist.jar}</echo>
-        <chmod file="${dist.jar.dir}/${standalone.jar.name}-all.ja" perm="u+x"/>
+        <chmod file="${dist.jar.dir}/${standalone.jar.name}-all.jar" perm="u+x"/>
         <echo file="${dist.jar.dir}/README.txt" append="true">
 Run the stand-alone distribution from the command line using:
         java -jar -Xmx256m ${standalone.jar.name}-all.jar</echo>

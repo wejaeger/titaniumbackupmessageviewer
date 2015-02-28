@@ -49,7 +49,7 @@ import javax.swing.JTextArea;
  *
  * @author Werner Jaeger
  */
-public class MessagePanel extends JPanel
+class MessagePanel extends JPanel
 {
    private static final int VGAP = 20;
 
