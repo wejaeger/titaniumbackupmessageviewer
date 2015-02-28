@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<!--
+$Id$
+
+File:   overview.html
+Author: Werner Jaeger
+
+Created on Feb 25, 2015, 1:00:52 PM
+
+Copyright (C) 2015 Werner Jaeger
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<html>
+   <head>
+      <meta name="AUTHOR" content="Werner J&auml;ger"/>
+      <title>Titanium Backup Message Viewer</title>
+   </head>
+   <body>
+      This document is the API specification for the Titanium Backup Message
+      Viewer application.
+      <p>
+         This is a Swing GUI application to view the XML files created from the
+         Android App <a href="https://play.google.com/store/apps/details?id=com.keramidas.TitaniumBackup">Titanium Backup</a>.
+      </p>
+      <p>
+         Those message XML files are located under the folder <b>TitaniumBackup</b>
+         on the mobile phone and have following name pattern:
+         <code>com.keramidas.virtual.XML_MESSAGES-YYYYMMDD-HHMMSS.xml.gz</code>
+      </p>
+      <p>
+         Unfortunately, the XML file does not contain the contact's name.
+         Therefore you can optionally choose a contacts database to look up
+         contact's name from phone number.
+      </p>
+      <p>
+         Contacts database is stored as {@code contacts2.db} in a archive file
+         with name pattern
+         {@code com.android.providers.contacts-YYYYMMDD-HHMMSS.tar.gz} in the
+         {@code TitaniumBackup} folder on the mobile phone.
+      </p>
+      <p>
+         MMS Message currently only support message parts with following
+         content type:
+      </p>
+      <ul>
+         <li>text/plain</li>
+         <li>text/x-vCard</li>
+         <li>image/jpeg</li>
+         <li>application/smil</li>
+      </ul>
+      <p>
+         <code>SMIL</code> implementation is rudimentary because it does
+         not honor layout description, it only cares for correct order of
+         message parts.
+      </p>
+      <p>
+         The GUI displays both sides of a messaging (SMS/MMS) conversation on
+         the right screen side in chronological order. Each message is
+         displayed like a conversation bubble in a cartoon.
+      </p>
+      <p>
+         On the left side a list box of message threads is displayed.
+         In this way it groups messages from the same person and phone number
+         together.
+      </p>
+   </body>
+</html>

@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- You may freely edit this file. See commented blocks below for -->
+<!-- some examples of how to customize the build. -->
+<!-- (If you delete it and reopen the project it will be recreated.) -->
+<!-- By default, only the Clean and Build commands use this build script. -->
+<!-- Commands such as Run, Debug, and Test only use this build script if -->
+<!-- the Compile on Save feature is turned off for the project. -->
+<!-- You can turn off the Compile on Save (or Deploy on Save) setting -->
+<!-- in the project's Project Properties dialog box.-->
+<project name="AndroidMessageReader" default="default" basedir=".">
+    <description>Builds, tests, and runs the project AndroidMessageReader.</description>
+    <import file="nbproject/build-impl.xml"/>
+    <!--
+
+    There exist several targets which are by default empty and which can be
+    used for execution of your tasks. These targets are usually executed
+    before and after some main targets. They are:
+
+      -pre-init:                 called before initialization of project properties
+      -post-init:                called after initialization of project properties
+      -pre-compile:              called before javac compilation
+      -post-compile:             called after javac compilation
+      -pre-compile-single:       called before javac compilation of single file
+      -post-compile-single:      called after javac compilation of single file
+      -pre-compile-test:         called before javac compilation of JUnit tests
+      -post-compile-test:        called after javac compilation of JUnit tests
+      -pre-compile-test-single:  called before javac compilation of single JUnit test
+      -post-compile-test-single: called after javac compilation of single JUunit test
+      -pre-jar:                  called before JAR building
+      -post-jar:                 called after JAR building
+      -post-clean:               called after cleaning build products
+
+    (Targets beginning with '-' are not intended to be called on their own.)
+
+    Example of inserting an obfuscator after compilation could look like this:
+
+        <target name="-post-compile">
+            <obfuscate>
+                <fileset dir="${build.classes.dir}"/>
+            </obfuscate>
+        </target>
+
+    For list of available properties check the imported
+    nbproject/build-impl.xml file.
+
+
+    Another way to customize the build is by overriding existing main targets.
+    The targets of interest are:
+
+      -init-macrodef-javac:     defines macro for javac compilation
+      -init-macrodef-junit:     defines macro for junit execution
+      -init-macrodef-debug:     defines macro for class debugging
+      -init-macrodef-java:      defines macro for class execution
+      -do-jar:                  JAR building
+      run:                      execution of project
+      -javadoc-build:           Javadoc generation
+      test-report:              JUnit report generation
+
+    An example of overriding the target for project execution could look like this:
+
+        <target name="run" depends="AndroidMessageReader-impl.jar">
+            <exec dir="bin" executable="launcher.exe">
+                <arg file="${dist.jar}"/>
+            </exec>
+        </target>
+
+    Notice that the overridden target depends on the jar target and not only on
+    the compile target as the regular run target does. Again, for a list of available
+    properties which you can use, check the target you are overriding in the
+    nbproject/build-impl.xml file.
+
+    -->
+
+   <property name="project.name" value="Titanium Backup Message Viewer" />
+   <property name="version.num" value="0.9.1" />
+   <tstamp>
+      <format property="version.dat" pattern="yyyy-MM-dd" />
+   </tstamp>
+
+
+   <!-- provide a path where executable distros should be saved  -->
+   <property name="release.dir" value="${basedir}/release"/>
+   <!-- provide a base name for your executable. -->
+   <property name="standalone.jar.name" value="AndroidMessageReader"/>
+
+   <target name="-pre-jar" >
+      <propertyfile file="${src.dir}/com/wj/android/messageviewer/resources/application.properties">
+         <entry key="project.name" value="${project.name}"/>
+         <entry key="version.num" value="${version.num}"/>
+         <entry key="version.dat" value="${version.dat}"/>
+      </propertyfile>
+   </target>
+
+   <import file="one-jar-ant-task.xml" />
+   <target name="dist-all" depends="jar" description="Bundles a stand-alone OneJAR distribution">
+        <echo>Bundling: OneJAR is composing ${standalone.jar.name}-all.jar</echo>
+        <tstamp>
+           <format property="NOW" pattern="yyyy-MM-dd HH:mm:ss z" />
+        </tstamp>
+
+        <one-jar destfile="${dist.jar.dir}/${standalone.jar.name}-all.jar" update="true">
+            <manifest>
+              <attribute name="Manifest-Version" value="1.0"/>
+              <attribute name="Ant-Version" value="1.8.3"/>
+              <attribute name="Main-Class" value="com.simontuffs.onejar.Boot"/>
+              <attribute name="Class-Path" value="lib/commons-compress-1.9.jar lib/sqlite-jdbc-3.8.6.jar"/>
+              <attribute name="One-Jar-Main-Class" value="com.wj.android.messageviewer.gui.TitaniumBackupMessageViewer"/>
+              <attribute name="Bundle-Name" value="${project.name}" />
+              <attribute name="Bundle-Version" value="${version.num}" />
+              <attribute name="Bundle-Date" value="${NOW}" />
+              <!--<attribute name="Bundle-Revision" value="${svna.version}" />-->
+              <attribute name="Implementation-Title" value="${project.name}" />
+              <attribute name="Implementation-Version" value="${version.num}" />
+              </manifest>
+            <main>
+                <fileset dir="${build.classes.dir}/" />
+            </main>
+            <lib>
+                <fileset file="${dist.jar.dir}/lib/*.*" />
+            </lib>
+        </one-jar>
+        <echo level="info">adding execute permission to ${dist.jar}</echo>
+        <chmod file="${dist.jar.dir}/${standalone.jar.name}-all.jar" perm="u+x"/>
+        <echo file="${dist.jar.dir}/README.txt" append="true">
+Run the stand-alone distribution from the command line using:
+        java -jar -Xmx256m ${standalone.jar.name}-all.jar</echo>
+        <echo>Bundling: OneJAR is done.</echo>
+   </target>
+
+   <target name="dist-zip" depends="dist-all" description="Creating ZIP archives of the standalone OneJAR for windows, mac, linux">
+     <echo>Bundling: Creating JAR Launchers</echo>
+     <mkdir  dir="${release.dir}" />
+     <mkdir  dir="${release.dir}/${standalone.jar.name}-mac" />
+     <mkdir  dir="${release.dir}/${standalone.jar.name}-win" />
+     <echo  file="${release.dir}/${standalone.jar.name}-win/${standalone.jar.name}.bat">
+java -jar -Xmx256m ${standalone.jar.name}-all.jar
+     </echo>
+     <copy todir="${release.dir}/${standalone.jar.name}-win/" file="${dist.jar.dir}/${standalone.jar.name}-all.jar" />
+     <mkdir  dir="${release.dir}/${standalone.jar.name}-linux" />
+     <echo  file="${release.dir}/${standalone.jar.name}-linux/${standalone.jar.name}.sh">#!/bin/sh -e
+
+java -jar -Xmx256m ${standalone.jar.name}-all.jar
+     </echo>
+     <chmod file="${release.dir}/${standalone.jar.name}-linux/${standalone.jar.name}.sh" perm="u+x"/>
+     <copy todir="${release.dir}/${standalone.jar.name}-linux/" file="${dist.jar.dir}/${standalone.jar.name}-all.jar" />
+     <echo>Bundling: Creating ZIP Archives</echo>
+     <zip destfile="${release.dir}/${standalone.jar.name}-win.zip" basedir="${release.dir}/${standalone.jar.name}-win" update="true" />
+     <zip destfile="${release.dir}/${standalone.jar.name}-linux.tar.gz" basedir="${release.dir}/${standalone.jar.name}-linux" update="true" />
+     <move todir="${release.dir}/${standalone.jar.name}-mac/" file="${dist.jar.dir}/${standalone.jar.name}-all.jar" />
+     <zip destfile="${release.dir}/${standalone.jar.name}-mac.tar.gz" basedir="${release.dir}/${standalone.jar.name}-mac" update="true" />
+     <echo>Bundling: Cleaning up temporary files</echo>
+     <delete dir="${release.dir}/${standalone.jar.name}-win" />
+     <delete dir="${release.dir}/${standalone.jar.name}-linux" />
+     <delete dir="${release.dir}/${standalone.jar.name}-mac" />
+   </target>
+
+   <target name="-post-clean">
+      <delete dir="${release.dir}" />
+   </target>
+</project>
