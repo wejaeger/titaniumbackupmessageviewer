@@ -45,6 +45,7 @@ class MessageThreadList extends JList<MessageThread>
 {
    final private static String RESOURCEPATH = "/com/wj/android/messageviewer/resources/";
    final private static ImageIcon ICON = new ImageIcon(MessageThreadListCellRenderer.class.getResource(RESOURCEPATH + "user16.png"));
+   private static final long serialVersionUID = -1648776942721559318L;
 
    final class MessageThreadComponentAdapter extends ComponentAdapter
    {
@@ -65,6 +66,7 @@ class MessageThreadList extends JList<MessageThread>
     */
    final class MessageThreadListCellRenderer extends DefaultListCellRenderer
    {
+      private static final long serialVersionUID = -2684873318524485434L;
       final private JPanel m_Panel;
       final private JTextArea m_TextArea;
 

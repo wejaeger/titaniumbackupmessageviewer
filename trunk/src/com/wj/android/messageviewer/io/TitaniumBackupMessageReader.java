@@ -31,10 +31,11 @@ import com.wj.android.messageviewer.message.SMILMessage;
 import com.wj.android.messageviewer.message.SMSMessage;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
@@ -45,6 +46,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.bind.DatatypeConverter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -73,8 +76,10 @@ import org.xml.sax.SAXException;
  *
  * @author Werner Jaeger
  */
-public class AndroidMessageReader
+public class TitaniumBackupMessageReader
 {
+   private static final Logger LOGGER = Logger.getLogger(TitaniumBackupMessageReader.class.getName());
+
    private final static String DEFAULTCHARSET = Charset.defaultCharset().name();
 
    final private SimpleDateFormat m_DateFmt;
@@ -83,9 +88,9 @@ public class AndroidMessageReader
    private int m_iNumberOfSMS;
 
    /**
-    * Creates new {@code AndroidMessageReader}.
+    * Creates new {@code TitaniumBackupMessageReader}.
     */
-   public AndroidMessageReader()
+   public TitaniumBackupMessageReader()
    {
       m_DateFmt = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // e.g. 2015-01-12T08:43:30.830Z
       m_ThreadList = new ArrayList<>();
@@ -100,7 +105,9 @@ public class AndroidMessageReader
     * @param is the message file input stream to read from.
     *        Must not be {@code null}.
     * @param contactsDB the SQLLite contact database file or {@code null}.
-    * @return the error code 0 meaning success.
+    *
+    * @return the error code 0 meaning success, 1 {@code is} == {@code null}, 2
+    *          invalid XML and 3 other reading problems.
     */
    public int loadMessages(final InputStream is, final File contactsDB)
    {
@@ -132,65 +139,94 @@ public class AndroidMessageReader
             {
                for (int i = 0; i < threads.getLength(); i++)
                {
-                  final Element threadElement = (Element)threads.item(i);
-                  final String strAddress = threadElement.getAttribute("address");
-
-                  final String strContactName = m_ContactReader == null ? null : m_ContactReader.getContactNameForAddress(strAddress.split(";", 2)[0]);
-                  final MessageThread thread = new MessageThread(strContactName, strAddress);
-                  final NodeList messages = threadElement.getChildNodes();
-
-                  m_iNumberOfSMS += messages.getLength();
-
-                  for (int j = 0; j < messages.getLength(); j++)
+                  if (Node.ELEMENT_NODE == threads.item(i).getNodeType())
                   {
-                     final Element             messageElement   = (Element)messages.item(j);
-                     final String              strTagName       = messageElement.getTagName();
-                     final String              strServiceCenter = messageElement.getAttribute("serviceCenter");
-                     final IMessage.MessageBox msgBox           = IMessage.MessageBox.fromString(messageElement.getAttribute("msgBox"));
+                     final Element threadElement = (Element)threads.item(i);
+                     final String strAddress = threadElement.getAttribute("address");
 
-                     final IMessage message;
-                     switch(strTagName)
+                     final String strContactName = m_ContactReader == null ? null : m_ContactReader.getContactNameForAddress(strAddress.split(";", 2)[0]);
+                     final MessageThread thread = new MessageThread(strContactName, strAddress);
+                     final NodeList messages = threadElement.getChildNodes();
+
+                     m_iNumberOfSMS += messages.getLength();
+
+                     for (int j = 0; j < messages.getLength(); j++)
                      {
-                        case "sms":
-                           message = elementToMessage(msgBox, strServiceCenter, strAddress, messageElement);
-                           break;
+                        if (Node.ELEMENT_NODE == messages.item(j).getNodeType())
+                        {
+                           final Element             messageElement   = (Element)messages.item(j);
+                           final String              strTagName       = messageElement.getTagName();
+                           final String              strServiceCenter = messageElement.getAttribute("serviceCenter");
+                           final String              strMsgBox        = messageElement.getAttribute("msgBox");
+                           final IMessage.MessageBox msgBox           = IMessage.MessageBox.fromString(strMsgBox);
 
-                        case "mms":
-                           message = elementToMMSMessage(msgBox, strServiceCenter, messageElement);
-                           break;
+                           if (null != msgBox)
+                           {
+                              final IMessage message;
+                              switch(strTagName)
+                              {
+                                 case "sms":
+                                    message = elementToMessage(msgBox, strServiceCenter, strAddress, messageElement);
+                                    break;
 
-                        default:
-                           message = null;
+                                 case "mms":
+                                    message = elementToMMSMessage(msgBox, strServiceCenter, messageElement);
+                                    break;
+
+                                 default:
+                                    LOGGER.log(Level.WARNING, "Unknown message type: ''{0}''", strTagName);
+                                    message = null;
+                              }
+
+                              if (null != message)
+                                 thread.addMessage(message);
+                           }
+                           else
+                              LOGGER.log(Level.WARNING, "Unknown message box type: ''{0}''", strMsgBox);
+                        }
+//                        else
+//                           LOGGER.log(Level.WARNING, "Unexpected non message ELEMENT_NODE {0}", messages.item(j).getNodeName());
+
                      }
-
-                     if (null != message)
-                        thread.addMessage(message);
+                     m_ThreadList.add(thread);
                   }
-                  m_ThreadList.add(thread);
+//                  else
+//                     LOGGER.log(Level.WARNING, "Unexpected non thread ELEMENT_NODE {0}", threads.item(i).getNodeName());
                }
 
                iErorror = 0;
             }
          }
-         catch (SAXException e)
+         catch (SAXException ex)
          {
+            LOGGER.log(Level.SEVERE, ex.toString(), ex);
             iErorror = 2;
          }
-         catch (ParserConfigurationException | ParseException | IOException e)
+         catch (ParserConfigurationException | ParseException | IOException ex)
          {
+            LOGGER.log(Level.SEVERE, ex.toString(), ex);
             iErorror = 3;
          }
       }
       return(iErorror);
    }
 
+   /**
+    * Export the messages as plain text of the thread given by the contact
+    * index to the specified file.
+    *
+    * @param saveFile the file to save the messages to.
+    * @param iContactIndex index in message tread.
+    *
+    * @return {@code true} if and only if messages are exported successfully.
+    */
    public boolean exportThreadMessages(final File saveFile, final int iContactIndex)
    {
       boolean fRet = true;
 
       try
       {
-         try (BufferedWriter outputWriter = new BufferedWriter(new FileWriter(saveFile)))
+         try (final BufferedWriter outputWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(saveFile), DEFAULTCHARSET)))
          {
             final Collection<IMessage> selectedMessages = m_ThreadList.get(iContactIndex).getMessages();
 
@@ -200,29 +236,34 @@ public class AndroidMessageReader
 
             for (IMessage selectedMessage : selectedMessages)
             {
-               outputWriter.write((selectedMessage).toString());
+               outputWriter.write(selectedMessage.toString());
                outputWriter.newLine();
             }
 
             outputWriter.flush();
          }
       }
-      catch (IOException e)
+      catch (IOException ex)
       {
+         LOGGER.log(Level.SEVERE, ex.toString(), ex);
          fRet = false;
       }
 
       return(fRet);
    }
 
+   /**
+    * Export all messages as plain text to the specified file.
+    *
+    * @param saveFile the file to save the messages to.
+    * @return {@code true} if and only if messages are exported successfully.
+    */
    public boolean exportAllMessages(final File saveFile)
    {
       boolean fRet = true;
 
-      try
+      try (final BufferedWriter outputWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(saveFile), DEFAULTCHARSET)))
       {
-         final BufferedWriter outputWriter = new BufferedWriter(new FileWriter(saveFile));
-
          for (final MessageThread selectedContact : m_ThreadList)
          {
             final Collection<IMessage> selectedMessages = selectedContact.getMessages();
@@ -233,7 +274,7 @@ public class AndroidMessageReader
 
             for (final IMessage selectedMessage : selectedMessages)
             {
-               outputWriter.write((selectedMessage).toString());
+               outputWriter.write(selectedMessage.toString());
                outputWriter.newLine();
             }
 
@@ -241,19 +282,30 @@ public class AndroidMessageReader
             outputWriter.newLine();
          }
       }
-      catch (IOException e)
+      catch (final IOException ex)
       {
+         LOGGER.log(Level.SEVERE, ex.toString(), ex);
          fRet = false;
       }
 
       return(fRet);
    }
 
+   /**
+    * Get an array of all message threads.
+    *
+    * @return array of all threads. Never {@code null}.
+    */
    public MessageThread[] getThreadArray()
    {
       return(m_ThreadList.toArray(new MessageThread[m_ThreadList.size()]));
    }
 
+   /**
+    * Get the number of all messages in all threads.
+    *
+    * @return the number of messages
+    */
    public int getNumberOfSMS()
    {
       return(m_iNumberOfSMS);
@@ -370,8 +422,9 @@ public class AndroidMessageReader
             final String  strContentType     = partElement.getAttribute("contentType");
             final String  strContentId       = partElement.getAttribute("contentId");
             final String  strContentLocation = partElement.getAttribute("contentLocation");
+            final String  strEncoding        = partElement.getAttribute("encoding");
 
-            final IMessage.Encoding encoding = IMessage.Encoding.fromString(partElement.getAttribute("encoding"));
+            final IMessage.Encoding encoding = IMessage.Encoding.fromString(strEncoding);
 
             if (null != encoding)
             {
@@ -382,10 +435,20 @@ public class AndroidMessageReader
                   abContent = partElement.getTextContent().getBytes(DEFAULTCHARSET);
 
                final IMMSMessagePart.ContentType contentType = IMMSMessagePart.ContentType.fromString(strContentType);
-               final IMMSMessagePart messagePart = contentType.newMessagePart(contentType, strContentId, strContentLocation, abContent, DEFAULTCHARSET);
-               if (null != messagePart)
-                  partsRet.add(messagePart);
+
+               if (null != contentType)
+               {
+                  final IMMSMessagePart messagePart = contentType.newMessagePart(contentType, strContentId, strContentLocation, abContent, DEFAULTCHARSET);
+                  if (null != messagePart)
+                     partsRet.add(messagePart);
+                  else
+                     LOGGER.log(Level.WARNING, "Failed to instatiate message üart for content typ: ''{0}''", strContentType);
+               }
+               else
+                  LOGGER.log(Level.WARNING, "Unknown content typ: ''{0}''", strContentType);
             }
+            else
+               LOGGER.log(Level.WARNING, "Unknown character encoding: ''{0}''", strEncoding);
          }
       }
 

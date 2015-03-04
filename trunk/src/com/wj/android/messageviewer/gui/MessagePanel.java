@@ -52,6 +52,7 @@ import javax.swing.JTextArea;
 class MessagePanel extends JPanel
 {
    private static final int VGAP = 20;
+   private static final long serialVersionUID = 5182781147775125388L;
 
    private final IMessage m_Message;
 

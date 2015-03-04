@@ -23,6 +23,7 @@
  */
 package com.wj.android.messageviewer.message;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -30,11 +31,14 @@ import java.util.Date;
  *
  * @author Werner Jaeger
  */
-public interface IMessage extends Comparable<IMessage>
+public interface IMessage extends Comparable<IMessage>, Serializable
 {
+   /** Represent the contents encoding */
    public enum Encoding
    {
+      /** No encoding */
       PLAIN ("plain"),
+      /** Content is base 64 encoded */
       BAS64 ("base64");
 
       private final String m_strEncoding;
@@ -44,12 +48,27 @@ public interface IMessage extends Comparable<IMessage>
          m_strEncoding = strEncoding;
       }
 
+      /**
+       * Returns a text representation of this encoding.
+       *
+       * @return the encoding string e.g. {@code plain} or {@code base64}.
+       *         Never {@code null}.
+       */
       @Override
       public String toString()
       {
          return(m_strEncoding);
       }
 
+      /**
+       * Creates the appropriate encoding instance for the given encoding
+       * string.
+       *
+       * @param strEncoding
+       * @return the appropriate encoding instance for the given encoding
+       *         string or {@code null} if this if it is not defined in this
+       *         enumeration.
+       */
       public static Encoding fromString(final String strEncoding)
       {
          Encoding eRet = null;
@@ -69,10 +88,17 @@ public interface IMessage extends Comparable<IMessage>
       }
    }
 
+   /**
+    * Represents the type of the messages message box.
+    */
    public enum MessageBox
    {
+      /** Message was sent. */
       SENT ("sent"),
-      INBOX ("inbox");
+      /** Message was received. */
+      INBOX ("inbox"),
+      /** Daft message box */
+      DRAFT ("draft");
 
       private final String m_strMsgBox;
 
@@ -81,12 +107,26 @@ public interface IMessage extends Comparable<IMessage>
          m_strMsgBox = strMsgBox;
       }
 
+      /**
+       * Returns a string representation.
+       *
+       * @return the message box type string e.g. {@code sent/inbox}.
+       */
       @Override
       public String toString()
       {
          return(m_strMsgBox);
       }
 
+      /**
+       * Factory method to construct the appropriate enumeration type for this
+       * message box type
+       *
+       * @param strMsgBox
+       *
+       * @return the appropriate message box  type or {@code null} if no message
+       *         box type is defined for the given {@code strMsgBox}.
+       */
       public static MessageBox fromString(final String strMsgBox)
       {
          MessageBox msgBoxRet = null;

@@ -28,6 +28,8 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
 /**
@@ -37,7 +39,10 @@ import javax.imageio.ImageIO;
  */
 public class ImagePart extends GenericMessagePart
 {
-   private Image m_Image;
+   private static final long serialVersionUID = 5536466658406127949L;
+   private static final Logger LOGGER = Logger.getLogger(ImagePart.class.getName());
+
+   private transient Image m_Image;
 
    /**
     * Creates new {@code ImagePart}.
@@ -63,7 +68,7 @@ public class ImagePart extends GenericMessagePart
    public Image getImage()
    {
       if (null == m_Image)
-         m_Image = byteArrayToImage(getContent());
+         m_Image = byteArrayToImage(m_abContent);
 
       return(m_Image);
    }
@@ -79,7 +84,7 @@ public class ImagePart extends GenericMessagePart
       return(getContentLocation());
    }
 
-   private static BufferedImage byteArrayToImage(byte[] abImage)
+   private static BufferedImage byteArrayToImage(final byte[] abImage)
    {
       BufferedImage image;
 
@@ -90,6 +95,7 @@ public class ImagePart extends GenericMessagePart
       }
       catch (IOException ex)
       {
+         LOGGER.log(Level.SEVERE, ex.toString(), ex);
          image = null;
       }
 

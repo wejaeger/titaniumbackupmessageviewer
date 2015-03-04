@@ -25,7 +25,6 @@ package com.wj.android.messageviewer.gui;
 
 import com.wj.android.messageviewer.message.IMessage;
 import com.wj.android.messageviewer.message.SMSMessage;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -43,6 +42,8 @@ import javax.swing.JPanel;
  */
 class MessageViewer extends JPanel
 {
+   private static final long serialVersionUID = 6976417460980887099L;
+
    private static final int VGAP = 20;
    private static final int LEFT_MARGIN = 10;
    private static final int RIGHT_MARGIN = 10;
@@ -51,7 +52,7 @@ class MessageViewer extends JPanel
    /**
     * Storage for all the ArrorBubbles drawn on the panel
     */
-   final private List<ArrowBubble> m_Bubbles;
+   final private List<Bubble> m_Bubbles;
 
    private int m_iWidth;
    private int m_iHeight;
@@ -90,10 +91,7 @@ class MessageViewer extends JPanel
       setMaximumSize(d);
       setMinimumSize(d);
 
-      //default BG white
-      setBackground(Color.white);
-
-      m_Bubbles = new ArrayList<>();
+      m_Bubbles = new ConcurrentList<>(new ArrayList<Bubble>());
 
       m_iWidth = d.width;
       m_iHeight = d.height;
@@ -127,7 +125,7 @@ class MessageViewer extends JPanel
     *
     * @param bubble the graphic to add
     */
-   public void addArrowBubble(final ArrowBubble bubble)
+   public void addArrowBubble(final Bubble bubble)
    {
       if (!m_Bubbles.contains(bubble))
          m_Bubbles.add(bubble);
@@ -138,7 +136,7 @@ class MessageViewer extends JPanel
     *
     * @param bubble the bubble to remove
     */
-   public void removeArrowBubble(final ArrowBubble bubble)
+   public void removeArrowBubble(final Bubble bubble)
    {
       m_Bubbles.remove(bubble);
    }
@@ -155,16 +153,21 @@ class MessageViewer extends JPanel
          // append message info date/zime sent/received
          final SMSMessage messageInfo = new SMSMessage(message.getServiceCenter(), message.getMessageAddress(), message.getMessageDate(), message.getFormattedMessageDate(), message.getMessageBox());
 
-         final ArrowBubble b;
-         if (message.getMessageBox() == IMessage.MessageBox.SENT)
+         final Bubble b;
+         if (IMessage.MessageBox.SENT == message.getMessageBox())
          {
-            setLocation(ArrowBubble.Type.RIGHTARROW.newArrowBubble(message, this));
-            b = ArrowBubble.Type.RIGHTNOARROW.newArrowBubble(messageInfo, this);
+            setLocation(Bubble.Type.RIGHTARROW.newBubble(message, this));
+            b = Bubble.Type.RIGHTINFO.newBubble(messageInfo, this);
+         }
+         else if (IMessage.MessageBox.DRAFT == message.getMessageBox())
+         {
+            setLocation(Bubble.Type.DRAFT.newBubble(message, this));
+            b = Bubble.Type.RIGHTINFO.newBubble(messageInfo, this);
          }
          else
          {
-            setLocation(ArrowBubble.Type.LEFTARROW.newArrowBubble(message, this));
-            b = ArrowBubble.Type.LEFTNOARROW.newArrowBubble(messageInfo, this);
+            setLocation(Bubble.Type.LEFTARROW.newBubble(message, this));
+            b = Bubble.Type.LEFTINFO.newBubble(messageInfo, this);
          }
 
          b.setBorderWidth(0);
@@ -173,7 +176,7 @@ class MessageViewer extends JPanel
       }
    }
 
-   private void setLocation(final ArrowBubble b)
+   private void setLocation(final Bubble b)
    {
       final int ix;
 
@@ -181,15 +184,22 @@ class MessageViewer extends JPanel
 
       switch (b.getType())
       {
-         case LEFTNOARROW:
+         case LEFTINFO:
             iVGap = VGAP;
+            ix = LEFT_MARGIN;
+            break;
+
          case LEFTARROW:
             ix = LEFT_MARGIN;
             break;
 
-         case RIGHTNOARROW:
+         case RIGHTINFO:
             iVGap = VGAP;
+            ix = getWidth() - calcBubbleWidth() - RIGHT_MARGIN;
+            break;
+
          case RIGHTARROW:
+         case DRAFT:
             ix = getWidth() - calcBubbleWidth() - RIGHT_MARGIN;
             break;
 
@@ -207,9 +217,10 @@ class MessageViewer extends JPanel
       return((getWidth() - LEFT_MARGIN - RIGHT_MARGIN) * 5/6 - LEFT_MARGIN - RIGHT_MARGIN);
    }
 
-   private void setWidth(final ArrowBubble b)
+   private void setWidth(final Bubble b)
    {
       m_iWidth = calcBubbleWidth();
+
       b.setWidth(m_iWidth);
    }
 
@@ -233,7 +244,7 @@ class MessageViewer extends JPanel
       final Graphics2D g2 = (Graphics2D)g;
 
       m_iHeight = 0;
-      for (final ArrowBubble bubble : m_Bubbles)
+      for (final Bubble bubble : m_Bubbles)
       {
          setLocation(bubble);
          bubble.draw(g2);

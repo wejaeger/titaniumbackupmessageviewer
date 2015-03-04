@@ -37,11 +37,15 @@ import java.util.Arrays;
  */
 public abstract class GenericMessagePart implements IMMSMessagePart
 {
+   private static final long serialVersionUID = 5929878763930779397L;
+
    private final ContentType m_ContentType;
    private final String m_StrContentId;
    private final String m_StrContentLocation;
    private final String m_strCharset;
-   private final byte[] m_abContent;
+
+   /** Contains the content bytes. */
+   protected final byte[] m_abContent;
 
    /**
     * Creates new {@code GenericMessagePart}.
@@ -61,13 +65,6 @@ public abstract class GenericMessagePart implements IMMSMessagePart
       m_StrContentLocation = strContentLocation;
       m_abContent = Arrays.copyOf(abContent, abContent.length);
       m_strCharset = strCharset;
-   }
-
-   /** {@inheritDoc} */
-   @Override
-   final public byte[] getContent()
-   {
-      return(m_abContent);
    }
 
    /** {@inheritDoc} */

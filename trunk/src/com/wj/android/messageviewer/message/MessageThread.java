@@ -57,26 +57,52 @@ public class MessageThread
       m_MessageList = new ArrayList<>();
    }
 
+   /**
+    * Get the contact name.
+    *
+    * @return the name of the contact or {@code null} if name is not known.
+    */
    public String getName()
    {
       return(m_strName);
    }
 
+   /**
+    * Get the address of the contact.
+    *
+    * @return the address (e.g. phone number). Never {@code null}.
+    */
    public String getAddress()
    {
       return(m_strAddress);
    }
 
+   /**
+    * Get all the messages of this thread.
+    *
+    * @return all messages of this thread. Never {@code null}.
+    */
    public Collection<IMessage> getMessages()
    {
       return(Collections.unmodifiableCollection(m_MessageList));
    }
 
+   /**
+    * Add a message to this thread.
+    *
+    * @param msgToAdd the message to add. Must not be {@code null}.
+    */
    public void addMessage(final IMessage msgToAdd)
    {
       m_MessageList.add(msgToAdd);
    }
 
+   /**
+    * Returns a string representation.
+    *
+    * @return the name (if not {@code null}) concatenated with a blank, hyphen,
+    *          blank and then the address. Never {@code null}.
+    */
    @Override
    public String toString()
    {

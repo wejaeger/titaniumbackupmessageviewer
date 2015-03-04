@@ -32,6 +32,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
@@ -46,6 +48,7 @@ import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
  */
 public class ExtractTarGz
 {
+   private static final Logger LOGGER = Logger.getLogger(ExtractTarGz.class.getName());
    private static final int DEFAULT_BUFFER_SIZE = 8192;
 
    /**
@@ -127,9 +130,7 @@ public class ExtractTarGz
    {
       List<File> untaredFiles = null;
 
-      outputDir.mkdirs();
-
-      if (outputDir.exists())
+      if (outputDir.exists() || outputDir.mkdirs())
       {
          try
          {
@@ -141,9 +142,10 @@ public class ExtractTarGz
 
             untaredFiles = unTar(in, outputDir);
          }
-         catch (final IOException | ArchiveException e)
+         catch (final IOException | ArchiveException ex)
          {
             untaredFiles = null;
+            LOGGER.log(Level.SEVERE, ex.toString(), ex);
          }
       }
 

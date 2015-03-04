@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * File:   NoArrowBubble.java
+ * File:   InfoBubble.java
  * Author: Werner Jaeger
  *
  * Created on Feb 25, 2015, 11:10:38 AM
@@ -24,29 +24,30 @@
 package com.wj.android.messageviewer.gui;
 
 import com.wj.android.messageviewer.message.IMessage;
-import java.awt.Color;
 import java.awt.Polygon;
 
 /**
- * Subclass of ArrowBubble that will display a message info as a
- * conversation bubble with no arrow.
+ * Subclass of Bubble that will display a message info as a
+ conversation bubble with no arrow.
  *
  * @author Werner Jaeger
  */
-class NoArrowBubble extends ArrowBubble
+class InfoBubble extends Bubble
 {
+   private static final long serialVersionUID = 3904447495064329055L;
+
    /**
-    * Creates new {@code NoArrowBubble}.
+    * Creates new {@code InfoBubble}.
     *
     * @param message the message to draw within the bubble.
     * @param viewer the viewer. Must not be {@code null}.
     * @param type the type of the bubble.
     */
-   protected NoArrowBubble(final Type type, final IMessage message, final MessageViewer viewer)
+   protected InfoBubble(final Type type, final IMessage message, final MessageViewer viewer)
    {
       super(type, message, viewer);
 
-      setFillColor(Color.WHITE);
+      setFillColor(viewer.getBackground());
    }
 
    @Override

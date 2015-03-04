@@ -21,3 +21,11 @@ Change log:
  - improved about dialog
  - UI redesign, use menu instead of buttons for open and export actions
  - changed application title
+ - save/restore main window state in preferences
+ - added recent file list to file menu
+ - added image/png
+ - wait cursor for possibly lengthy actions
+
+0.9.2
+ - handle draft messages
+ - various bug fixes

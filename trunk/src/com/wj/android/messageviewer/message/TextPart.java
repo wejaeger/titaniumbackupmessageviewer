@@ -32,6 +32,7 @@ import java.io.UnsupportedEncodingException;
  */
 public class TextPart extends GenericMessagePart
 {
+   private static final long serialVersionUID = -6945026818750672390L;
    private final String m_strText;
 
    /**

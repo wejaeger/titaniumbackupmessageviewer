@@ -25,6 +25,7 @@ package com.wj.android.messageviewer.message;
 
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.Objects;
 import java.util.TimeZone;
 
 /**
@@ -40,6 +41,8 @@ import java.util.TimeZone;
  */
 public class SMSMessage implements IMessage
 {
+   private static final long serialVersionUID = -3092043642357166011L;
+
    private static final class AddressInfo
    {
       /**
@@ -71,7 +74,6 @@ public class SMSMessage implements IMessage
    private String m_strMessageAddress;
    private String m_strServiceCenter;
 
-   final private static DateFormat DATEFORMATTER = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.LONG);
    /**
     * Creates new {@code SMSMessage}.
     */
@@ -97,7 +99,7 @@ public class SMSMessage implements IMessage
    {
       m_strMessageAddress = strAddress;
       m_strServiceCenter = strServiceCenter;
-      m_MessageDate = date;
+      m_MessageDate = date != null ? new Date(date.getTime()) : null;
       m_strMessageText = strBody;
       m_msgBox = msgBox;
    }
@@ -129,13 +131,13 @@ public class SMSMessage implements IMessage
    @Override
    final public void setMessageDate(final Date msgDate)
    {
-      m_MessageDate = msgDate;
+      m_MessageDate = msgDate != null ? new Date(msgDate.getTime()) : null;
    }
 
    @Override
    final public Date getMessageDate()
    {
-      return(m_MessageDate);
+      return(new Date(m_MessageDate.getTime()));
    }
 
    @Override
@@ -144,11 +146,11 @@ public class SMSMessage implements IMessage
       final TimeZone tz = AddressInfo.toTimeZone(m_strServiceCenter == null || m_strServiceCenter.trim().isEmpty() ? m_strMessageAddress : m_strServiceCenter);
 
       if (null != tz)
-         DATEFORMATTER.setTimeZone(tz);
+         DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.LONG).setTimeZone(tz);
       else
-         DATEFORMATTER.setTimeZone(TimeZone.getDefault());
+         DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.LONG).setTimeZone(TimeZone.getDefault());
 
-      return(DATEFORMATTER.format(getMessageDate()));
+      return(DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.LONG).format(m_MessageDate));
    }
 
    @Override
@@ -175,15 +177,74 @@ public class SMSMessage implements IMessage
       return(m_strServiceCenter);
    }
 
+   /**
+    * A string representation.
+    *
+    * @return the message box concatenated with a colon, blank, message date,
+    *         colon, blank and the message text. Never {@code null}.
+    */
    @Override
    public String toString()
    {
       return(getMessageBox() + ": " + getFormattedMessageDate() + ":  " + getMessageText());
    }
 
+   /**
+    * Compares this message date with the specified message date.
+    *
+    * @param msg the message to be compared. Must not be {@code null}.
+    *
+    * @return a negative integer, zero, or a positive integer as this message
+    *          date is less than, equal to, or greater than the specified
+    *          message date.
+    */
    @Override
    public int compareTo(final IMessage msg)
    {
-      return(getMessageDate().compareTo(msg.getMessageDate()));
+      return(m_MessageDate.compareTo(msg.getMessageDate()));
+   }
+
+   /**
+    * Indicates whether some other object is "equal to" this one.
+    *
+    * @param o the reference object with which to compare. May be {@code null}.
+    *
+    * @return {@code true} if this message date  is the same as the {@code obj}
+    *          date; {@code false} otherwise.
+    */
+   @Override
+   public boolean equals(final Object o)
+   {
+      boolean fRet = false;
+
+      if (this != o)
+      {
+         if (o != null && getClass() == o.getClass())
+         {
+            final SMSMessage msg = (SMSMessage)o;
+
+            if (m_MessageDate != null ? m_MessageDate.equals(msg.m_MessageDate) : msg.m_MessageDate == null)
+                  fRet = true;
+         }
+      }
+      else
+         fRet = true;
+
+      return(fRet);
+   }
+
+   /**
+    * Returns a hash code value for the object.
+    *
+    * @return a hash code value for this object.
+    */
+   @Override
+   public int hashCode()
+   {
+      int iHash = 5;
+
+      iHash = 73 * iHash + Objects.hashCode(m_MessageDate);
+
+      return(iHash);
    }
 }
