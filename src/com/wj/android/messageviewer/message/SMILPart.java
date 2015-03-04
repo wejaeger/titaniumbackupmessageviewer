@@ -29,11 +29,14 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -45,10 +48,12 @@ import org.xml.sax.SAXException;
  */
 public class SMILPart extends GenericMessagePart
 {
-   private final String PARTAGNAME = "par";
-   private final String SRCATTRNAME = "src";
+   private static final long serialVersionUID = -4062949269796069080L;
+   private static final Logger LOGGER = Logger.getLogger(SMILPart.class.getName());
+   private static final String PARTAGNAME = "par";
+   private static final String SRCATTRNAME = "src";
 
-   private Document m_SMILDocument;
+   private transient Document m_SMILDocument;
    private final List<String> m_ContentReferences;
 
    /**
@@ -101,21 +106,31 @@ public class SMILPart extends GenericMessagePart
          final NodeList pars = m_SMILDocument.getElementsByTagName(PARTAGNAME);
          for (int i = 0; i < pars.getLength(); i++)
          {
-            final Element parElement = (Element)pars.item(i);
-            if (null != parElement)
+            if (Node.ELEMENT_NODE == pars.item(i).getNodeType())
             {
-               final NodeList childs = parElement.getChildNodes();
-               for (int j = 0; j < childs.getLength(); j++)
+               final Element parElement = (Element)pars.item(i);
+               if (null != parElement)
                {
-                  final Element childElement = (Element)childs.item(j);
-                  if (null != childElement)
+                  final NodeList childs = parElement.getChildNodes();
+                  for (int j = 0; j < childs.getLength(); j++)
                   {
-                     final String strSrc =childElement.getAttribute(SRCATTRNAME);
-                     if (null != strSrc && !strSrc.trim().isEmpty())
-                        m_ContentReferences.add(strSrc);
+                     if (Node.ELEMENT_NODE == childs.item(j).getNodeType())
+                     {
+                        final Element childElement = (Element)childs.item(j);
+                        if (null != childElement)
+                        {
+                           final String strSrc = childElement.getAttribute(SRCATTRNAME);
+                           if (!strSrc.trim().isEmpty())
+                              m_ContentReferences.add(strSrc);
+                        }
+                     }
+//                     else
+//                        LOGGER.log(Level.WARNING, "Unexpected non par child ELEMENT_NODE {0}", childs.item(j).getNodeName());
                   }
                }
             }
+            else
+               LOGGER.log(Level.WARNING, "Unexpected non par ELEMENT_NODE {0}", pars.item(i).getNodeName());
          }
       }
 
@@ -133,14 +148,15 @@ public class SMILPart extends GenericMessagePart
 
       try
       {
-         final Reader reader = new StringReader(new String(getContent(), getCharSet()));
+         final Reader reader = new StringReader(new String(m_abContent, getCharSet()));
          final DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
          final DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
          doc = dBuilder.parse(new InputSource(reader));
          doc.getDocumentElement().normalize();
       }
-      catch (final SAXException | IOException | ParserConfigurationException e)
+      catch (final SAXException | IOException | ParserConfigurationException ex)
       {
+         LOGGER.log(Level.SEVERE, ex.toString(), ex);
          doc = null;
       }
       return(doc);

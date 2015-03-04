@@ -32,6 +32,7 @@ import java.io.UnsupportedEncodingException;
  */
 public class VCardPart extends GenericMessagePart
 {
+   private static final long serialVersionUID = 7328187699443431871L;
    private final String m_strText;
 
    /**

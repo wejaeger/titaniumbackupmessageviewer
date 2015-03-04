@@ -77,7 +77,7 @@ class TitaniumBackupMessageFileNameFilter extends FileFilter
 
       if (null != f)
       {
-         m_Matcher.reset(f.getName().toLowerCase());
+         m_Matcher.reset(f.getName());
 
          fRet = f.isDirectory() || m_Matcher.matches();
       }

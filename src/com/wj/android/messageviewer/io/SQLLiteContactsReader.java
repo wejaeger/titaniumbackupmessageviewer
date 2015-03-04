@@ -30,6 +30,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Reads a Titanium Backup created SQLLite contact database.
@@ -44,9 +46,11 @@ import java.sql.SQLException;
  */
 public class SQLLiteContactsReader
 {
-   private final String DISPLAYNAME = "display_name";
-   private final String CONTACTNAMEQUERY1 = "select c." + DISPLAYNAME + " from raw_contacts c, phone_lookup p where p.normalized_number like ? and c.\"_id\" = p.raw_contact_id";
-   private final String CONTACTNAMEQUERY2 = "select c." + DISPLAYNAME + " from raw_contacts c, phone_lookup p where p.min_match like ? and c.\"_id\" = p.raw_contact_id";
+   private static final Logger LOGGER = Logger.getLogger(SQLLiteContactsReader.class.getName());
+
+   private static final String DISPLAYNAME = "display_name";
+   private static final String CONTACTNAMEQUERY1 = "select c." + DISPLAYNAME + " from raw_contacts c, phone_lookup p where p.normalized_number like ? and c.\"_id\" = p.raw_contact_id";
+   private static final String CONTACTNAMEQUERY2 = "select c." + DISPLAYNAME + " from raw_contacts c, phone_lookup p where p.min_match like ? and c.\"_id\" = p.raw_contact_id";
 
    private final File m_ContactsDB;
 
@@ -77,31 +81,38 @@ public class SQLLiteContactsReader
 
       if (null != m_Connection && null != strAddress)
       {
-         try
+         try (final PreparedStatement statement1 = m_Connection.prepareStatement(CONTACTNAMEQUERY1))
          {
-            final PreparedStatement statement1 = m_Connection.prepareStatement(CONTACTNAMEQUERY1);
             statement1.setQueryTimeout(30);  // set timeout to 30 sec.
             statement1.setString(1, strAddress);
-            final ResultSet rs1 = statement1.executeQuery();
-            if (!rs1.next())
-            {
-               final PreparedStatement statement2 = m_Connection.prepareStatement(CONTACTNAMEQUERY2);
-               statement2.setQueryTimeout(30);  // set timeout to 30 sec.
-               statement2.setString(1, toCallerIDMinMatch(strAddress));
-               final ResultSet rs2 = statement2.executeQuery();
-               if (rs2.next())
-               {
-                  strContactName = rs2.getString(DISPLAYNAME);
-                  if (rs2.next()) // only if is unique
-                     strContactName = null;
-               }
 
+            try (final ResultSet rs1 = statement1.executeQuery())
+            {
+               if (!rs1.next())
+               {
+                  try (final PreparedStatement statement2 = m_Connection.prepareStatement(CONTACTNAMEQUERY2))
+                  {
+                     statement2.setQueryTimeout(30);  // set timeout to 30 sec.
+                     statement2.setString(1, toCallerIDMinMatch(strAddress));
+
+                     try (final ResultSet rs2 = statement2.executeQuery())
+                     {
+                        if (rs2.next())
+                        {
+                           strContactName = rs2.getString(DISPLAYNAME);
+                           if (rs2.next()) // only if is unique
+                              strContactName = null;
+                        }
+                     }
+                  }
+               }
+               else
+                  strContactName = rs1.getString(DISPLAYNAME);
             }
-            else
-               strContactName = rs1.getString(DISPLAYNAME);
          }
-         catch (final SQLException e)
+         catch (final SQLException ex)
          {
+            LOGGER.log(Level.SEVERE, ex.toString(), ex);
             strContactName = null;
          }
       }
@@ -121,8 +132,9 @@ public class SQLLiteContactsReader
          m_Connection = DriverManager.getConnection("jdbc:sqlite:" + m_ContactsDB.getCanonicalPath());
          fRet = true;
       }
-      catch (final ClassNotFoundException | SQLException | IOException e)
+      catch (final ClassNotFoundException | SQLException | IOException ex)
       {
+         LOGGER.log(Level.SEVERE, ex.toString(), ex);
          m_Connection = null;
          fRet = false;
       }

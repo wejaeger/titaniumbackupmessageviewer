@@ -28,13 +28,15 @@ import java.awt.Color;
 import java.awt.Polygon;
 
 /**
- * Subclass of ArrowBubble that will display a received message as a
- * conversation bubble with arrow on the left.
+ * Subclass of Bubble that will display a received message as a
+ conversation bubble with arrow on the left.
  *
  * @author Werner Jaeger
  */
-class LeftArrowBubble extends ArrowBubble
+class LeftArrowBubble extends Bubble
 {
+   private static final long serialVersionUID = 4896971040878002751L;
+
    /**
     * Creates new {@code LeftArrowBubble}.
     *

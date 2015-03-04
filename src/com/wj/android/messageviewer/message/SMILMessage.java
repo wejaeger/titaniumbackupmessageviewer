@@ -31,6 +31,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The {@code SMILMessage} is a {@link MMSMessage} extended by a SMIL document
@@ -52,7 +54,9 @@ import java.util.Map;
  */
 public class SMILMessage extends MMSMessage
 {
-   private final String CIDPREFIX = "cid:";
+   private static final long serialVersionUID = -9168554817199468278L;
+   private static final Logger LOGGER = Logger.getLogger(ImagePart.class.getName());
+   private static final String CIDPREFIX = "cid:";
 
    final private Map<String, IMMSMessagePart> m_PartsMap;
    final private SMILPart m_SMILPart;
@@ -124,8 +128,9 @@ public class SMILMessage extends MMSMessage
                      final IMMSMessagePart newPart = contenType.newMessagePart(contenType, strContentId, strContentLocation, abContent, strCharSet);
                      m_OrderedParts.add(newPart);
                   }
-                  catch (final UnsupportedEncodingException e)
+                  catch (final UnsupportedEncodingException ex)
                   {
+                     LOGGER.log(Level.SEVERE, ex.toString(), ex);
                      m_OrderedParts.add(part);
                   }
                }
@@ -142,5 +147,30 @@ public class SMILMessage extends MMSMessage
          }
       }
       return(Collections.unmodifiableCollection(m_OrderedParts));
+   }
+
+   /**
+    * Indicates whether some other object is "equal to" this one.
+    *
+    * @param o the reference object with which to compare. May be {@code null}.
+    *
+    * @return {@code true} if this message date  is the same as the {@code obj}
+    *          date; {@code false} otherwise.
+    */
+   @Override
+   public boolean equals(final Object o)
+   {
+      return(super.equals(o));
+   }
+
+   /**
+    * Returns a hash code value for the object.
+    *
+    * @return a hash code value for this object.
+    */
+   @Override
+   public int hashCode()
+   {
+      return(super.hashCode());
    }
 }

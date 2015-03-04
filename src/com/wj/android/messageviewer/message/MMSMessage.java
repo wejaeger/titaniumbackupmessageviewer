@@ -42,6 +42,8 @@ import java.util.List;
  */
 public class MMSMessage extends SMSMessage
 {
+   private static final long serialVersionUID = -8840815849215931167L;
+
    private final List<IMMSMessagePart> m_Parts;
 
    private String m_strSubject;
@@ -148,5 +150,30 @@ public class MMSMessage extends SMSMessage
    public void setMessageText(final String strText)
    {
       m_strMessageText = strText;
+   }
+
+   /**
+    * Indicates whether some other object is "equal to" this one.
+    *
+    * @param o the reference object with which to compare. May be {@code null}.
+    *
+    * @return {@code true} if this message date  is the same as the {@code obj}
+    *          date; {@code false} otherwise.
+    */
+   @Override
+   public boolean equals(final Object o)
+   {
+      return(super.equals(o));
+   }
+
+   /**
+    * Returns a hash code value for the object.
+    *
+    * @return a hash code value for this object.
+    */
+   @Override
+   public int hashCode()
+   {
+      return(super.hashCode());
    }
 }

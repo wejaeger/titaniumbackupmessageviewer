@@ -23,6 +23,7 @@
  */
 package com.wj.android.messageviewer.message;
 
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 
 /**
@@ -32,13 +33,22 @@ import java.io.UnsupportedEncodingException;
  *
  * @author Werner Jaeger
  */
-public interface IMMSMessagePart
+public interface IMMSMessagePart extends Serializable
 {
+   /**
+    * Represents the content type of a message part.
+    */
    public enum ContentType
    {
+      /** A JPEG image */
       IMAMGEJPEG ("image/jpeg"),
+     /** A PNG image */
+      IMAMGEPNG ("image/png"),
+      /** Plain text */
       TEXTPLAIN ("text/plain"),
+      /** SMIL document */
       APPLICATIONSMIL ("application/smil"),
+      /** A vCard */
       TEXTVCARD ("text/x-vCard");
 
       private final String m_strContentType;
@@ -82,6 +92,7 @@ public interface IMMSMessagePart
          switch(this)
          {
             case IMAMGEJPEG:
+            case IMAMGEPNG:
                mmsMessagePart = new ImagePart(contentType, strContentId, strContentLocation, abContent, strCharset);
                break;
 
@@ -132,13 +143,6 @@ public interface IMMSMessagePart
          return(contentTypeRet);
       }
    }
-
-   /**
-    * Get the content data of this message part.
-    *
-    * @return a {@code byte[]} with the content data.
-    */
-   byte[] getContent();
 
    /**
     * Get the content location of this message part.

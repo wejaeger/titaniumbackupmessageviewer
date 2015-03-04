@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * File:   ArrowBubble.java
+ * File:   Bubble.java
  * Author: Werner Jaeger
  *
  * Created on Feb 25, 2015, 11:10:38 AM
@@ -35,6 +35,7 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.Area;
 import java.awt.geom.RoundRectangle2D;
+import java.io.Serializable;
 
 /**
  * Superclass for all bubbles that will display a message, like conversation
@@ -42,14 +43,16 @@ import java.awt.geom.RoundRectangle2D;
  *
  * @author Werner Jaeger
  */
-abstract class ArrowBubble
+abstract class Bubble implements Serializable
 {
+   private static final long serialVersionUID = -3613617398312453469L;
+
    /**
     * What kind of arrow bubble.
     */
    public enum Type
    {
-      LEFTARROW, RIGHTARROW, LEFTNOARROW, RIGHTNOARROW;
+      LEFTARROW, RIGHTARROW, DRAFT, LEFTINFO, RIGHTINFO;
 
       /**
        * Factory method to construct the appropriate arrow bubble.
@@ -58,12 +61,12 @@ abstract class ArrowBubble
        *                Must not be {@code null}
        * @param viewer the parent component. Must not be {@code null}.
        *
-       * @return a newly created instance of {@link ArrowBubble}.
+       * @return a newly created instance of {@link Bubble}.
        *         or {@code null} if no appropriate implementation exists.
        */
-      public final ArrowBubble newArrowBubble(final IMessage message, final MessageViewer viewer)
+      public final Bubble newBubble(final IMessage message, final MessageViewer viewer)
       {
-         final ArrowBubble bubble;
+         final Bubble bubble;
 
          switch (this)
          {
@@ -71,13 +74,17 @@ abstract class ArrowBubble
                bubble = new LeftArrowBubble(this, message, viewer);
                break;
 
-            case LEFTNOARROW:
-            case RIGHTNOARROW:
-               bubble = new NoArrowBubble(this, message, viewer);
+            case LEFTINFO:
+            case RIGHTINFO:
+               bubble = new InfoBubble(this, message, viewer);
                break;
 
             case RIGHTARROW:
                bubble = new RightArrowBubble(this, message, viewer);
+               break;
+
+            case DRAFT:
+               bubble = new DraftBubble(this, message, viewer);
                break;
 
             default:
@@ -103,7 +110,6 @@ abstract class ArrowBubble
    private int m_iBorderWidth;
    private int m_ivGap;
    private Point m_Loc;
-   private Color m_BackgroundColor;
    private Color m_FillColor;
    private Color m_FrameColor;
    private Dimension m_Dim;
@@ -114,13 +120,13 @@ abstract class ArrowBubble
    protected int m_iPadding = m_iStrokeThickness / 2;
 
    /**
-    * Creates new {@code ArrowBubble}.
+    * Creates new {@code Bubble}.
     *
     * @param message the message to draw within the bubble.
     * @param viewer the viewer. Must not be {@code null}.
     * @param type the type of the bubble.
     */
-   protected ArrowBubble(final Type type, final IMessage message, final MessageViewer viewer)
+   protected Bubble(final Type type, final IMessage message, final MessageViewer viewer)
    {
       m_Type = type;
       m_Viewer = viewer;
@@ -159,7 +165,7 @@ abstract class ArrowBubble
    }
 
    /**
-    * Sets the location of the ArrowBubble. Overridden to position the text box
+    * Sets the location of the Bubble. Overridden to position the text box
     * within the frame. (Calls to <code>setLocation(int, int)</code> forward to
     * <code>setLocation(java.awt.Point)</code>, so either one will work
     * correctly.)
@@ -175,7 +181,7 @@ abstract class ArrowBubble
    }
 
    /**
-    * Set the location of the ArrowBubble.
+    * Set the location of the Bubble.
     *
     * @param ix x coordinate of the upper-left corner of bounding box
     * @param iy y coordinate of the upper-left corner of bounding box
@@ -197,7 +203,7 @@ abstract class ArrowBubble
    }
 
    /**
-    * Sets the size of the ArrowBubble. NOTE: setting an explicit size for the
+    * Sets the size of the Bubble. NOTE: setting an explicit size for the
     * bubble may cut off some of the text. Use <code>setWidth(int)</code> to
     * specify a width for the bubble while maintaining view of all the text.
     *
@@ -273,8 +279,8 @@ abstract class ArrowBubble
    }
 
    /**
-    * Sizes the ArrowBubble to the given width, but maintains full view of the
-    * contents by adjusting the height if necessary.
+    * Sizes the Bubble to the given width, but maintains full view of the
+ contents by adjusting the height if necessary.
     *
     * @param iWidth the width to set. May be {@code null};
     */
@@ -349,7 +355,7 @@ abstract class ArrowBubble
    }
 
    /**
-    * Set the background and frame color of the ArrowBubble.
+    * Set the background and frame color of the Bubble.
     *
     * @param c the color to set. May be {@code null}.
     */
@@ -358,12 +364,11 @@ abstract class ArrowBubble
       if (null != m_MessagePanel)
          m_MessagePanel.setBackground(c);
 
-      m_BackgroundColor = c;
       m_Viewer.repaint(getBounds());
    }
 
    /**
-    * Set the fill color of the ArrowBubble.
+    * Set the fill color of the Bubble.
     *
     * @param c the color to set. May be {@code null}.
     */
