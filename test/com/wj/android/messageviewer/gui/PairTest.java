@@ -23,6 +23,7 @@
  */
 package com.wj.android.messageviewer.gui;
 
+import com.wj.android.messageviewer.util.Pair;
 import org.junit.Test;
 import static org.junit.Assert.*;
 

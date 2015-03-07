@@ -21,14 +21,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.wj.android.messageviewer.gui;
+package com.wj.android.messageviewer.gui.workers;
 
-import com.wj.android.messageviewer.io.TitaniumBackupMessageReader;
+import com.wj.android.messageviewer.message.IMessage;
+import com.wj.android.messageviewer.message.MessageThread;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
+import java.util.Collection;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 
 /**
@@ -36,15 +44,16 @@ import javax.swing.JOptionPane;
  *
  * @author <a href="mailto:werner.jaeger@t-systems.com">Werner Jaeger</a>
  */
-class ExportWorker extends AbstractDisabelingUIWorker<Boolean, Void>
+public class ExportWorker extends AbstractDisabelingUIWorker<Boolean, Void>
 {
    private static final Logger LOGGER = Logger.getLogger(ExportWorker.class.getName());
+
+   private final static String DEFAULTCHARSET = Charset.defaultCharset().name();
 
    private final JFrame m_Frame;
    private final boolean m_fAll;
    private final File m_FileToExport;
-   private final int m_iSelectedIndex;
-   private final TitaniumBackupMessageReader m_Reader;
+   private final JList<MessageThread> m_ThreadListBox;
 
    /**
     * Constructs a new {@code ExportWorker}.
@@ -55,21 +64,16 @@ class ExportWorker extends AbstractDisabelingUIWorker<Boolean, Void>
     *        messages of the selected thread are exported.
     * @param fileToExport the file to export messages to. Must not be
     *        {@code null}.
-    * @param iSelectedIndex if {@code fAll} if {@code false} this is the index
-    *        in the thread collection, determining which thread messages to
-    *        export.
-    * @param reader the handler instance that actually exports the messages.
-    *               Must net be {@code null}.
+    * @param threadListBox list of currently loaded threads
     */
-   ExportWorker(final JFrame frame, final boolean fAll, final File fileToExport, final int iSelectedIndex, final TitaniumBackupMessageReader reader)
+   public ExportWorker(final JFrame frame, final boolean fAll, final File fileToExport, final JList<MessageThread> threadListBox)
    {
       super(frame, true);
 
       m_Frame = frame;
       m_fAll = fAll;
       m_FileToExport = fileToExport;
-      m_iSelectedIndex = iSelectedIndex;
-      m_Reader = reader;
+      m_ThreadListBox = threadListBox;
    }
 
    /**
@@ -97,9 +101,9 @@ class ExportWorker extends AbstractDisabelingUIWorker<Boolean, Void>
       if (true == fResult && null != m_FileToExport)
       {
          if (true == m_fAll)
-            fResult = m_Reader.exportAllMessages(m_FileToExport);
+            fResult = exportAllMessages(m_FileToExport);
          else
-            fResult = m_Reader.exportThreadMessages(m_FileToExport, m_iSelectedIndex);
+            fResult = exportThreadMessages(m_FileToExport);
       }
 
       return(fResult);
@@ -148,4 +152,85 @@ class ExportWorker extends AbstractDisabelingUIWorker<Boolean, Void>
 
       super.done();
    }
+
+   /**
+    * Export all messages as plain text to the specified file.
+    *
+    * @param saveFile the file to save the messages to.
+    * @return {@code true} if and only if messages are exported successfully.
+    */
+   private boolean exportAllMessages(final File saveFile)
+   {
+      boolean fRet = true;
+
+      try (final BufferedWriter outputWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(saveFile), DEFAULTCHARSET)))
+      {
+         for (final MessageThread selectedContact : m_ThreadListBox.getSelectedValuesList())
+         {
+            final Collection<IMessage> selectedMessages = selectedContact.getMessages();
+
+            outputWriter.write(selectedContact.toString());
+            outputWriter.newLine();
+            outputWriter.newLine();
+
+            for (final IMessage selectedMessage : selectedMessages)
+            {
+               outputWriter.write(selectedMessage.toString());
+               outputWriter.newLine();
+            }
+
+            outputWriter.write("++++++++++++++++++++++++++++++++++++++++++++++++++");
+            outputWriter.newLine();
+         }
+      }
+      catch (final IOException ex)
+      {
+         LOGGER.log(Level.SEVERE, ex.toString(), ex);
+         fRet = false;
+      }
+
+      return(fRet);
+   }
+
+   /**
+    * Export the messages as plain text of the thread given by the contact
+    * index to the specified file.
+    *
+    * @param saveFile the file to save the messages to.
+    *
+    * @return {@code true} if and only if messages are exported successfully.
+    */
+   private boolean exportThreadMessages(final File saveFile)
+   {
+      boolean fRet = true;
+
+      try
+      {
+         try (final BufferedWriter outputWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(saveFile), DEFAULTCHARSET)))
+         {
+            final MessageThread thread = m_ThreadListBox.getSelectedValuesList().get(m_ThreadListBox.getSelectedIndex());
+            final Collection<IMessage> selectedMessages = thread.getMessages();
+
+            outputWriter.write(thread.toString());
+            outputWriter.newLine();
+            outputWriter.newLine();
+
+            for (IMessage selectedMessage : selectedMessages)
+            {
+               outputWriter.write(selectedMessage.toString());
+               outputWriter.newLine();
+            }
+
+            outputWriter.flush();
+         }
+      }
+      catch (IOException ex)
+      {
+         LOGGER.log(Level.SEVERE, ex.toString(), ex);
+         fRet = false;
+      }
+
+      return(fRet);
+   }
+
 }

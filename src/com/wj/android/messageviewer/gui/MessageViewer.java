@@ -23,6 +23,8 @@
  */
 package com.wj.android.messageviewer.gui;
 
+import com.wj.android.messageviewer.gui.shapes.Bubble;
+import com.wj.android.messageviewer.util.ConcurrentList;
 import com.wj.android.messageviewer.message.IMessage;
 import com.wj.android.messageviewer.message.SMSMessage;
 import java.awt.Dimension;
@@ -40,7 +42,7 @@ import javax.swing.JPanel;
  *
  * @author Werner Jaeger
  */
-class MessageViewer extends JPanel
+public class MessageViewer extends JPanel
 {
    private static final long serialVersionUID = 6976417460980887099L;
 
@@ -225,6 +227,11 @@ class MessageViewer extends JPanel
       b.setWidth(m_iWidth);
    }
 
+   /**
+    * Returns the preferred size.
+    *
+    * @return the preferred size.
+    */
    @Override
    public Dimension getPreferredSize()
    {
@@ -236,6 +243,11 @@ class MessageViewer extends JPanel
       return(PREFERREDSIZE);
    }
 
+   /**
+    * Draw all contained bubbles.
+    * 
+    * @param g the Graphics object to protect.
+    */
    @Override
    protected void paintComponent(final Graphics g)
    {

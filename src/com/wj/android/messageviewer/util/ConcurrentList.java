@@ -21,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.wj.android.messageviewer.gui;
+package com.wj.android.messageviewer.util;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -39,11 +39,13 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  *    Implemented simply by maintaining object level {@code ReadWriteLock}
  *    instance, and gaining the read lock in the read operations and gaining
  *    the write lock in the write operations
- * </>
+ * </p>
+ *
+ * @param <T> the type of elements maintained by this list.
  *
  * @author <a href="mailto:werner.jaeger@t-systems.com">Werner Jaeger</a>
  */
-class ConcurrentList<T> implements List< T>, Serializable
+public class ConcurrentList<T> implements List< T>, Serializable
 {
    private static final long serialVersionUID = -7731035618650790744L;
    private final ReadWriteLock m_ReadWriteLock = new ReentrantReadWriteLock();
@@ -59,6 +61,13 @@ class ConcurrentList<T> implements List< T>, Serializable
       m_List = list;
    }
 
+   /**
+    * {@inheritDoc}
+    *
+    * @param o element to be removed from this list, if present
+    *
+    *  @return {@code true} if this list contained the specified element
+    */
    @Override
    public boolean remove(final Object o)
    {
@@ -75,6 +84,13 @@ class ConcurrentList<T> implements List< T>, Serializable
       return(iRet);
    }
 
+   /**
+    * {@inheritDoc}
+    *
+    * @param t element to be appended to this list
+    *
+    * @return {@code true} if this collection changed as a result of the call
+    */
    @Override
    public boolean add(final T t)
    {
@@ -91,6 +107,9 @@ class ConcurrentList<T> implements List< T>, Serializable
       return(iRet);
    }
 
+   /**
+    * {@inheritDoc}
+    */
    @Override
    public void clear()
    {
@@ -105,6 +124,11 @@ class ConcurrentList<T> implements List< T>, Serializable
       }
    }
 
+   /**
+    * {@inheritDoc}
+    *
+    * @return the number of elements in this list
+    */
    @Override
    public int size()
    {
@@ -119,6 +143,13 @@ class ConcurrentList<T> implements List< T>, Serializable
       }
    }
 
+   /**
+    * {@inheritDoc}
+    *
+    * @param o element whose presence in this list is to be tested
+    *
+    * @return {@code true} if this list contains the specified element
+    */
    @Override
    public boolean contains(final Object o)
    {
@@ -133,6 +164,13 @@ class ConcurrentList<T> implements List< T>, Serializable
       }
    }
 
+   /**
+    * {@inheritDoc}
+    *
+    * @param iIndex index of the element to return
+    *
+    * @return the element at the specified position in this list
+    */
    @Override
    public T get(final int iIndex)
    {
@@ -147,6 +185,11 @@ class ConcurrentList<T> implements List< T>, Serializable
       }
    }
 
+   /**
+    * {@inheritDoc}
+    *
+    * @return {@code true} if this list contains no elements
+    */
    @Override
    public boolean isEmpty()
    {
@@ -161,6 +204,11 @@ class ConcurrentList<T> implements List< T>, Serializable
       }
    }
 
+   /**
+    * {@inheritDoc}
+    *
+    * @return an iterator over the elements in this list in proper sequence
+    */
    @Override
    public Iterator<T> iterator()
    {
@@ -175,18 +223,46 @@ class ConcurrentList<T> implements List< T>, Serializable
       }
    }
 
+   /**
+    * {@inheritDoc}
+    *
+    * @return an array containing the elements of this list.
+    *
+    * @throws UnsupportedOperationException always
+    */
    @Override
-   public Object[] toArray()
+   public Object[] toArray() throws UnsupportedOperationException
    {
       throw new UnsupportedOperationException("Not supported yet.");
    }
 
+   /**
+    * {@inheritDoc}
+    *
+    * @param a the array into which the elements of this list are to be stored,
+    *          if it is big enough; otherwise, a new array of the same runtime
+    *          type is allocated for this purpose.
+    *
+    * @param <T> the type of elements maintained by in the array
+    *
+    * @return an array containing the elements of this list.
+    *
+    * @throws UnsupportedOperationException always
+    */
    @Override
-   public <T> T[] toArray(final T[] a)
+   public <T> T[] toArray(final T[] a) throws UnsupportedOperationException
    {
       throw new UnsupportedOperationException("Not supported yet.");
    }
 
+   /**
+    * {@inheritDoc}
+    *
+    * @param c collection to be checked for containment in this list
+    *
+    * @return {@code true} if this list contains all of the elements of the
+    *         specified collection
+    */
    @Override
    public boolean containsAll(final Collection<?> c)
    {
@@ -201,6 +277,13 @@ class ConcurrentList<T> implements List< T>, Serializable
       }
    }
 
+   /**
+    * {@inheritDoc}
+    *
+    * @param c collection containing elements to be added to this list
+    *
+    * @return {@code true} if this list changed as a result of the call
+    */
    @Override
    public boolean addAll(final Collection<? extends T> c)
    {
@@ -217,14 +300,23 @@ class ConcurrentList<T> implements List< T>, Serializable
       return(iRet);
    }
 
+   /**
+    * {@inheritDoc}
+    *
+    * @param iIndex index at which to insert the first element from the
+    *        specified collection
+    * @param c collection containing elements to be added to this list
+    *
+    * @return {@code true} if this list changed as a result of the call
+    */
    @Override
-   public boolean addAll(final int arg0, final Collection<? extends T> arg1)
+   public boolean addAll(final int iIndex, final Collection<? extends T> c)
    {
       m_ReadWriteLock.writeLock().lock();
       boolean iRet;
       try
       {
-         iRet = m_List.addAll(arg0, arg1);
+         iRet = m_List.addAll(iIndex, c);
       }
       finally
       {
@@ -233,6 +325,13 @@ class ConcurrentList<T> implements List< T>, Serializable
       return(iRet);
    }
 
+   /**
+    * {@inheritDoc}
+    *
+    * @param c collection containing elements to be removed from this list
+    *
+    * @return {@code true} if this list changed as a result of the call
+    */
    @Override
    public boolean removeAll(final Collection<?> c)
    {
@@ -249,20 +348,37 @@ class ConcurrentList<T> implements List< T>, Serializable
       return(iRet);
    }
 
+   /**
+    * {@inheritDoc}
+    *
+    * @param c collection containing elements to be retained in this list
+    *
+    * @return true if this list changed as a result of the call
+    *
+    * @throws UnsupportedOperationException always
+    */
    @Override
-   public boolean retainAll(final Collection<?> c)
+   public boolean retainAll(final Collection<?> c) throws UnsupportedOperationException
    {
       throw new UnsupportedOperationException("Not supported yet.");
    }
 
+   /**
+    * {@inheritDoc}
+    *
+    * @param iIndex  index of the element to replace
+    * @param element element to be stored at the specified position
+    *
+    * @return the element previously at the specified position
+    */
    @Override
-   public T set(final int arg0, final T arg1)
+   public T set(final int iIndex, final T element)
    {
       m_ReadWriteLock.writeLock().lock();
       T ret;
       try
       {
-         ret = m_List.set(arg0, arg1);
+         ret = m_List.set(iIndex, element);
       }
       finally
       {
@@ -271,13 +387,19 @@ class ConcurrentList<T> implements List< T>, Serializable
       return(ret);
    }
 
+   /**
+    * {@inheritDoc}
+    *
+    * @param iIndex index at which the specified element is to be inserted
+    * @param element element to be inserted
+    */
    @Override
-   public void add(final int arg0, final T arg1)
+   public void add(final int iIndex, final T element)
    {
       m_ReadWriteLock.writeLock().lock();
       try
       {
-         m_List.add(arg0, arg1);
+         m_List.add(iIndex, element);
       }
       finally
       {
@@ -285,6 +407,13 @@ class ConcurrentList<T> implements List< T>, Serializable
       }
    }
 
+   /**
+    * {@inheritDoc}
+    *
+    * @param iIndex the index of the element to be remove
+    *
+    * @return the element previously at the specified position
+    */
    @Override
    public T remove(final int iIndex)
    {
@@ -301,6 +430,14 @@ class ConcurrentList<T> implements List< T>, Serializable
       return(ret);
    }
 
+   /**
+    * {@inheritDoc}
+    *
+    * @param o  element to search for
+    *
+    * @return the index of the first occurrence of the specified element in
+    *         this list, or -1 if this list does not contain the element
+    */
    @Override
    public int indexOf(final Object o)
    {
@@ -315,6 +452,14 @@ class ConcurrentList<T> implements List< T>, Serializable
       }
    }
 
+   /**
+    * {@inheritDoc}
+    *
+    * @param o element to search for
+    *
+    * @return the index of the last occurrence of the specified element in
+    *         this list, or -1 if this list does not contain the element
+    */
    @Override
    public int lastIndexOf(final Object o)
    {
@@ -329,20 +474,49 @@ class ConcurrentList<T> implements List< T>, Serializable
       }
    }
 
+   /**
+    * {@inheritDoc}
+    *
+    * @return a list iterator over the elements in this list
+    *           (in proper sequence)
+    *
+    * @throws UnsupportedOperationException always
+    */
    @Override
-   public ListIterator<T> listIterator()
+   public ListIterator<T> listIterator() throws UnsupportedOperationException
    {
       throw new UnsupportedOperationException("Not supported yet.");
    }
 
+   /**
+    * {@inheritDoc}
+    *
+    * @param iIndex index of first element to be returned from the list
+    *               iterator (by a call to the {@code next} method)
+    *
+    * @return a list iterator of the elements in this list (in proper sequence),
+    *           starting at the specified position in this list
+    *
+    * @throws UnsupportedOperationException always
+    */
    @Override
-   public ListIterator<T> listIterator(final int iIndex)
+   public ListIterator<T> listIterator(final int iIndex) throws UnsupportedOperationException
    {
       throw new UnsupportedOperationException("Not supported yet.");
    }
 
+   /**
+    * {@inheritDoc}
+    *
+    * @param iFromIndex low endpoint (inclusive) of the subList
+    * @param iToIndex high endpoint (exclusive) of the subList
+    *
+    * @return a view of the specified range within this list
+    *
+    * @throws UnsupportedOperationException always
+    */
    @Override
-   public List<T> subList(final int arg0, final int arg1)
+   public List<T> subList(final int iFromIndex, final int iToIndex) throws UnsupportedOperationException
    {
       throw new UnsupportedOperationException("Not supported yet.");
    }

@@ -21,12 +21,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.wj.android.messageviewer.gui;
+package com.wj.android.messageviewer.gui.workers;
 
+import com.wj.android.messageviewer.gui.MessageViewer;
 import com.wj.android.messageviewer.message.IMessage;
 import com.wj.android.messageviewer.message.MessageThread;
 import java.awt.Rectangle;
 import java.util.Collection;
+import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
 
 /**
@@ -34,8 +38,10 @@ import javax.swing.JFrame;
  *
  * @author <a href="mailto:werner.jaeger@t-systems.com">Werner Jaeger</a>
  */
-class DisplayThreadMessageWorker extends AbstractDisabelingUIWorker<Void, Void>
+public class DisplayThreadMessageWorker extends AbstractDisabelingUIWorker<Void, Void>
 {
+   private static final Logger LOGGER = Logger.getLogger(ExportWorker.class.getName());
+   
    private final MessageThread m_SelectedMessageThread;
    private final MessageViewer m_MessageViewer;
 
@@ -46,7 +52,7 @@ class DisplayThreadMessageWorker extends AbstractDisabelingUIWorker<Void, Void>
     * @param selectedThread the selected thread. Must not be {@code null}.
     * @param messageViewer the pane that displays thread message.
     */
-   DisplayThreadMessageWorker(final JFrame readerFrame, final MessageThread selectedThread, final MessageViewer messageViewer)
+   public DisplayThreadMessageWorker(final JFrame readerFrame, final MessageThread selectedThread, final MessageViewer messageViewer)
    {
       super(readerFrame, null);
 
@@ -104,6 +110,20 @@ class DisplayThreadMessageWorker extends AbstractDisabelingUIWorker<Void, Void>
    @Override
    protected void done()
    {
+      try
+      {
+         get();
+      }
+      catch (final ExecutionException ex)
+      {
+         LOGGER.log(Level.SEVERE, ex.toString(), ex);
+      }
+      catch (final InterruptedException ex)
+      {
+         Thread.currentThread().interrupt();
+         LOGGER.log(Level.SEVERE, ex.toString(), ex);
+      }
+
       super.done();
       m_MessageViewer.setVisible(true);
    }

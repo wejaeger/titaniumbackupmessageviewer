@@ -21,8 +21,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.wj.android.messageviewer.gui;
+package com.wj.android.messageviewer.gui.shapes;
 
+import com.wj.android.messageviewer.gui.MessagePanel;
+import com.wj.android.messageviewer.gui.MessageViewer;
 import com.wj.android.messageviewer.message.IMessage;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -42,7 +44,7 @@ import java.io.Serializable;
  *
  * @author Werner Jaeger
  */
-abstract class Bubble implements Serializable
+public abstract class Bubble implements Serializable
 {
    private static final long serialVersionUID = -3613617398312453469L;
 
@@ -51,7 +53,16 @@ abstract class Bubble implements Serializable
     */
    public enum Type
    {
-      LEFTARROW, RIGHTARROW, DRAFT, LEFTINFO, RIGHTINFO;
+      /** A bubble with a left arrow for displaying incoming messages */
+      LEFTARROW,
+      /** A bubble with a right arrow for displaying outgoing messages */
+      RIGHTARROW,
+      /** A bubble with a right arrow for displaying draft messages */
+      DRAFT,
+      /** A bubble with no arrow for displaying incoming message info */
+      LEFTINFO,
+      /** A bubble with no arrow for displaying outgoing message info */
+      RIGHTINFO;
 
       /**
        * Factory method to construct the appropriate arrow bubble.
@@ -97,6 +108,12 @@ abstract class Bubble implements Serializable
    private static final int DEFAULT_WIDTH = 200;
    private static final int DEFAULT_BORDER_WIDTH = 10;
 
+   private final static int RADIUS = 10;
+   private final static int ARROWSIZE = 8;
+   private final static int STROKETHICKNES = 3;
+   private final static int PADDING = STROKETHICKNES / 2;
+
+   /** The container for this bubble */
    protected MessageViewer m_Viewer;
 
    final private Type m_Type;
@@ -113,11 +130,6 @@ abstract class Bubble implements Serializable
    private Color m_FrameColor;
    private Dimension m_Dim;
 
-   protected int m_iRadius = 10;
-   protected int m_iArrowSize = 8;
-   protected int m_iStrokeThickness = 3;
-   protected int m_iPadding = m_iStrokeThickness / 2;
-
    /**
     * Creates new {@code Bubble}.
     *
@@ -131,8 +143,8 @@ abstract class Bubble implements Serializable
       m_Viewer = viewer;
       m_RenderingHints = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
       m_Arrow = new Polygon();
-      m_Stroke = new BasicStroke(m_iStrokeThickness);
-      m_Rect = new RoundRectangle2D.Double(0, 0, 0, 0, m_iRadius, m_iRadius);
+      m_Stroke = new BasicStroke(STROKETHICKNES);
+      m_Rect = new RoundRectangle2D.Double(0, 0, 0, 0, RADIUS, RADIUS);
 
       m_iBorderWidth = DEFAULT_BORDER_WIDTH;
       m_ivGap = m_iBorderWidth;
@@ -173,7 +185,7 @@ abstract class Bubble implements Serializable
    public final void setLocation(final Point p)
    {
       if (null != m_MessagePanel)
-         m_MessagePanel.setLocation(new Point(p.x + m_iBorderWidth + m_iArrowSize, p.y + m_ivGap));
+         m_MessagePanel.setLocation(new Point(p.x + m_iBorderWidth + ARROWSIZE, p.y + m_ivGap));
 
       m_Loc = p;
    }
@@ -187,6 +199,16 @@ abstract class Bubble implements Serializable
    public void setLocation (final int ix, final int iy)
    {
       setLocation(new Point(ix, iy));
+   }
+
+   /**
+    * Get the width in pixel of an arrow.
+    *
+    * @return the width in pixel.
+    */
+   protected int getArrowSize()
+   {
+      return(ARROWSIZE);
    }
 
    /**
@@ -212,7 +234,7 @@ abstract class Bubble implements Serializable
       if (null != m_MessagePanel)
       {
          // center the text vertically if there's room
-         final int iNewTWidth = d.width - 2 * m_iBorderWidth - m_iArrowSize;
+         final int iNewTWidth = d.width - 2 * m_iBorderWidth - ARROWSIZE;
 
          // first set the width with any height so we can find
          // out the optimal height for the given width
@@ -286,10 +308,10 @@ abstract class Bubble implements Serializable
    {
       // set to any height so we can find out the optimal height for
       // the given width
-      m_MessagePanel.setSize(new Dimension(iWidth - 2 * m_iBorderWidth - m_iArrowSize, 1));
+      m_MessagePanel.setSize(new Dimension(iWidth - 2 * m_iBorderWidth - ARROWSIZE, 1));
       // set size to the optimal dimension
       final Dimension d = getPreferredSize();
-      setSize(new Dimension(d.width + 2 * m_iBorderWidth - m_iArrowSize, d.height + 2 * m_iBorderWidth));
+      setSize(new Dimension(d.width + 2 * m_iBorderWidth - ARROWSIZE, d.height + 2 * m_iBorderWidth));
    }
 
    /**
@@ -442,17 +464,22 @@ abstract class Bubble implements Serializable
       return(loc);
    }
 
+   /**
+    * Draw this bubble.
+    *
+    * @param g2 the graphics context in which to draw
+    */
    public final void draw(final Graphics2D g2)
    {
-      final int iX = getLocation().x + m_iPadding + m_iStrokeThickness + m_iArrowSize;
-      final int iY = getLocation().y + m_iPadding;
-      final int iWidth = getWidth() - m_iArrowSize - (m_iStrokeThickness * 2);
-      final int iHeight = getHeight() - m_iStrokeThickness;
+      final int iX = getLocation().x + PADDING + STROKETHICKNES + ARROWSIZE;
+      final int iY = getLocation().y + PADDING;
+      final int iWidth = getWidth() - ARROWSIZE - (STROKETHICKNES * 2);
+      final int iHeight = getHeight() - STROKETHICKNES;
       g2.setPaint(getFillColor());
       g2.fillRect(iX, iY, iWidth, iHeight);
       g2.setRenderingHints(m_RenderingHints);
       g2.setStroke(m_Stroke);
-      m_Rect.setRoundRect(iX, iY, iWidth, iHeight, m_iRadius, m_iRadius);
+      m_Rect.setRoundRect(iX, iY, iWidth, iHeight, RADIUS, RADIUS);
       m_Arrow.reset();
       setArrow(m_Arrow);
       final Area area = new Area(m_Rect);
@@ -460,5 +487,10 @@ abstract class Bubble implements Serializable
       g2.draw(area);
    }
 
+   /**
+    * implemented by sub classes to actually draw (or not draw) an arrow.
+    *
+    * @param arrow the polygon to render.
+    */
    protected abstract void setArrow(final Polygon arrow);
 }

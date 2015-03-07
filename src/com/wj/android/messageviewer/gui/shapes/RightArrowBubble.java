@@ -21,8 +21,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.wj.android.messageviewer.gui;
+package com.wj.android.messageviewer.gui.shapes;
 
+import com.wj.android.messageviewer.gui.MessageViewer;
 import com.wj.android.messageviewer.message.IMessage;
 import java.awt.Color;
 import java.awt.Polygon;
@@ -36,7 +37,7 @@ import java.awt.Polygon;
 class RightArrowBubble extends Bubble
 {
    private static final long serialVersionUID = -5309922534404878188L;
-   
+
    /**
     * Creates new {@code RightArrowBubble}.
     *
@@ -55,7 +56,7 @@ class RightArrowBubble extends Bubble
    protected void setArrow(final Polygon arrow)
    {
       arrow.addPoint(getLocation().x + getWidth(), getLocation().y + 8);
-      arrow.addPoint(getLocation().x + getWidth() + m_iArrowSize, getLocation().y + 8);
+      arrow.addPoint(getLocation().x + getWidth() + getArrowSize(), getLocation().y + 8);
       arrow.addPoint(getLocation().x + getWidth(), getLocation().y + 12);
    }
 }
