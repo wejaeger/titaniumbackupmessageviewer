@@ -34,5 +34,6 @@ Change log:
  - fixed bug: wrong number of messages displayed in some cases
  - fixed bug: mms are alway the last in order, they do not correctly appear in
               date/time order
- - left and right aligned message bubbles in message viewer, with of bubbles no
-   longer fixed, adapts now do the text with.
+ - left and right aligned message bubbles in message viewer, width of bubbles no
+   longer fixed, adapts now do the text width.
+ - display long recent files path names shortened

@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
+<threads count="1" xmlns="http://www.titaniumtrack.com/ns/titanium-backup/messages">
+   <thread address="Test">
+      <sms msgBox="sent" date="2015-01-10T20:01:00.00Z" locked="false" seen="true" read="true" address="Test" encoding="plain">I have sent a test message. Only for test purposes to demonstrate the look and feel of the message viewer</sms>
+      <sms msgBox="inbox" date="2015-01-10T20:02:00.00Z" dateSent="2015-01-10T20:02:10.00Z" locked="false" seen="true" read="true" serviceCenter="Test" address="Test" encoding="plain">This is a message I have received</sms>
+      <sms msgBox="inbox" date="2015-01-10T20:03:00.00Z" dateSent="2015-01-10T20:03:10.00Z" locked="false" seen="true" read="true" serviceCenter="Test" address="Test" encoding="plain">Yet another received text message</sms>
+      <sms msgBox="sent" date="2015-01-10T20:04:00.00Z" locked="false" seen="true" read="true" address="Test" encoding="plain">I have replied to a test message</sms>
+      <sms msgBox="draft" date="2015-01-10T20:05:00.00Z" locked="false" seen="false" read="true" encoding="plain">Not yet sent. Just a draft</sms>
+   </thread>
+</threads>

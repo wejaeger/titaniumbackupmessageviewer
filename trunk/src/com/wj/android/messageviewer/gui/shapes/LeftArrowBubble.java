@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * File:   InfoBubble.java
+ * File:   LeftArowBubble.java
  * Author: Werner Jaeger
  *
  * Created on Feb 25, 2015, 11:10:38 AM
@@ -21,37 +21,42 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.wj.android.messageviewer.gui;
+package com.wj.android.messageviewer.gui.shapes;
 
+import com.wj.android.messageviewer.gui.MessageViewer;
 import com.wj.android.messageviewer.message.IMessage;
+import java.awt.Color;
 import java.awt.Polygon;
 
 /**
- * Subclass of Bubble that will display a message info as a
- conversation bubble with no arrow.
+ * Subclass of Bubble that will display a received message as a
+ conversation bubble with arrow on the left.
  *
  * @author Werner Jaeger
  */
-class InfoBubble extends Bubble
+class LeftArrowBubble extends Bubble
 {
-   private static final long serialVersionUID = 3904447495064329055L;
+   private static final long serialVersionUID = 4896971040878002751L;
 
    /**
-    * Creates new {@code InfoBubble}.
+    * Creates new {@code LeftArrowBubble}.
     *
     * @param message the message to draw within the bubble.
     * @param viewer the viewer. Must not be {@code null}.
     * @param type the type of the bubble.
     */
-   protected InfoBubble(final Type type, final IMessage message, final MessageViewer viewer)
+   protected LeftArrowBubble(final Type type, final IMessage message, final MessageViewer viewer)
    {
       super(type, message, viewer);
 
-      setFillColor(viewer.getBackground());
+      setFillColor(Color.YELLOW);
    }
 
    @Override
    protected void setArrow(final Polygon arrow)
    {
+      arrow.addPoint(getLocation().x + getArrowSize() + 1, getLocation().y + 8);
+      arrow.addPoint(getLocation().x + 0, getLocation().y + 8);
+      arrow.addPoint(getLocation().x + getArrowSize() + 1, getLocation().y + 12);
    }
 }

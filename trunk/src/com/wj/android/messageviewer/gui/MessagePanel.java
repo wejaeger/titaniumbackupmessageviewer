@@ -48,7 +48,7 @@ import javax.swing.JPanel;
  *
  * @author Werner Jaeger
  */
-class MessagePanel extends JPanel
+public class MessagePanel extends JPanel
 {
    private static final int VGAP = 20;
    private static final long serialVersionUID = 5182781147775125388L;

@@ -29,20 +29,16 @@ import com.wj.android.messageviewer.message.MMSMessage;
 import com.wj.android.messageviewer.message.MessageThread;
 import com.wj.android.messageviewer.message.SMILMessage;
 import com.wj.android.messageviewer.message.SMSMessage;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -222,86 +218,6 @@ public class TitaniumBackupMessageReader
          iError =1 ;
 
       return(iError);
-   }
-
-   /**
-    * Export the messages as plain text of the thread given by the contact
-    * index to the specified file.
-    *
-    * @param saveFile the file to save the messages to.
-    * @param iContactIndex index in message tread.
-    *
-    * @return {@code true} if and only if messages are exported successfully.
-    */
-   public boolean exportThreadMessages(final File saveFile, final int iContactIndex)
-   {
-      boolean fRet = true;
-
-      try
-      {
-         try (final BufferedWriter outputWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(saveFile), DEFAULTCHARSET)))
-         {
-            final Collection<IMessage> selectedMessages = m_ThreadList.get(iContactIndex).getMessages();
-
-            outputWriter.write(m_ThreadList.get(iContactIndex).toString());
-            outputWriter.newLine();
-            outputWriter.newLine();
-
-            for (IMessage selectedMessage : selectedMessages)
-            {
-               outputWriter.write(selectedMessage.toString());
-               outputWriter.newLine();
-            }
-
-            outputWriter.flush();
-         }
-      }
-      catch (IOException ex)
-      {
-         LOGGER.log(Level.SEVERE, ex.toString(), ex);
-         fRet = false;
-      }
-
-      return(fRet);
-   }
-
-   /**
-    * Export all messages as plain text to the specified file.
-    *
-    * @param saveFile the file to save the messages to.
-    * @return {@code true} if and only if messages are exported successfully.
-    */
-   public boolean exportAllMessages(final File saveFile)
-   {
-      boolean fRet = true;
-
-      try (final BufferedWriter outputWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(saveFile), DEFAULTCHARSET)))
-      {
-         for (final MessageThread selectedContact : m_ThreadList)
-         {
-            final Collection<IMessage> selectedMessages = selectedContact.getMessages();
-
-            outputWriter.write(selectedContact.toString());
-            outputWriter.newLine();
-            outputWriter.newLine();
-
-            for (final IMessage selectedMessage : selectedMessages)
-            {
-               outputWriter.write(selectedMessage.toString());
-               outputWriter.newLine();
-            }
-
-            outputWriter.write("++++++++++++++++++++++++++++++++++++++++++++++++++");
-            outputWriter.newLine();
-         }
-      }
-      catch (final IOException ex)
-      {
-         LOGGER.log(Level.SEVERE, ex.toString(), ex);
-         fRet = false;
-      }
-
-      return(fRet);
    }
 
    /**

@@ -21,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.wj.android.messageviewer.gui;
+package com.wj.android.messageviewer.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -58,9 +58,11 @@ import java.util.prefs.Preferences;
  *     Returns elements in the most recently used order.
  * </p>
  *
+ * @param <E> the type of elements maintained by this collection
+ *
  * @author <a href="mailto:werner.jaeger@t-systems.com">Werner Jaeger</a>
  */
-class RecentCollection<E extends Serializable> implements Iterable<E>
+public class RecentCollection<E extends Serializable> implements Iterable<E>
 {
    private static final Logger LOGGER = Logger.getLogger(RecentCollection.class.getName());
    private static final int PIECELENGTH = (int)Math.floor(Preferences.MAX_VALUE_LENGTH * 0.75);
@@ -182,7 +184,11 @@ class RecentCollection<E extends Serializable> implements Iterable<E>
        m_Keys.clear();
    }
 
-   /** {@inheritDoc */
+   /**
+    * {@inheritDoc}
+    *
+    * @return an iterator over the elements in this collection in reverse order
+    */
    @Override
    public Iterator<E> iterator()
    {
@@ -220,7 +226,7 @@ class RecentCollection<E extends Serializable> implements Iterable<E>
                   m_Keys.add(m_strKeyPrefix + i);
                }
             }
-            catch (final IOException | BackingStoreException | ClassNotFoundException ex)
+            catch (final IOException | BackingStoreException ex)
             {
                fRet = false;
                LOGGER.log(Level.SEVERE, ex.toString(), ex);
@@ -290,12 +296,36 @@ class RecentCollection<E extends Serializable> implements Iterable<E>
       writePieces(prefs, strKey + ".", abPieces);
    }
 
-   static Object getObject(final Preferences prefs, final String strKey) throws IOException, BackingStoreException, ClassNotFoundException
+   /**
+    * Get an object from preferences stored under the specified key.
+    *
+    * @param prefs the preference node to look for the object
+    * @param strKey the associated key for the object to retrieve
+    *
+    * @return the object if it is associated withe the key,
+    *          {@code null} otherwise
+    *
+    * @throws IOException if an IO error occurred
+    * @throws BackingStoreException if an error in backing store occured
+    */
+   Object getObject(final Preferences prefs, final String strKey) throws IOException, BackingStoreException
    {
       final byte abPieces[][] = readPieces(prefs, strKey + ".");
       final byte abRaw[] = combinePieces(abPieces);
 
-      return(bytes2Object(abRaw));
+      Object oRet = null;
+
+      try
+      {
+         oRet = bytes2Object(abRaw);
+      }
+      catch (final ClassNotFoundException ex)
+      {
+         removeFromPreferences(strKey);
+         sync();
+      }
+
+      return(oRet);
    }
 
    private static byte[][] breakIntoPieces(final byte abRaw[])

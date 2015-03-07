@@ -23,7 +23,14 @@
  */
 package com.wj.android.messageviewer.gui;
 
-import com.wj.android.messageviewer.io.TitaniumBackupMessageReader;
+import com.wj.android.messageviewer.gui.actions.ExportAllMessagesAction;
+import com.wj.android.messageviewer.gui.actions.ExportSelectedMessagesAction;
+import com.wj.android.messageviewer.gui.actions.OpenAction;
+import com.wj.android.messageviewer.gui.actions.OpenRecentFileAction;
+import com.wj.android.messageviewer.util.RecentCollection;
+import com.wj.android.messageviewer.util.Pair;
+import com.wj.android.messageviewer.gui.workers.DisplayThreadMessageWorker;
+import com.wj.android.messageviewer.gui.workers.LoadMessagesWorker;
 import com.wj.android.messageviewer.message.MessageThread;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -38,7 +45,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
@@ -54,7 +60,6 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -147,7 +152,6 @@ public final class TitaniumBackupMessageViewer
 
    private static final String RESOURCEPATH = "/com/wj/android/messageviewer/resources/";
    private static final Preferences PREFERENCES = Preferences.userNodeForPackage(TitaniumBackupMessageViewer.class);
-   private static final String FILELOCATIONSEPARATOR = ":";
 
    private static final String recentFilesKey = "recentfile";
    private static final String windowXKey = "window.x";
@@ -158,19 +162,14 @@ public final class TitaniumBackupMessageViewer
    private static final String windowVisibleKey = "window.visible";
 
    private final RecentCollection<Pair<String, String>> m_RecentCollection;
-   private final Pair<String, String> m_FileLocations;
 
    private JFrame m_ReaderFrame;
    private JTextField m_NumberSMSField;
-   private JFileChooser m_MessageFileChooser;
-   private JFileChooser m_ContactsDatabaseChooser;
-   private JFileChooser m_SaveChooser;
    private JScrollPane m_ScrollPaneThread;
    private JScrollPane m_ScrollPaneMessages;
    private JMenu m_mnRecentFiles;
    private JList<MessageThread> m_ThreadListBox;
    private MessageViewer m_MessageViewer;
-   private TitaniumBackupMessageReader m_Reader;
 
    /**
     * Creates new {@code GUI}.
@@ -184,9 +183,8 @@ public final class TitaniumBackupMessageViewer
    public TitaniumBackupMessageViewer(final String strMessageFileName, final String strContactsDBFileName)
    {
       m_RecentCollection = new RecentCollection<>(PREFERENCES, recentFilesKey);
-      m_FileLocations = new Pair<>(null, null);
 
-      initialize(strMessageFileName, strContactsDBFileName);
+      initialize(new Pair<>(strMessageFileName, strContactsDBFileName));
    }
 
    /**
@@ -216,12 +214,28 @@ public final class TitaniumBackupMessageViewer
    }
 
    /**
+    * Synchronizes recent files menu with preferences.
+    *
+    * <p>
+    *    Populates recent file menu items form stored preferences.
+    * </p>
+    */
+   public void syncRecentFiles()
+   {
+      if (null != m_mnRecentFiles)
+      {
+         m_mnRecentFiles.removeAll();
+
+         for (final Pair<String, String> pair : m_RecentCollection)
+            addRecentFile2RecentFileMenu(pair);
+      }
+   }
+
+   /**
     * This method is called from within the constructor to initialize the form.
     */
-   private void initialize(final String strMessageFileName, final String strContactsDBFileName)
+   private void initialize(Pair<String, String> files2Open)
    {
-      m_Reader = new TitaniumBackupMessageReader();
-
       m_ReaderFrame = new JFrame();
       m_ReaderFrame.addWindowListener(new WindowAdapter()
       {
@@ -239,33 +253,6 @@ public final class TitaniumBackupMessageViewer
 
       setFrameIcon();
 
-      UIManager.put("FileChooser.readOnly", Boolean.TRUE);
-      m_MessageFileChooser = new JFileChooser();
-      m_MessageFileChooser.setDialogTitle("Open message file");
-      m_MessageFileChooser.setFileFilter(new TitaniumBackupMessageFileNameFilter());
-      m_MessageFileChooser.setApproveButtonToolTipText("You can open the commpressd (.gz) or plain (.xml) message file");
-
-
-      UIManager.put("FileChooser.readOnly", Boolean.TRUE);
-      m_ContactsDatabaseChooser = new JFileChooser();
-      m_ContactsDatabaseChooser.setDialogTitle("Open contacts database");
-      m_ContactsDatabaseChooser.setFileFilter(new TitaniumBackupContactsFileNameFilter());
-      m_ContactsDatabaseChooser.setApproveButtonToolTipText("You can open the archived (.tar.gz) or the plain (.db) contacts database");
-
-      m_SaveChooser = new JFileChooser();
-
-      createMenu();
-
-      if (null != strMessageFileName && !strMessageFileName.trim().isEmpty())
-         m_FileLocations.setFirst(strMessageFileName);
-      else
-         m_FileLocations.setFirst(null);
-
-      if (null != strContactsDBFileName && !strContactsDBFileName.trim().isEmpty())
-         m_FileLocations.setSecond(strContactsDBFileName);
-      else
-         m_FileLocations.setSecond(null);
-
       final JLabel lblNumberOfSms = new JLabel("Number of SMS:");
 
       m_NumberSMSField = new JTextField();
@@ -277,7 +264,6 @@ public final class TitaniumBackupMessageViewer
       m_MessageViewer.setBackground(m_ReaderFrame.getContentPane().getBackground());
       m_ScrollPaneMessages = new JScrollPane(m_MessageViewer);
       m_ScrollPaneMessages.getVerticalScrollBar().setUnitIncrement(10);
-
 
       m_ThreadListBox = new MessageThreadList(300);
       m_ThreadListBox.setBackground(m_ReaderFrame.getContentPane().getBackground());
@@ -296,6 +282,8 @@ public final class TitaniumBackupMessageViewer
 
       m_ThreadListBox.setEnabled(false);
       m_ThreadListBox.setBorder(new EtchedBorder(1, null, null));
+
+      createMenu();
 
       final Box h1Box = Box.createHorizontalBox();
       h1Box.add(Box.createVerticalStrut(lblNumberOfSms.getPreferredSize().height * 4));
@@ -318,8 +306,8 @@ public final class TitaniumBackupMessageViewer
       m_ScrollPaneThread.setMaximumSize(new Dimension(m_ThreadListBox.getPreferredSize().width, Short.MAX_VALUE));
       m_ScrollPaneMessages.setMinimumSize(new Dimension(300, 100));
 
-      if (null != strMessageFileName)
-         loadAction();
+      if (null != files2Open.getFirst())
+         new LoadMessagesWorker(this, m_ReaderFrame, files2Open, m_RecentCollection, m_ThreadListBox, m_NumberSMSField, m_MessageViewer, m_ScrollPaneThread).execute();
    }
 
    private void createMenu()
@@ -330,43 +318,20 @@ public final class TitaniumBackupMessageViewer
       final JMenu mnFile = new JMenu("File");
       menuBar.add(mnFile);
 
-      final JMenuItem mntmOpen = new JMenuItem("Open ...");
-      mntmOpen.setMnemonic(KeyEvent.VK_O);
-      mntmOpen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
-      mntmOpen.addActionListener(new ActionListener()
-      {
-         @Override
-         public void actionPerformed(final ActionEvent evt)
-         {
-            chooseMessageFileAction();
-         }
-      });
+      final OpenAction openAction = new OpenAction(this, m_ReaderFrame, m_RecentCollection, m_ThreadListBox, m_NumberSMSField, m_MessageViewer, m_ScrollPaneThread);
+      final JMenuItem mntmOpen = new JMenuItem(openAction);
       mnFile.add(mntmOpen);
 
       createRecentFileMenu(mnFile);
 
       mnFile.add(new JSeparator()); // SEPARATOR
 
-      final JMenuItem mntmExportSelected = new JMenuItem("Export selected messages ...");
-      mntmExportSelected.addActionListener(new ActionListener()
-      {
-         @Override
-         public void actionPerformed(final ActionEvent evt)
-         {
-            exportAction(false);
-         }
-      });
+      final ExportSelectedMessagesAction exportSelectedAction = new ExportSelectedMessagesAction(m_ReaderFrame, m_ThreadListBox);
+      final JMenuItem mntmExportSelected = new JMenuItem(exportSelectedAction);
       mnFile.add(mntmExportSelected);
 
-      final JMenuItem mntmExportAll = new JMenuItem("Export all messages ...");
-      mntmExportAll.addActionListener(new ActionListener()
-      {
-         @Override
-         public void actionPerformed(final ActionEvent evt)
-         {
-            exportAction(true);
-         }
-      });
+      final ExportAllMessagesAction exportAllAction = new ExportAllMessagesAction(m_ReaderFrame, m_ThreadListBox);
+      final JMenuItem mntmExportAll = new JMenuItem(exportAllAction);
       mnFile.add(mntmExportAll);
 
 
@@ -424,70 +389,13 @@ public final class TitaniumBackupMessageViewer
       }
    }
 
-   void syncRecentFiles()
-   {
-      if (null != m_mnRecentFiles)
-      {
-         m_mnRecentFiles.removeAll();
-
-         for (final Pair<String, String> pair : m_RecentCollection)
-            addRecentFile2RecentFileMenu(pair);
-      }
-   }
-
    private void addRecentFile2RecentFileMenu(final Pair<String, String> pair)
    {
-      final JMenuItem mnItem = new JMenuItem(pair.getFirst() + (pair.getSecond() == null ? "" :  FILELOCATIONSEPARATOR) + (pair.getSecond() == null ? "" :  pair.getSecond()));
-      mnItem.addActionListener(new ActionListener()
-      {
-         @Override
-         public void actionPerformed(final ActionEvent evt)
-         {
-            final String[] strFiles = evt.getActionCommand().split("\\" + FILELOCATIONSEPARATOR, 2);
-            if (1 <= strFiles.length)
-               m_FileLocations.setFirst(strFiles[0]);
+      final OpenRecentFileAction action = new OpenRecentFileAction(this, m_ReaderFrame, pair, m_RecentCollection, m_ThreadListBox, m_NumberSMSField, m_MessageViewer, m_ScrollPaneThread);
 
-            if (2 <= strFiles.length)
-               m_FileLocations.setSecond(strFiles[1]);
-
-            loadAction();
-         }
-      });
+      final JMenuItem mnItem = new JMenuItem(action);
       m_mnRecentFiles.add(mnItem);
     }
-
-   private void chooseMessageFileAction()
-   {
-      m_MessageFileChooser.setSelectedFile(new File(""));
-      final int iRet = m_MessageFileChooser.showOpenDialog(m_ReaderFrame);
-
-      if (JFileChooser.APPROVE_OPTION == iRet)
-      {
-         m_FileLocations.setFirst(m_MessageFileChooser.getSelectedFile().getAbsolutePath());
-         chooseContactsDBAction();
-      }
-   }
-
-   private void chooseContactsDBAction()
-   {
-      m_ContactsDatabaseChooser.setCurrentDirectory(m_MessageFileChooser.getCurrentDirectory());
-
-      m_ContactsDatabaseChooser.setSelectedFile(new File(""));
-      final int iRet = m_ContactsDatabaseChooser.showOpenDialog(m_ReaderFrame);
-
-      if (JFileChooser.APPROVE_OPTION == iRet)
-         m_FileLocations.setSecond(m_ContactsDatabaseChooser.getSelectedFile().getAbsolutePath());
-
-      loadAction();
-  }
-
-   private void loadAction()
-   {
-      if (null != m_FileLocations.getFirst())
-         new LoadMessagesWorker(this, m_ReaderFrame, m_FileLocations, m_RecentCollection, m_Reader, m_ThreadListBox, m_NumberSMSField, m_MessageViewer, m_ScrollPaneThread).execute();
-      else
-         JOptionPane.showMessageDialog(m_ReaderFrame, "Choose message file first!");
-   }
 
    private void threadListValueChanged(final ListSelectionEvent evt)
    {
@@ -525,31 +433,6 @@ public final class TitaniumBackupMessageViewer
       textPane.addHyperlinkListener(new HyperlinkListenerImpl());
 
       JOptionPane.showMessageDialog(m_ReaderFrame, textPane, "About", JOptionPane.INFORMATION_MESSAGE, getDialogIcon());
-   }
-
-   private void exportAction(final boolean fAll)
-   {
-      if (null != m_FileLocations.getFirst() && m_ThreadListBox.isEnabled())
-      {
-         if (fAll || m_ThreadListBox.getSelectedIndex() != -1)
-         {
-            m_SaveChooser.setDialogTitle("Choose a file to save as...");
-            m_SaveChooser.setDialogType(JFileChooser.SAVE_DIALOG);
-
-            if (fAll)
-                  m_SaveChooser.setSelectedFile(new File("AndroidAllMessagesExport.txt"));
-            else
-               m_SaveChooser.setSelectedFile(new File("AndroidSelectedMessagesExport.txt"));
-
-            final int iRet = m_SaveChooser.showSaveDialog(m_ReaderFrame);
-            if (iRet == 0)
-               new ExportWorker(m_ReaderFrame, fAll, m_SaveChooser.getSelectedFile(), m_ThreadListBox.getSelectedIndex(), m_Reader).execute();
-         }
-         else
-            JOptionPane.showMessageDialog(m_ReaderFrame, "Select a thread first!");
-      }
-      else
-         JOptionPane.showMessageDialog(m_ReaderFrame, "Load messages first!");
    }
 
    private void setFrameIcon()

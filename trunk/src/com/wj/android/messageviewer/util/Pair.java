@@ -21,21 +21,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.wj.android.messageviewer.gui;
+package com.wj.android.messageviewer.util;
 
 import java.io.Serializable;
 
 /**
  * A class to hold two generic data together.
  *
+ * @param <First> the type of the first data item.
+ * @param <Second> the type of the second data item.
+ *
  * @author <a href="mailto:werner.jaeger@t-systems.com">Werner Jaeger</a>
  */
-class Pair<First extends Serializable, Second extends Serializable> implements Serializable
+public class Pair<First extends Serializable, Second extends Serializable> implements Serializable
 {
    private static final long serialVersionUID = -8524273621472431244L;
 
-   private First m_First;
-   private Second m_Second;
+   private final First m_First;
+   private final Second m_Second;
 
    /**
     * Constructs a new {@code Pair}.
@@ -46,37 +49,6 @@ class Pair<First extends Serializable, Second extends Serializable> implements S
    public Pair(final First first, final Second second)
    {
       m_First = first;
-      m_Second = second;
-   }
-
-   /**
-    * Copy constructs for a {@code Pair}.
-    *
-    * @param first the pair to make a copy from. May not be {@code null}.
-    */
-   public Pair(final Pair<First, Second> pair)
-   {
-      m_First = pair.getFirst();
-      m_Second = pair.getSecond();
-   }
-
-   /**
-    * Set the first data item.
-    *
-    * @param first the data to set. May be {@code null}.
-    */
-   public void setFirst(final First first)
-   {
-      m_First = first;
-   }
-
-   /**
-    * Set the second data item.
-    *
-    * @param second the data to set. May be {@code null}.
-    */
-   public void setSecond(final Second second)
-   {
       m_Second = second;
    }
 
@@ -100,19 +72,13 @@ class Pair<First extends Serializable, Second extends Serializable> implements S
       return(m_Second);
    }
 
-    /**
-    * Set the first and the second data item.
-    *
-    * @param first the first data to set. May be {@code null}.
-    * @param second the second data to set. May be {@code null}.
-    */
-  public void set(final First first, final Second second)
-   {
-      setFirst(first);
-      setSecond(second);
-   }
-
-  /** {@inheritDoc */
+  /**
+   * {@inheritDoc}
+   *
+   * @param o the object to be compared for equality with this object
+   *
+   * @return {@code true} if the specified object is equal to this object
+   */
    @Override
    public boolean equals(final Object o)
    {
@@ -137,7 +103,11 @@ class Pair<First extends Serializable, Second extends Serializable> implements S
       return(fRet);
    }
 
-  /** {@inheritDoc */
+  /**
+   * {@inheritDoc}
+   *
+   * @return the hash code value for this pair
+   */
    @Override
    public int hashCode()
    {

@@ -21,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.wj.android.messageviewer.gui;
+package com.wj.android.messageviewer.util;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -134,7 +134,7 @@ public class RecentCollectionTest
 
       for (int i = 19; i >= 10; i--)
       {
-         final String str = RecentCollection.getObject(PREFERENCES, "recentTestFiles." + (i -10)).toString();
+         final String str = m_Recent.getObject(PREFERENCES, "recentTestFiles." + (i -10)).toString();
          assertEquals("" + i, str);
       }
     }
