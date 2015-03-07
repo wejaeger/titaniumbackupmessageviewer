@@ -91,7 +91,17 @@ public class ExtractTarGz
    {
       File returnFile = null;
 
-      final List<File> untaredFiles = extractTarGz(inputFile, outputDir);
+      List<File> untaredFiles;
+
+      try
+      {
+         untaredFiles = extractTarGz(inputFile, outputDir);
+      }
+      catch (final IOException | ArchiveException ex)
+      {
+         untaredFiles = null;
+         LOGGER.log(Level.SEVERE, ex.toString(), ex);
+      }
 
       if (null != untaredFiles)
       {
@@ -125,28 +135,23 @@ public class ExtractTarGz
     *
     * @return The {@link List} of {@link File}s with the untared content or
     *         {@code null} if an error occurred.
+    *
+    * @throws IOException in case of an IO error
+    * @throws ArchiveException in case of an archive error
     */
-   public static List<File> extractTarGz(final File inputFile, final File outputDir)
+   public static List<File> extractTarGz(final File inputFile, final File outputDir) throws IOException, ArchiveException
    {
       List<File> untaredFiles = null;
 
       if (outputDir.exists() || outputDir.mkdirs())
       {
-         try
-         {
-            final InputStream in;
-            if (inputFile.getName().endsWith(".gz"))
-               in = new GZIPInputStream(new FileInputStream(inputFile));
-            else
-               in = new FileInputStream(inputFile);
+         final InputStream in;
+         if (inputFile.getName().endsWith(".gz"))
+            in = new GZIPInputStream(new FileInputStream(inputFile));
+         else
+            in = new FileInputStream(inputFile);
 
-            untaredFiles = unTar(in, outputDir);
-         }
-         catch (final IOException | ArchiveException ex)
-         {
-            untaredFiles = null;
-            LOGGER.log(Level.SEVERE, ex.toString(), ex);
-         }
+         untaredFiles = unTar(in, outputDir);
       }
 
       return(untaredFiles);

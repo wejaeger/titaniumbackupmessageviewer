@@ -31,7 +31,6 @@ import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.Font;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -240,12 +239,14 @@ public final class TitaniumBackupMessageViewer
 
       setFrameIcon();
 
+      UIManager.put("FileChooser.readOnly", Boolean.TRUE);
       m_MessageFileChooser = new JFileChooser();
       m_MessageFileChooser.setDialogTitle("Open message file");
       m_MessageFileChooser.setFileFilter(new TitaniumBackupMessageFileNameFilter());
       m_MessageFileChooser.setApproveButtonToolTipText("You can open the commpressd (.gz) or plain (.xml) message file");
 
 
+      UIManager.put("FileChooser.readOnly", Boolean.TRUE);
       m_ContactsDatabaseChooser = new JFileChooser();
       m_ContactsDatabaseChooser.setDialogTitle("Open contacts database");
       m_ContactsDatabaseChooser.setFileFilter(new TitaniumBackupContactsFileNameFilter());
@@ -258,12 +259,12 @@ public final class TitaniumBackupMessageViewer
       if (null != strMessageFileName && !strMessageFileName.trim().isEmpty())
          m_FileLocations.setFirst(strMessageFileName);
       else
-         m_FileLocations.setFirst("...");
+         m_FileLocations.setFirst(null);
 
       if (null != strContactsDBFileName && !strContactsDBFileName.trim().isEmpty())
          m_FileLocations.setSecond(strContactsDBFileName);
       else
-         m_FileLocations.setSecond("...");
+         m_FileLocations.setSecond(null);
 
       final JLabel lblNumberOfSms = new JLabel("Number of SMS:");
 
@@ -280,7 +281,6 @@ public final class TitaniumBackupMessageViewer
 
       m_ThreadListBox = new MessageThreadList(300);
       m_ThreadListBox.setBackground(m_ReaderFrame.getContentPane().getBackground());
-      m_ThreadListBox.setFont(new Font("Arial Unicode MS", 0, 12));
       m_ThreadListBox.addListSelectionListener(new ListSelectionListener()
       {
          /** @inherited */
@@ -437,7 +437,7 @@ public final class TitaniumBackupMessageViewer
 
    private void addRecentFile2RecentFileMenu(final Pair<String, String> pair)
    {
-      final JMenuItem mnItem = new JMenuItem(pair.getFirst() + FILELOCATIONSEPARATOR + pair.getSecond());
+      final JMenuItem mnItem = new JMenuItem(pair.getFirst() + (pair.getSecond() == null ? "" :  FILELOCATIONSEPARATOR) + (pair.getSecond() == null ? "" :  pair.getSecond()));
       mnItem.addActionListener(new ActionListener()
       {
          @Override
@@ -458,6 +458,7 @@ public final class TitaniumBackupMessageViewer
 
    private void chooseMessageFileAction()
    {
+      m_MessageFileChooser.setSelectedFile(new File(""));
       final int iRet = m_MessageFileChooser.showOpenDialog(m_ReaderFrame);
 
       if (JFileChooser.APPROVE_OPTION == iRet)
@@ -471,19 +472,18 @@ public final class TitaniumBackupMessageViewer
    {
       m_ContactsDatabaseChooser.setCurrentDirectory(m_MessageFileChooser.getCurrentDirectory());
 
+      m_ContactsDatabaseChooser.setSelectedFile(new File(""));
       final int iRet = m_ContactsDatabaseChooser.showOpenDialog(m_ReaderFrame);
 
       if (JFileChooser.APPROVE_OPTION == iRet)
          m_FileLocations.setSecond(m_ContactsDatabaseChooser.getSelectedFile().getAbsolutePath());
-      else
-          m_FileLocations.setSecond(null);
 
       loadAction();
   }
 
    private void loadAction()
    {
-      if (null != m_FileLocations.getFirst() && !m_FileLocations.getFirst().equals("..."))
+      if (null != m_FileLocations.getFirst())
          new LoadMessagesWorker(this, m_ReaderFrame, m_FileLocations, m_RecentCollection, m_Reader, m_ThreadListBox, m_NumberSMSField, m_MessageViewer, m_ScrollPaneThread).execute();
       else
          JOptionPane.showMessageDialog(m_ReaderFrame, "Choose message file first!");
@@ -529,7 +529,7 @@ public final class TitaniumBackupMessageViewer
 
    private void exportAction(final boolean fAll)
    {
-      if (null != m_FileLocations.getFirst() && !m_FileLocations.getFirst().equals("...") && m_ThreadListBox.isEnabled())
+      if (null != m_FileLocations.getFirst() && m_ThreadListBox.isEnabled())
       {
          if (fAll || m_ThreadListBox.getSelectedIndex() != -1)
          {

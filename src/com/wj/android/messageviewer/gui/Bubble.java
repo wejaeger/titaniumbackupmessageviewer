@@ -27,7 +27,6 @@ import com.wj.android.messageviewer.message.IMessage;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Polygon;
@@ -142,7 +141,6 @@ abstract class Bubble implements Serializable
       m_MessagePanel = new MessagePanel(message);
       // defaults to same color as background, so appears transparent
       m_MessagePanel.setBackground(m_Viewer.getBackground());
-      m_MessagePanel.setFont(new Font("Arial Unicode MS", 0, 12));
       setFrameColor(Color.black);
       setFillColor(null);
       m_Dim = new Dimension();
@@ -188,7 +186,7 @@ abstract class Bubble implements Serializable
     */
    public void setLocation (final int ix, final int iy)
    {
-      setLocation(new java.awt.Point(ix, iy));
+      setLocation(new Point(ix, iy));
    }
 
    /**
@@ -197,19 +195,19 @@ abstract class Bubble implements Serializable
     * @param iWidth the width.
     * @param iHeight the height.
     */
-   public final void setSize(final int iWidth, final int iHeight)
+   private void setSize(final int iWidth, final int iHeight)
    {
       setSize(new Dimension(iWidth, iHeight));
    }
 
    /**
     * Sets the size of the Bubble. NOTE: setting an explicit size for the
-    * bubble may cut off some of the text. Use <code>setWidth(int)</code> to
+    * bubble may cut off some of the text. Use {@code setWidth(int)} to
     * specify a width for the bubble while maintaining view of all the text.
     *
     * @param d the dimension to set. May be {@code null};
     */
-   public final void setSize(final Dimension d)
+   private void setSize(final Dimension d)
    {
       if (null != m_MessagePanel)
       {
@@ -271,7 +269,7 @@ abstract class Bubble implements Serializable
       final Dimension dim;
 
       if (null != m_Dim)
-         dim = m_Dim;
+         dim = new Dimension(m_Dim.width, m_Dim.height);
       else
          dim = new Dimension(0, 0);
 
@@ -280,9 +278,9 @@ abstract class Bubble implements Serializable
 
    /**
     * Sizes the Bubble to the given width, but maintains full view of the
- contents by adjusting the height if necessary.
+    * contents by adjusting the height if necessary.
     *
-    * @param iWidth the width to set. May be {@code null};
+    * @param iWidth the width to set.
     */
    public final void setWidth(final int iWidth)
    {

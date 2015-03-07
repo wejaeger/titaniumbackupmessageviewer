@@ -29,3 +29,10 @@ Change log:
 0.9.2
  - handle draft messages
  - various bug fixes
+
+0.9.3
+ - fixed bug: wrong number of messages displayed in some cases
+ - fixed bug: mms are alway the last in order, they do not correctly appear in
+              date/time order
+ - left and right aligned message bubbles in message viewer, with of bubbles no
+   longer fixed, adapts now do the text with.

@@ -209,8 +209,9 @@ public class SMSMessage implements IMessage
     *
     * @param o the reference object with which to compare. May be {@code null}.
     *
-    * @return {@code true} if this message date  is the same as the {@code obj}
-    *          date; {@code false} otherwise.
+    * @return {@code true} if this message date, address, text, service center
+    *         and message box are is the same as the {@code obj} date, address,
+    *         text, service center and message box; {@code false} otherwise.
     */
    @Override
    public boolean equals(final Object o)
@@ -224,7 +225,19 @@ public class SMSMessage implements IMessage
             final SMSMessage msg = (SMSMessage)o;
 
             if (m_MessageDate != null ? m_MessageDate.equals(msg.m_MessageDate) : msg.m_MessageDate == null)
-                  fRet = true;
+            {
+               if (m_strMessageAddress != null ? m_strMessageAddress.equals(msg.m_strMessageAddress) : msg.m_strMessageAddress == null)
+               {
+                  if (m_strMessageText != null ? m_strMessageText.equals(msg.m_strMessageText) : msg.m_strMessageText == null)
+                  {
+                     if (m_msgBox != null ? m_msgBox.equals(msg.m_msgBox) : msg.m_msgBox == null)
+                     {
+                        if (m_strServiceCenter != null ? m_strServiceCenter.equals(msg.m_strServiceCenter) : msg.m_strServiceCenter == null)
+                           fRet = true;
+                     }
+                  }
+               }
+            }
          }
       }
       else
@@ -243,7 +256,7 @@ public class SMSMessage implements IMessage
    {
       int iHash = 5;
 
-      iHash = 73 * iHash + Objects.hashCode(m_MessageDate);
+      iHash = 73 * iHash + Objects.hashCode(m_MessageDate) + Objects.hashCode(m_strMessageAddress) + Objects.hashCode(m_strMessageText) + Objects.hashCode(m_msgBox) + Objects.hashCode(m_strServiceCenter);
 
       return(iHash);
    }

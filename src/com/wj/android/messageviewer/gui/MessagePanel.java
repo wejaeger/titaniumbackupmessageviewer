@@ -41,7 +41,6 @@ import java.awt.image.BufferedImage;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
 
 /**
  * Modified JPanel for easy drawing of
@@ -154,7 +153,7 @@ class MessagePanel extends JPanel
          comp.setLocation(loc);
          loc.y += preferredSize.height + VGAP;
       }
-
+      loc.y -= VGAP;
       return(new Dimension(iWidth, loc.y));
    }
 
@@ -184,7 +183,8 @@ class MessagePanel extends JPanel
          final String strSubject = mmsMessage.getSubject().trim().isEmpty() ? "(no subject)" : mmsMessage.getSubject();
          final JLabel subject =  new JLabel(strSubject, JLabel.CENTER);
          subject.setVerticalAlignment(JLabel.TOP);
-         subject.setFont(new Font("Arial Unicode MS", 0, 24));
+         final Font defFont = subject.getFont();
+         subject.setFont(new Font(defFont.getFamily(), defFont.getStyle(), 24));
          subject.setLocation(loc);
          add(subject);
          loc.y += subject.getPreferredSize().height + VGAP;
@@ -194,11 +194,10 @@ class MessagePanel extends JPanel
             if (part instanceof TextPart)
             {
                final TextPart textPart = (TextPart)part;
-               final JTextArea text = new JTextArea(textPart.getText());
+               final BubbleText text = new BubbleText(textPart.getText());
                text.setEditable(false);
                text.setLineWrap(true);
                text.setWrapStyleWord(true);
-               text.setFont(new Font("Arial Unicode MS", 0, 12));
                text.setLocation(loc);
                add(text);
                loc.y += text.getPreferredSize().height + VGAP;
@@ -206,11 +205,10 @@ class MessagePanel extends JPanel
             else if (part instanceof VCardPart)
             {
                final VCardPart textPart = (VCardPart)part;
-               final JTextArea text = new JTextArea(textPart.getText());
+               final BubbleText text = new BubbleText(textPart.getText());
                text.setEditable(false);
                text.setLineWrap(true);
                text.setWrapStyleWord(true);
-               text.setFont(new Font("Arial Unicode MS", 0, 12));
                text.setLocation(loc);
                add(text);
                loc.y += text.getPreferredSize().height + VGAP;
@@ -250,11 +248,10 @@ class MessagePanel extends JPanel
       }
       else
       {
-         final JTextArea text = new JTextArea(m_Message.getMessageText());
+         final BubbleText text = new BubbleText(m_Message.getMessageText());
          text.setEditable(false);
          text.setLineWrap(true);
          text.setWrapStyleWord(true);
-         text.setFont(new Font("Arial Unicode MS", 0, 12));
          add(text);
       }
    }
