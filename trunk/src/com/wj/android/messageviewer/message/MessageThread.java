@@ -23,9 +23,11 @@
  */
 package com.wj.android.messageviewer.message;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Represents threaded messaging.
@@ -41,7 +43,7 @@ public class MessageThread
 {
    final private String m_strName;
    final private String m_strAddress;
-   final private ArrayList<IMessage> m_MessageList;
+   final private Set<IMessage> m_MessageList;
 
    /**
     * Creates new {@code MessageThread}.
@@ -54,7 +56,7 @@ public class MessageThread
    {
       m_strName = strName;
       m_strAddress = strAddress;
-      m_MessageList = new ArrayList<>();
+      m_MessageList = new TreeSet<>();
    }
 
    /**
@@ -114,5 +116,52 @@ public class MessageThread
          strRet  = m_strName + (!m_strAddress.equals("") ? " - " + m_strAddress : "");
 
       return(strRet);
+   }
+
+   /**
+    * Indicates whether some other object is "equal to" this one.
+    *
+    * @param o the reference object with which to compare. May be {@code null}.
+    *
+    * @return {@code true} if this thread name and thread address are the same
+    *          as the {@code obj} name and address; {@code false} otherwise.
+    */
+   @Override
+   public boolean equals(final Object o)
+   {
+      boolean fRet = false;
+
+      if (this != o)
+      {
+         if (o != null && Objects.equals(getClass(), o.getClass()))
+         {
+            final MessageThread thread = (MessageThread)o;
+
+            if (m_strName != null ? m_strName.equals(thread.m_strName) : thread.m_strName == null)
+            {
+               if (m_strAddress != null ? m_strAddress.equals(thread.m_strAddress) : thread.m_strAddress == null)
+                  fRet = true;
+            }
+         }
+      }
+      else
+         fRet = true;
+
+      return(fRet);
+   }
+
+   /**
+    * Returns a hash code value for the object.
+    *
+    * @return a hash code value for this object.
+    */
+   @Override
+   public int hashCode()
+   {
+      int iResult = m_strName != null ? m_strName.hashCode() : 0;
+
+      iResult = 35 * iResult + (m_strAddress != null ? m_strAddress.hashCode() : 0);
+
+      return(iResult);
    }
 }

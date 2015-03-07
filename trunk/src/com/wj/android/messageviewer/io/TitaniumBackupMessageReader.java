@@ -106,109 +106,122 @@ public class TitaniumBackupMessageReader
     *        Must not be {@code null}.
     * @param contactsDB the SQLLite contact database file or {@code null}.
     *
-    * @return the error code 0 meaning success, 1 {@code is} == {@code null}, 2
-    *          invalid XML and 3 other reading problems.
+    * @return the error code -3 meaning contact database file not found,
+    *         0 meaning success, 1 {@code is} == {@code null}, 2
+    *         invalid XML and 3 other reading problems.
     */
    public int loadMessages(final InputStream is, final File contactsDB)
    {
-      int iErorror = 1;
+      int iError = 0;
 
       if (is != null)
       {
          m_ThreadList.clear();
          m_iNumberOfSMS = 0;
 
-         if (null == m_ContactReader)
-            instantiateContactReader(contactsDB);
-
-         try
+         if (null != contactsDB)
          {
-            final Reader reader = new InputStreamReader(is, DEFAULTCHARSET);
+            if (null == m_ContactReader)
+               instantiateContactReader(contactsDB);
 
-            final DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            final DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            final Document doc = dBuilder.parse(new InputSource(reader));
+            iError = (m_ContactReader == null ? -3 : 0);
+         }
 
-            doc.getDocumentElement().normalize();
-
-            final Element docEle = doc.getDocumentElement();
-
-            final NodeList threads = docEle.getElementsByTagName("thread");
-
-            if ((threads != null) && (threads.getLength() > 0))
+         if (0 == iError)
+         {
+            try
             {
-               for (int i = 0; i < threads.getLength(); i++)
+               final Reader reader = new InputStreamReader(is, DEFAULTCHARSET);
+
+               final DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+               final DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+               final Document doc = dBuilder.parse(new InputSource(reader));
+
+               doc.getDocumentElement().normalize();
+
+               final Element docEle = doc.getDocumentElement();
+
+               final NodeList threads = docEle.getElementsByTagName("thread");
+
+               if ((threads != null) && (threads.getLength() > 0))
                {
-                  if (Node.ELEMENT_NODE == threads.item(i).getNodeType())
+                  for (int i = 0; i < threads.getLength(); i++)
                   {
-                     final Element threadElement = (Element)threads.item(i);
-                     final String strAddress = threadElement.getAttribute("address");
-
-                     final String strContactName = m_ContactReader == null ? null : m_ContactReader.getContactNameForAddress(strAddress.split(";", 2)[0]);
-                     final MessageThread thread = new MessageThread(strContactName, strAddress);
-                     final NodeList messages = threadElement.getChildNodes();
-
-                     m_iNumberOfSMS += messages.getLength();
-
-                     for (int j = 0; j < messages.getLength(); j++)
+                     if (Node.ELEMENT_NODE == threads.item(i).getNodeType())
                      {
-                        if (Node.ELEMENT_NODE == messages.item(j).getNodeType())
+                        final Element threadElement = (Element)threads.item(i);
+                        final String strAddress = threadElement.getAttribute("address");
+
+                        final String strContactName = m_ContactReader == null ? null : m_ContactReader.getContactNameForAddress(strAddress.split(";", 2)[0]);
+                        final MessageThread thread = new MessageThread(strContactName, strAddress);
+                        final NodeList messages = threadElement.getChildNodes();
+
+                        for (int j = 0; j < messages.getLength(); j++)
                         {
-                           final Element             messageElement   = (Element)messages.item(j);
-                           final String              strTagName       = messageElement.getTagName();
-                           final String              strServiceCenter = messageElement.getAttribute("serviceCenter");
-                           final String              strMsgBox        = messageElement.getAttribute("msgBox");
-                           final IMessage.MessageBox msgBox           = IMessage.MessageBox.fromString(strMsgBox);
-
-                           if (null != msgBox)
+                           if (Node.ELEMENT_NODE == messages.item(j).getNodeType())
                            {
-                              final IMessage message;
-                              switch(strTagName)
+                              final Element             messageElement   = (Element)messages.item(j);
+                              final String              strTagName       = messageElement.getTagName();
+                              final String              strServiceCenter = messageElement.getAttribute("serviceCenter");
+                              final String              strMsgBox        = messageElement.getAttribute("msgBox");
+                              final IMessage.MessageBox msgBox           = IMessage.MessageBox.fromString(strMsgBox);
+
+                              if (null != msgBox)
                               {
-                                 case "sms":
-                                    message = elementToMessage(msgBox, strServiceCenter, strAddress, messageElement);
-                                    break;
+                                 final IMessage message;
+                                 switch(strTagName)
+                                 {
+                                    case "sms":
+                                       message = elementToMessage(msgBox, strServiceCenter, strAddress, messageElement);
+                                       break;
 
-                                 case "mms":
-                                    message = elementToMMSMessage(msgBox, strServiceCenter, messageElement);
-                                    break;
+                                    case "mms":
+                                       message = elementToMMSMessage(msgBox, strServiceCenter, messageElement);
+                                       break;
 
-                                 default:
-                                    LOGGER.log(Level.WARNING, "Unknown message type: ''{0}''", strTagName);
-                                    message = null;
+                                    default:
+                                       LOGGER.log(Level.WARNING, "Unknown message type: ''{0}''", strTagName);
+                                       message = null;
+                                 }
+
+                                 if (null != message)
+                                 {
+                                    thread.addMessage(message);
+                                    m_iNumberOfSMS++;
+                                 }
                               }
-
-                              if (null != message)
-                                 thread.addMessage(message);
+                              else
+                                 LOGGER.log(Level.WARNING, "Unknown message box type: ''{0}''", strMsgBox);
                            }
-                           else
-                              LOGGER.log(Level.WARNING, "Unknown message box type: ''{0}''", strMsgBox);
+   //                        else
+   //                           LOGGER.log(Level.WARNING, "Unexpected non message ELEMENT_NODE {0}", messages.item(j).getNodeName());
+
                         }
-//                        else
-//                           LOGGER.log(Level.WARNING, "Unexpected non message ELEMENT_NODE {0}", messages.item(j).getNodeName());
-
+                        m_ThreadList.add(thread);
                      }
-                     m_ThreadList.add(thread);
+   //                  else
+   //                     LOGGER.log(Level.WARNING, "Unexpected non thread ELEMENT_NODE {0}", threads.item(i).getNodeName());
                   }
-//                  else
-//                     LOGGER.log(Level.WARNING, "Unexpected non thread ELEMENT_NODE {0}", threads.item(i).getNodeName());
-               }
 
-               iErorror = 0;
+                  iError = 0;
+               }
+            }
+            catch (SAXException ex)
+            {
+               LOGGER.log(Level.SEVERE, ex.toString(), ex);
+               iError = 2;
+            }
+            catch (ParserConfigurationException | ParseException | IOException ex)
+            {
+               LOGGER.log(Level.SEVERE, ex.toString(), ex);
+               iError = 3;
             }
          }
-         catch (SAXException ex)
-         {
-            LOGGER.log(Level.SEVERE, ex.toString(), ex);
-            iErorror = 2;
-         }
-         catch (ParserConfigurationException | ParseException | IOException ex)
-         {
-            LOGGER.log(Level.SEVERE, ex.toString(), ex);
-            iErorror = 3;
-         }
       }
-      return(iErorror);
+      else
+         iError =1 ;
+
+      return(iError);
    }
 
    /**
@@ -319,7 +332,12 @@ public class TitaniumBackupMessageReader
       {
          if (element.getFirstChild().getNodeType() == Node.TEXT_NODE)
          {
-            final Date date = m_DateFmt.parse(element.getAttribute("date"));
+            final String strDateSent = element.getAttribute("dateSent");
+            final Date date;
+            if (!strDateSent.trim().isEmpty())
+               date= m_DateFmt.parse(strDateSent);
+            else
+               date = m_DateFmt.parse(element.getAttribute("date"));
 
             final IMessage.Encoding encoding = IMessage.Encoding.fromString(element.getAttribute("encoding"));
 

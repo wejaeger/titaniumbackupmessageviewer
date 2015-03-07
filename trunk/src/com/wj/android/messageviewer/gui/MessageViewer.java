@@ -150,7 +150,7 @@ class MessageViewer extends JPanel
    {
       if (null != message.getMessageBox())
       {
-         // append message info date/zime sent/received
+         // append message info date/time sent/received
          final SMSMessage messageInfo = new SMSMessage(message.getServiceCenter(), message.getMessageAddress(), message.getMessageDate(), message.getFormattedMessageDate(), message.getMessageBox());
 
          final Bubble b;
@@ -182,6 +182,8 @@ class MessageViewer extends JPanel
 
       int iVGap = 0;
 
+      setWidth(b);
+
       switch (b.getType())
       {
          case LEFTINFO:
@@ -195,12 +197,12 @@ class MessageViewer extends JPanel
 
          case RIGHTINFO:
             iVGap = VGAP;
-            ix = getWidth() - calcBubbleWidth() - RIGHT_MARGIN;
+            ix = getWidth() - b.getWidth() - RIGHT_MARGIN;
             break;
 
          case RIGHTARROW:
          case DRAFT:
-            ix = getWidth() - calcBubbleWidth() - RIGHT_MARGIN;
+            ix = getWidth() - b.getWidth() - RIGHT_MARGIN;
             break;
 
          default:
@@ -208,7 +210,6 @@ class MessageViewer extends JPanel
       }
 
       b.setLocation(ix, m_iHeight);
-      setWidth(b);
       m_iHeight += b.getHeight() + iVGap;
    }
 

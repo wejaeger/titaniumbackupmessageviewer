@@ -123,7 +123,7 @@ class LoadMessagesWorker extends AbstractDisabelingUIWorker<Integer, Integer>
 
             final File contactsDBFile;
             final String strContactsDBFileName = m_FileLocations.getSecond();
-            if (null != strContactsDBFileName && !strContactsDBFileName.trim().isEmpty() && !strContactsDBFileName.equals("..."))
+            if (null != strContactsDBFileName && !strContactsDBFileName.trim().isEmpty())
                contactsDBFile= new File(strContactsDBFileName);
             else
                contactsDBFile = null;
@@ -194,13 +194,19 @@ class LoadMessagesWorker extends AbstractDisabelingUIWorker<Integer, Integer>
                break;
 
             case -1:
-               strErrorMessage = strErrorMessage + "Error Code " + iResult + ": Problem file not found!\n";
+               strErrorMessage = strErrorMessage + "Error Code " + iResult + ": Problem message file not found!\n";
                m_RecentCollection.remove(new Pair<>(m_FileLocations));
                m_Caller.syncRecentFiles();
                break;
 
             case -2:
                strErrorMessage = strErrorMessage + "Error Code " + iResult + ": Problem closing the file!\n";
+               break;
+
+            case -3:
+               strErrorMessage = strErrorMessage + "Error Code " + iResult + ": Problem contact database file file not found!\n";
+               m_RecentCollection.remove(new Pair<>(m_FileLocations));
+               m_Caller.syncRecentFiles();
                break;
 
             case 1:
@@ -233,6 +239,8 @@ class LoadMessagesWorker extends AbstractDisabelingUIWorker<Integer, Integer>
          LOGGER.log(Level.SEVERE, ex.toString(), ex);
       }
 
+      m_FileLocations.setFirst(null);
+      m_FileLocations.setSecond(null);
       super.done();
    }
 }
