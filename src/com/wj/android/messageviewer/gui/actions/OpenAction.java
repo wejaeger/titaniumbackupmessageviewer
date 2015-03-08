@@ -23,12 +23,9 @@
  */
 package com.wj.android.messageviewer.gui.actions;
 
-import com.wj.android.messageviewer.gui.MessageViewer;
 import com.wj.android.messageviewer.gui.TitaniumBackupMessageViewer;
 import com.wj.android.messageviewer.gui.workers.LoadMessagesWorker;
-import com.wj.android.messageviewer.message.MessageThread;
 import com.wj.android.messageviewer.util.Pair;
-import com.wj.android.messageviewer.util.RecentCollection;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
@@ -36,10 +33,6 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 
@@ -55,11 +48,6 @@ public class OpenAction extends AbstractAction
 
    private transient final TitaniumBackupMessageViewer m_Caller;
    private final JFrame m_Frame;
-   private transient final RecentCollection<Pair<String, String>> m_RecentCollection;
-   private final JList<MessageThread> m_ThreadListBox;
-   private final JTextField m_NumberSMSField;
-   private final MessageViewer m_MessageViewer;
-   private final JScrollPane m_ScrollPaneThread;
 
    private final JFileChooser m_MessageFileChooser;
    private final JFileChooser m_ContactsDatabaseChooser;
@@ -69,14 +57,8 @@ public class OpenAction extends AbstractAction
     *
     * @param caller the calling application
     * @param frame application main window
-    * @param recentCollection recent file list
-    * @param threadListBox list of currently loaded threads
-    * @param numberSMSField displays the number of loaded messages
-    * @param messageViewer the pane that displays thread message
-    * @param scrollPaneThread scroll pane for thread list
     */
-   public OpenAction(final TitaniumBackupMessageViewer caller, final JFrame frame, final RecentCollection<Pair<String, String>> recentCollection,
-                     final JList<MessageThread> threadListBox, final JTextField numberSMSField, final MessageViewer messageViewer, final JScrollPane scrollPaneThread)
+   public OpenAction(final TitaniumBackupMessageViewer caller, final JFrame frame)
    {
       putValue(Action.NAME, "Open ...");
       putValue(Action.MNEMONIC_KEY, KeyEvent.VK_O);
@@ -84,11 +66,6 @@ public class OpenAction extends AbstractAction
 
       m_Caller = caller;
       m_Frame = frame;
-      m_RecentCollection = recentCollection;
-      m_ThreadListBox = threadListBox;
-      m_NumberSMSField = numberSMSField;
-      m_MessageViewer = messageViewer;
-      m_ScrollPaneThread = scrollPaneThread;
 
       UIManager.put("FileChooser.readOnly", Boolean.TRUE);
       m_MessageFileChooser = new JFileChooser();
@@ -119,13 +96,9 @@ public class OpenAction extends AbstractAction
       if (null != strMessageFilePath)
       {
          final String strContactDatabaseFilePath = chooseContactsDBFilePath(strMessageFilePath);
-         new LoadMessagesWorker(m_Caller, m_Frame, new Pair<>(strMessageFilePath, strContactDatabaseFilePath), m_RecentCollection, m_ThreadListBox, m_NumberSMSField,
-                                m_MessageViewer, m_ScrollPaneThread).execute();
+         new LoadMessagesWorker(m_Caller, m_Frame, new Pair<>(strMessageFilePath, strContactDatabaseFilePath)).execute();
       }
-      else
-         JOptionPane.showMessageDialog(m_Frame, "Choose message file first!");
    }
-
 
    private String chooseMessageFilePath()
    {

@@ -24,12 +24,13 @@
 package com.wj.android.messageviewer.gui;
 
 import com.wj.android.messageviewer.message.MessageThread;
+import com.wj.android.messageviewer.resources.Resources;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import javax.swing.DefaultListCellRenderer;
-import javax.swing.ImageIcon;
+import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -43,8 +44,7 @@ import javax.swing.JTextArea;
  */
 class MessageThreadList extends JList<MessageThread>
 {
-   final private static String RESOURCEPATH = "/com/wj/android/messageviewer/resources/";
-   final private static ImageIcon ICON = new ImageIcon(MessageThreadListCellRenderer.class.getResource(RESOURCEPATH + "user16.png"));
+   final private static Icon ICON = Resources.getIcon(Resources.USER16);
    private static final long serialVersionUID = -1648776942721559318L;
 
    final class MessageThreadComponentAdapter extends ComponentAdapter
@@ -64,7 +64,7 @@ class MessageThreadList extends JList<MessageThread>
     *
     * @author <a href="mailto:werner.jaeger@t-systems.com">Werner Jaeger</a>
     */
-   final class MessageThreadListCellRenderer extends DefaultListCellRenderer
+   static class MessageThreadListCellRenderer extends DefaultListCellRenderer
    {
       private static final long serialVersionUID = -2684873318524485434L;
       final private JPanel m_Panel;
