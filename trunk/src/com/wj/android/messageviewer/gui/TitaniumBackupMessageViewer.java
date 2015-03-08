@@ -23,34 +23,25 @@
  */
 package com.wj.android.messageviewer.gui;
 
+import com.wj.android.messageviewer.gui.actions.AboutAction;
 import com.wj.android.messageviewer.gui.actions.ExportAllMessagesAction;
 import com.wj.android.messageviewer.gui.actions.ExportSelectedMessagesAction;
+import com.wj.android.messageviewer.gui.actions.HelpAction;
 import com.wj.android.messageviewer.gui.actions.OpenAction;
 import com.wj.android.messageviewer.gui.actions.OpenRecentFileAction;
+import com.wj.android.messageviewer.gui.actions.QuitAction;
 import com.wj.android.messageviewer.util.RecentCollection;
 import com.wj.android.messageviewer.util.Pair;
 import com.wj.android.messageviewer.gui.workers.DisplayThreadMessageWorker;
 import com.wj.android.messageviewer.gui.workers.LoadMessagesWorker;
 import com.wj.android.messageviewer.message.MessageThread;
+import com.wj.android.messageviewer.resources.Resources;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
-import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.Image;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
@@ -58,24 +49,17 @@ import java.util.prefs.Preferences;
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
-import javax.swing.ImageIcon;
-import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
-import javax.swing.KeyStroke;
-import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.border.EtchedBorder;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -117,40 +101,8 @@ public final class TitaniumBackupMessageViewer
       }
    }
 
-   private static class HyperlinkListenerImpl implements HyperlinkListener
-   {
-      public HyperlinkListenerImpl()
-      {
-      }
-
-      @Override
-      public void hyperlinkUpdate(final HyperlinkEvent evt)
-      {
-         if (HyperlinkEvent.EventType.ACTIVATED == evt.getEventType())
-         {
-            if(Desktop.isDesktopSupported())
-            {
-               try
-               {
-                  Desktop.getDesktop().browse(evt.getURL().toURI());
-               }
-               catch (final IOException | URISyntaxException e)
-               {
-                  LOGGER.log(Level.SEVERE, e.toString(), e);
-               }
-            }
-         }
-      }
-   }
-
    private static final Logger LOGGER = Logger.getLogger(TitaniumBackupMessageViewer.class.getName());
 
-   // various keys for application.properties
-   private static final String VERSION = "version.num";
-   private static final String DATE = "version.dat";
-   private static final String TITLE = "project.name";
-
-   private static final String RESOURCEPATH = "/com/wj/android/messageviewer/resources/";
    private static final Preferences PREFERENCES = Preferences.userNodeForPackage(TitaniumBackupMessageViewer.class);
 
    private static final String recentFilesKey = "recentfile";
@@ -165,8 +117,6 @@ public final class TitaniumBackupMessageViewer
 
    private JFrame m_ReaderFrame;
    private JTextField m_NumberSMSField;
-   private JScrollPane m_ScrollPaneThread;
-   private JScrollPane m_ScrollPaneMessages;
    private JMenu m_mnRecentFiles;
    private JList<MessageThread> m_ThreadListBox;
    private MessageViewer m_MessageViewer;
@@ -214,21 +164,50 @@ public final class TitaniumBackupMessageViewer
    }
 
    /**
-    * Synchronizes recent files menu with preferences.
+    * Called to notify that messages are successfully loaded from file.
     *
     * <p>
-    *    Populates recent file menu items form stored preferences.
+    *    Adds the read thread to the thread list box, set the number of SMS
+    *    field, clears the message viewer and add the files from where the
+    *    messages where loaded to the recent file list.
     * </p>
+    *
+    * @param treads the thread containing the messages that where read from
+    *        the specified file
+    *
+    * @param iNoOfMessages the total number of messages read
+    * @param files2load the files (message file and optionally contacts
+    *        database) where messages were loaded from
     */
-   public void syncRecentFiles()
+   public void onMessagesLoaded(final MessageThread[] treads, final int iNoOfMessages, final Pair<String, String> files2load)
    {
-      if (null != m_mnRecentFiles)
-      {
-         m_mnRecentFiles.removeAll();
+      m_ThreadListBox.clearSelection();
+      m_ThreadListBox.setListData(treads);
+      m_ThreadListBox.setEnabled(true);
+      if (0 < m_ThreadListBox.getModel().getSize())
+         m_ThreadListBox.setSelectedIndex(0);
 
-         for (final Pair<String, String> pair : m_RecentCollection)
-            addRecentFile2RecentFileMenu(pair);
-      }
+      m_NumberSMSField.setText(Integer.toString(iNoOfMessages));
+      m_MessageViewer.clear();
+
+      m_RecentCollection.add(files2load);
+      syncRecentFiles();
+   }
+
+   /**
+    * Called to notify that loading messages from the specified files failed
+    * because the specified  message and/or contacts database file were not
+    * found.
+    *
+    * <p>
+    *    Removes the files not found from the recent files list.
+    * </p>
+    * @param files2load
+    */
+   public void onMessageFileNotFound(final Pair<String, String> files2load)
+   {
+      m_RecentCollection.remove(files2load);
+      syncRecentFiles();
    }
 
    /**
@@ -242,16 +221,16 @@ public final class TitaniumBackupMessageViewer
          @Override
          public void windowClosing(final WindowEvent windowEvent)
          {
-            shutdown();
+            savePreferences();
          }
       });
 
-      m_ReaderFrame.setTitle(getApplicationProperty(TITLE));
+      m_ReaderFrame.setTitle(Resources.getApplicationName());
       m_ReaderFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
       initReaderFrameFromPrefs();
 
-      setFrameIcon();
+      m_ReaderFrame.setIconImages(Resources.getFrameIcons());
 
       final JLabel lblNumberOfSms = new JLabel("Number of SMS:");
 
@@ -262,8 +241,8 @@ public final class TitaniumBackupMessageViewer
 
       m_MessageViewer = new MessageViewer();
       m_MessageViewer.setBackground(m_ReaderFrame.getContentPane().getBackground());
-      m_ScrollPaneMessages = new JScrollPane(m_MessageViewer);
-      m_ScrollPaneMessages.getVerticalScrollBar().setUnitIncrement(10);
+      JScrollPane scrollPaneMessages = new JScrollPane(m_MessageViewer);
+      scrollPaneMessages.getVerticalScrollBar().setUnitIncrement(10);
 
       m_ThreadListBox = new MessageThreadList(300);
       m_ThreadListBox.setBackground(m_ReaderFrame.getContentPane().getBackground());
@@ -277,7 +256,7 @@ public final class TitaniumBackupMessageViewer
          }
       });
 
-      m_ScrollPaneThread = new JScrollPane(m_ThreadListBox);
+      JScrollPane scrollPaneThread = new JScrollPane(m_ThreadListBox);
       m_ThreadListBox.setModel(new AbstractListModelImpl());
 
       m_ThreadListBox.setEnabled(false);
@@ -294,20 +273,20 @@ public final class TitaniumBackupMessageViewer
       h1Box.setAlignmentX(Component.LEFT_ALIGNMENT);
 
       final Box h2Box = Box.createHorizontalBox();
-      h2Box.add(m_ScrollPaneThread);
+      h2Box.add(scrollPaneThread);
       h2Box.add(Box.createHorizontalStrut(10));
-      h2Box.add(m_ScrollPaneMessages);
+      h2Box.add(scrollPaneMessages);
       h2Box.setAlignmentX(Component.LEFT_ALIGNMENT);
 
       m_ReaderFrame.add(h1Box, BorderLayout.PAGE_START);
       m_ReaderFrame.add(h2Box, BorderLayout.CENTER);
 
-      m_ScrollPaneThread.setMinimumSize(new Dimension(100,  100));
-      m_ScrollPaneThread.setMaximumSize(new Dimension(m_ThreadListBox.getPreferredSize().width, Short.MAX_VALUE));
-      m_ScrollPaneMessages.setMinimumSize(new Dimension(300, 100));
+      scrollPaneThread.setMinimumSize(new Dimension(100,  100));
+      scrollPaneThread.setMaximumSize(new Dimension(m_ThreadListBox.getPreferredSize().width, Short.MAX_VALUE));
+      scrollPaneMessages.setMinimumSize(new Dimension(300, 100));
 
       if (null != files2Open.getFirst())
-         new LoadMessagesWorker(this, m_ReaderFrame, files2Open, m_RecentCollection, m_ThreadListBox, m_NumberSMSField, m_MessageViewer, m_ScrollPaneThread).execute();
+         new LoadMessagesWorker(this, m_ReaderFrame, files2Open).execute();
    }
 
    private void createMenu()
@@ -318,63 +297,21 @@ public final class TitaniumBackupMessageViewer
       final JMenu mnFile = new JMenu("File");
       menuBar.add(mnFile);
 
-      final OpenAction openAction = new OpenAction(this, m_ReaderFrame, m_RecentCollection, m_ThreadListBox, m_NumberSMSField, m_MessageViewer, m_ScrollPaneThread);
-      final JMenuItem mntmOpen = new JMenuItem(openAction);
-      mnFile.add(mntmOpen);
+      mnFile.add(new JMenuItem(new OpenAction(this, m_ReaderFrame)));
 
       createRecentFileMenu(mnFile);
 
       mnFile.add(new JSeparator()); // SEPARATOR
-
-      final ExportSelectedMessagesAction exportSelectedAction = new ExportSelectedMessagesAction(m_ReaderFrame, m_ThreadListBox);
-      final JMenuItem mntmExportSelected = new JMenuItem(exportSelectedAction);
-      mnFile.add(mntmExportSelected);
-
-      final ExportAllMessagesAction exportAllAction = new ExportAllMessagesAction(m_ReaderFrame, m_ThreadListBox);
-      final JMenuItem mntmExportAll = new JMenuItem(exportAllAction);
-      mnFile.add(mntmExportAll);
-
-
+      mnFile.add(new JMenuItem(new ExportSelectedMessagesAction(m_ReaderFrame, m_ThreadListBox)));
+      mnFile.add(new JMenuItem(new ExportAllMessagesAction(m_ReaderFrame, m_ThreadListBox)));
       mnFile.add(new JSeparator()); // SEPARATOR
-
-      final JMenuItem mntmClose = new JMenuItem("Quit");
-      mntmClose.setMnemonic(KeyEvent.VK_Q);
-      mntmClose.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, ActionEvent.CTRL_MASK));
-      mntmClose.setToolTipText("Quit application");
-      mntmClose.addActionListener(new ActionListener()
-      {
-         @Override
-         public void actionPerformed(ActionEvent event)
-         {
-            shutdown();
-         }
-      });
-      mnFile.add(mntmClose);
+      mnFile.add(new JMenuItem(new QuitAction(m_ReaderFrame)));
 
       final JMenu mnHelp = new JMenu("Help");
       menuBar.add(mnHelp);
 
-      final JMenuItem mntmHelp = new JMenuItem("Help");
-      mntmHelp.addActionListener(new ActionListener()
-      {
-         @Override
-         public void actionPerformed(final ActionEvent evt)
-         {
-            helpAction();
-         }
-      });
-      mnHelp.add(mntmHelp);
-
-      final JMenuItem mntmAboutAndroidMessageReader = new JMenuItem("About " + getApplicationProperty(TITLE));
-      mntmAboutAndroidMessageReader.addActionListener(new ActionListener()
-      {
-         @Override
-         public void actionPerformed(final ActionEvent evt)
-         {
-            aboutAction();
-         }
-      });
-      mnHelp.add(mntmAboutAndroidMessageReader);
+      mnHelp.add(new JMenuItem(new HelpAction()));
+      mnHelp.add(new JMenuItem(new AboutAction(m_ReaderFrame)));
    }
 
    private void createRecentFileMenu(final JMenu mnFile)
@@ -389,97 +326,28 @@ public final class TitaniumBackupMessageViewer
       }
    }
 
-   private void addRecentFile2RecentFileMenu(final Pair<String, String> pair)
+   /**
+    * Synchronizes recent files menu with preferences.
+    *
+    * <p>
+    *    Populates recent file menu items form stored preferences.
+    * </p>
+    */
+   private void syncRecentFiles()
    {
-      final OpenRecentFileAction action = new OpenRecentFileAction(this, m_ReaderFrame, pair, m_RecentCollection, m_ThreadListBox, m_NumberSMSField, m_MessageViewer, m_ScrollPaneThread);
+      if (null != m_mnRecentFiles)
+      {
+         m_mnRecentFiles.removeAll();
 
-      final JMenuItem mnItem = new JMenuItem(action);
-      m_mnRecentFiles.add(mnItem);
-    }
+         for (final Pair<String, String> pair : m_RecentCollection)
+            m_mnRecentFiles.add(new JMenuItem(new OpenRecentFileAction(this, m_ReaderFrame, pair)));
+      }
+   }
 
    private void threadListValueChanged(final ListSelectionEvent evt)
    {
       if (!evt.getValueIsAdjusting())
          new DisplayThreadMessageWorker(m_ReaderFrame, m_ThreadListBox.getSelectedValue(), m_MessageViewer).execute();
-   }
-
-   private void helpAction()
-   {
-   }
-
-   private void aboutAction()
-   {
-      final StringBuffer strText = new StringBuffer("<html><body><center><h4>");
-      strText.append(getApplicationProperty(TITLE));
-      strText.append("</h4></center>");
-      strText.append("<center><h5>");
-      strText.append(getApplicationProperty(VERSION));
-      strText.append(" (");
-      strText.append(getApplicationProperty(DATE));
-      strText.append(")</h5></center>");
-      strText.append("<p><center>View messages from your Android device in a conversation like style.</center></p>");
-      strText.append("<p><center>Copyright &copy; ");
-      strText.append(getApplicationProperty(DATE).substring(0, 4));
-      strText.append(" Werner Jaeger</center></p>");
-      strText.append("<p><center>For more information please visit</center>");
-      strText.append("<center><a href=\"https://sourceforge.net/projects/titaniumbackupmessageviewer/\">sourceforge.net/projects/titaniumbackupmessageviewer</a></center></p>");
-      strText.append("</body></html>");
-
-      final JEditorPane textPane = new JEditorPane();
-      textPane.setContentType("text/html");
-      textPane.setEditable(false);
-      textPane.setText(strText.toString());
-      textPane.setBackground((Color)UIManager.get("OptionPane.background"));
-      textPane.addHyperlinkListener(new HyperlinkListenerImpl());
-
-      JOptionPane.showMessageDialog(m_ReaderFrame, textPane, "About", JOptionPane.INFORMATION_MESSAGE, getDialogIcon());
-   }
-
-   private void setFrameIcon()
-   {
-      final String[] astrIcons = {"app-icon32.png", "app-icon48.png", "app-icon64.png"};
-      final List<Image> icons = new ArrayList<>(5);
-
-      for (final String astrIcon : astrIcons)
-      {
-         final ImageIcon icon = new ImageIcon(getClass().getResource(RESOURCEPATH + astrIcon));
-         icons.add(icon.getImage());
-      }
-      m_ReaderFrame.setIconImages(icons);
-   }
-
-   private ImageIcon getDialogIcon()
-   {
-      return(new ImageIcon(getClass().getResource(RESOURCEPATH + "app-icon32.png")));
-   }
-
-   private void shutdown()
-   {
-      savePreferences();
-
-      // this will make sure WindowListener.windowClosing() et al. will be called.
-      final WindowEvent wev = new WindowEvent(m_ReaderFrame, WindowEvent.WINDOW_CLOSING);
-      Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(wev);
-   }
-
-   private static String getApplicationProperty(final String strKey)
-   {
-      final Properties appProps = new Properties();
-
-      String strVal;
-
-      try (final InputStream is = TitaniumBackupMessageViewer.class.getResourceAsStream(RESOURCEPATH + "application.properties"))
-      {
-         appProps.load(is);
-         strVal = appProps.getProperty(strKey, "");
-      }
-      catch (final IOException ex)
-      {
-         LOGGER.log(Level.SEVERE, ex.toString(), ex);
-         strVal = "";
-      }
-
-      return(strVal);
    }
 
    private void initReaderFrameFromPrefs()

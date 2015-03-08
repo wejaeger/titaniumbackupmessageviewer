@@ -23,12 +23,9 @@
  */
 package com.wj.android.messageviewer.gui.workers;
 
-import com.wj.android.messageviewer.gui.MessageViewer;
 import com.wj.android.messageviewer.util.Pair;
-import com.wj.android.messageviewer.util.RecentCollection;
 import com.wj.android.messageviewer.gui.TitaniumBackupMessageViewer;
 import com.wj.android.messageviewer.io.TitaniumBackupMessageReader;
-import com.wj.android.messageviewer.message.MessageThread;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -39,10 +36,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 import javax.swing.JFrame;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
 
 /**
  * Read and Load message files in the background.
@@ -57,11 +51,6 @@ public class LoadMessagesWorker extends AbstractDisabelingUIWorker<Integer, Inte
    private final TitaniumBackupMessageViewer m_Caller;
    private final JFrame m_ReaderFrame;
    private final Pair<String, String> m_FileLocations;
-   private final RecentCollection<Pair<String, String>> m_RecentCollection;
-   private final JList<MessageThread> m_ThreadListBox;
-   private final JTextField m_NumberSMSField;
-   private final MessageViewer m_MessageViewer;
-   private final JScrollPane m_ScrollPaneThread;
 
    /**
     * Constructs a new {@code LoadMessagesWorker}.
@@ -69,14 +58,8 @@ public class LoadMessagesWorker extends AbstractDisabelingUIWorker<Integer, Inte
     * @param caller the calling application
     * @param readerFrame application main window
     * @param fileLocations message and contact database file path
-    * @param recentCollection recent file list
-    * @param threadListBox list of currently loaded threads
-    * @param numberSMSField displays the number of loaded messages
-    * @param messageViewer the pane that displays thread message
-    * @param scrollPaneThread scroll pane for thread list
     */
-   public LoadMessagesWorker(final TitaniumBackupMessageViewer caller, final JFrame readerFrame, final Pair<String, String> fileLocations, final RecentCollection<Pair<String, String>> recentCollection,
-                             final JList<MessageThread> threadListBox, final JTextField numberSMSField, final MessageViewer messageViewer, final JScrollPane scrollPaneThread)
+   public LoadMessagesWorker(final TitaniumBackupMessageViewer caller, final JFrame readerFrame, final Pair<String, String> fileLocations)
    {
       super(readerFrame, 0);
 
@@ -85,11 +68,6 @@ public class LoadMessagesWorker extends AbstractDisabelingUIWorker<Integer, Inte
       m_Caller = caller;
       m_ReaderFrame = readerFrame;
       m_FileLocations = fileLocations;
-      m_RecentCollection = recentCollection;
-      m_ThreadListBox = threadListBox;
-      m_NumberSMSField = numberSMSField;
-      m_MessageViewer = messageViewer;
-      m_ScrollPaneThread = scrollPaneThread;
    }
 
    /**
@@ -133,8 +111,6 @@ public class LoadMessagesWorker extends AbstractDisabelingUIWorker<Integer, Inte
                contactsDBFile = null;
 
             iRet = m_Reader.loadMessages(is, contactsDBFile);
-
-            m_ScrollPaneThread.setPreferredSize(m_ThreadListBox.getPreferredSize());
          }
          catch (FileNotFoundException ex)
          {
@@ -184,23 +160,12 @@ public class LoadMessagesWorker extends AbstractDisabelingUIWorker<Integer, Inte
          switch (iResult)
          {
             case 0:
-               m_ThreadListBox.clearSelection();
-               m_ThreadListBox.setListData(m_Reader.getThreadArray());
-               m_ThreadListBox.setEnabled(true);
-               m_NumberSMSField.setText(Integer.toString(m_Reader.getNumberOfSMS()));
-               m_MessageViewer.clear();
-
-               if (0 < m_Reader.getNumberOfSMS())
-                  m_ThreadListBox.setSelectedIndex(0);
-
-               m_RecentCollection.add(m_FileLocations);
-               m_Caller.syncRecentFiles();
+               m_Caller.onMessagesLoaded(m_Reader.getThreadArray(), iResult, m_FileLocations);
                break;
 
             case -1:
                strErrorMessage = strErrorMessage + "Error Code " + iResult + ": Problem message file not found!\n";
-               m_RecentCollection.remove(m_FileLocations);
-               m_Caller.syncRecentFiles();
+               m_Caller.onMessageFileNotFound(m_FileLocations);
                break;
 
             case -2:
@@ -209,8 +174,7 @@ public class LoadMessagesWorker extends AbstractDisabelingUIWorker<Integer, Inte
 
             case -3:
                strErrorMessage = strErrorMessage + "Error Code " + iResult + ": Problem contact database file file not found!\n";
-               m_RecentCollection.remove(m_FileLocations);
-               m_Caller.syncRecentFiles();
+               m_Caller.onMessageFileNotFound(m_FileLocations);
                break;
 
             case 1:
