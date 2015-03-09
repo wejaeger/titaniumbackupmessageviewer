@@ -56,7 +56,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
- * Loads and exports message {@code xml} files from Titanium Backup folder.
+ * Loads message {@code xml} files from Titanium Backup folder.
  *
  * <p>
  *  Message files appear as file
@@ -72,7 +72,7 @@ import org.xml.sax.SAXException;
  *
  * @author Werner Jaeger
  */
-public class TitaniumBackupMessageReader
+public class TitaniumBackupMessageReader implements IMessageReader
 {
    private static final Logger LOGGER = Logger.getLogger(TitaniumBackupMessageReader.class.getName());
 
@@ -106,6 +106,7 @@ public class TitaniumBackupMessageReader
     *         0 meaning success, 1 {@code is} == {@code null}, 2
     *         invalid XML and 3 other reading problems.
     */
+   @Override
    public int loadMessages(final InputStream is, final File contactsDB)
    {
       int iError = 0;
@@ -225,6 +226,7 @@ public class TitaniumBackupMessageReader
     *
     * @return array of all threads. Never {@code null}.
     */
+   @Override
    public MessageThread[] getThreadArray()
    {
       return(m_ThreadList.toArray(new MessageThread[m_ThreadList.size()]));
@@ -235,7 +237,8 @@ public class TitaniumBackupMessageReader
     *
     * @return the number of messages
     */
-   public int getNumberOfSMS()
+   @Override
+   public int getNumberOfMessages()
    {
       return(m_iNumberOfSMS);
    }
@@ -376,7 +379,7 @@ public class TitaniumBackupMessageReader
                   if (null != messagePart)
                      partsRet.add(messagePart);
                   else
-                     LOGGER.log(Level.WARNING, "Failed to instatiate message üart for content typ: ''{0}''", strContentType);
+                     LOGGER.log(Level.WARNING, "Failed to instatiate message part for content typ: ''{0}''", strContentType);
                }
                else
                   LOGGER.log(Level.WARNING, "Unknown content typ: ''{0}''", strContentType);
