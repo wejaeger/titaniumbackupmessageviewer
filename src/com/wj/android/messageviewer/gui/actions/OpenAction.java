@@ -25,6 +25,7 @@ package com.wj.android.messageviewer.gui.actions;
 
 import com.wj.android.messageviewer.gui.BackupMessageViewerFrame;
 import com.wj.android.messageviewer.gui.workers.LoadMessagesWorker;
+import com.wj.android.messageviewer.io.IMessageReader;
 import com.wj.android.messageviewer.util.Pair;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -32,6 +33,7 @@ import java.io.File;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 
@@ -67,6 +69,7 @@ public class OpenAction extends AbstractAction
       m_MessageFileChooser = new JFileChooser();
       m_MessageFileChooser.setDialogTitle("Open message file");
       m_MessageFileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
+      m_MessageFileChooser.addChoosableFileFilter(new SMSBackupAndResoreMessageFileNameFilter());
       m_MessageFileChooser.setFileFilter(new TitaniumBackupMessageFileNameFilter());
       m_MessageFileChooser.setApproveButtonToolTipText("You can open the commpressd (.gz) or plain (.xml) message file");
 
@@ -91,8 +94,20 @@ public class OpenAction extends AbstractAction
 
       if (null != strMessageFilePath)
       {
-         final String strContactDatabaseFilePath = chooseContactsDBFilePath(strMessageFilePath);
-         new LoadMessagesWorker(m_Frame, new Pair<>(strMessageFilePath, strContactDatabaseFilePath)).execute();
+         IMessageReader.MessageFileType messageReaderType = IMessageReader.MessageFileType.getMessageFileType(strMessageFilePath);
+
+         if (null != messageReaderType)
+         {
+            final String strContactDatabaseFilePath;
+            if (IMessageReader.MessageFileType.TITANIUM == messageReaderType)
+               strContactDatabaseFilePath = chooseContactsDBFilePath(strMessageFilePath);
+            else
+               strContactDatabaseFilePath = null;
+
+            new LoadMessagesWorker(m_Frame, new Pair<>(strMessageFilePath, strContactDatabaseFilePath), messageReaderType).execute();
+         }
+         else
+            JOptionPane.showMessageDialog(m_Frame, "Specified file is a unknown backup message file", "Error", JOptionPane.ERROR_MESSAGE);
       }
    }
 

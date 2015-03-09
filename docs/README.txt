@@ -37,3 +37,5 @@ Change log:
  - left and right aligned message bubbles in message viewer, width of bubbles no
    longer fixed, adapts now do the text width.
  - display long recent files path names shortened
+ - Now also supports backup message XML files from SMS Backup and Restore App by
+   Ritesh (not only Titanium Backup)

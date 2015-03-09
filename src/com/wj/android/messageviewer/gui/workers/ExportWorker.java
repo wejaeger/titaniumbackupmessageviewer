@@ -128,16 +128,16 @@ public class ExportWorker extends AbstractDisabelingUIWorker<Boolean, Void>
          if (fResult)
          {
             if (m_fAll)
-               JOptionPane.showMessageDialog(m_Frame, "All messages exported successfully!");
+               JOptionPane.showMessageDialog(m_Frame, "All messages exported successfully!", "Info", JOptionPane.INFORMATION_MESSAGE);
             else
-               JOptionPane.showMessageDialog(m_Frame, "Messages with selected threads exported successfully!");
+               JOptionPane.showMessageDialog(m_Frame, "Messages with selected threads exported successfully!", "Info", JOptionPane.INFORMATION_MESSAGE);
          }
          else
          {
             if (m_fAll)
-               JOptionPane.showMessageDialog(m_Frame, "Failed to export all messages!");
+               JOptionPane.showMessageDialog(m_Frame, "Failed to export all messages!", "Error", JOptionPane.ERROR_MESSAGE);
             else
-               JOptionPane.showMessageDialog(m_Frame, "Failed to export selected messages!");
+               JOptionPane.showMessageDialog(m_Frame, "Failed to export selected messages!", "Error", JOptionPane.ERROR_MESSAGE);
          }
       }
       catch (final ExecutionException ex)

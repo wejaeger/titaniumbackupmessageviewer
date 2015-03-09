@@ -94,17 +94,27 @@ public interface IMessage extends Comparable<IMessage>, Serializable
    public enum MessageBox
    {
       /** Message was sent. */
-      SENT ("sent"),
+      SENT ("sent", "2"),
       /** Message was received. */
-      INBOX ("inbox"),
+      INBOX ("inbox", "1"),
       /** Daft message box */
-      DRAFT ("draft");
+      DRAFT ("draft", "3"),
+      /** Message not yet sent */
+      OUTBOX ("outbox", "4"),
+      /** Failed */
+      FAILED ("failed", "5"),
+      /** Message is queued */
+      QUEED ("queued", "6");
 
+      /** used by titanium */
       private final String m_strMsgBox;
+      /** used by SMS Backup and Restore */
+      private final String m_strType;
 
-      private MessageBox(final String strMsgBox)
+      private MessageBox(final String strMsgBox, final String strType)
       {
          m_strMsgBox = strMsgBox;
+         m_strType = strType;
       }
 
       /**
@@ -135,7 +145,7 @@ public interface IMessage extends Comparable<IMessage>, Serializable
          {
             for (MessageBox msgBox : MessageBox.values())
             {
-               if (strMsgBox.equalsIgnoreCase(msgBox.m_strMsgBox))
+               if (strMsgBox.equalsIgnoreCase(msgBox.m_strMsgBox) || strMsgBox.equalsIgnoreCase(msgBox.m_strType))
                {
                   msgBoxRet = msgBox;
                   break;
