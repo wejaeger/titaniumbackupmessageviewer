@@ -23,7 +23,7 @@
  */
 package com.wj.android.messageviewer.gui.actions;
 
-import com.wj.android.messageviewer.gui.TitaniumBackupMessageViewer;
+import com.wj.android.messageviewer.gui.BackupMessageViewerFrame;
 import com.wj.android.messageviewer.resources.Resources;
 import java.awt.Color;
 import java.awt.Desktop;
@@ -75,7 +75,7 @@ public class AboutAction extends AbstractAction
    }
 
    private static final long serialVersionUID = -3119845028768148725L;
-   private static final Logger LOGGER = Logger.getLogger(TitaniumBackupMessageViewer.class.getName());
+   private static final Logger LOGGER = Logger.getLogger(BackupMessageViewerFrame.class.getName());
 
    private final JFrame m_Frame;
 

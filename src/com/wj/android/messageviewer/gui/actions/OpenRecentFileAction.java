@@ -23,13 +23,12 @@
  */
 package com.wj.android.messageviewer.gui.actions;
 
-import com.wj.android.messageviewer.gui.TitaniumBackupMessageViewer;
+import com.wj.android.messageviewer.gui.BackupMessageViewerFrame;
 import com.wj.android.messageviewer.gui.workers.LoadMessagesWorker;
 import com.wj.android.messageviewer.util.Pair;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JFrame;
 
 /**
  * Triggered by the recent files menu item to load the message and optionally
@@ -43,25 +42,22 @@ public class OpenRecentFileAction extends AbstractAction
 
    private static final String FILELOCATIONSEPARATOR = ":";
 
-   private transient final TitaniumBackupMessageViewer m_Caller;
-   private final JFrame m_Frame;
+   private transient final BackupMessageViewerFrame m_Frame;
 
    /**
     * Constructs a new {@code OpenRecentFileAction}.
     *
-    * @param caller the calling application
-    * @param frame application main window
+    * @param frame application main window frame
     * @param files2Open contains the absolute path to the message and contacts
     *                   database files to be loaded
     */
-   public OpenRecentFileAction(final TitaniumBackupMessageViewer caller, final JFrame frame, final Pair<String, String> files2Open)
+   public OpenRecentFileAction(final BackupMessageViewerFrame frame, final Pair<String, String> files2Open)
    {
       putValue(Action.NAME, makeName(files2Open));
 
       final String strCmd = makeCommand(files2Open);
       putValue(Action.ACTION_COMMAND_KEY, strCmd.trim().isEmpty() ? null : strCmd);
 
-      m_Caller = caller;
       m_Frame = frame;
    }
 
@@ -92,7 +88,7 @@ public class OpenRecentFileAction extends AbstractAction
       else
          strSecondFile = null;
 
-      new LoadMessagesWorker(m_Caller, m_Frame, new Pair<>(strFirstFile, strSecondFile)).execute();
+      new LoadMessagesWorker(m_Frame, new Pair<>(strFirstFile, strSecondFile)).execute();
    }
 
    private static String makeName(final Pair<String, String> files2Open)

@@ -23,7 +23,7 @@
  */
 package com.wj.android.messageviewer.gui.actions;
 
-import com.wj.android.messageviewer.gui.TitaniumBackupMessageViewer;
+import com.wj.android.messageviewer.gui.BackupMessageViewerFrame;
 import com.wj.android.messageviewer.gui.workers.LoadMessagesWorker;
 import com.wj.android.messageviewer.util.Pair;
 import java.awt.event.ActionEvent;
@@ -32,7 +32,6 @@ import java.io.File;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 
@@ -46,8 +45,7 @@ public class OpenAction extends AbstractAction
 {
    private static final long serialVersionUID = -1759188821667390901L;
 
-   private transient final TitaniumBackupMessageViewer m_Caller;
-   private final JFrame m_Frame;
+   private transient final BackupMessageViewerFrame m_Frame;
 
    private final JFileChooser m_MessageFileChooser;
    private final JFileChooser m_ContactsDatabaseChooser;
@@ -55,16 +53,14 @@ public class OpenAction extends AbstractAction
    /**
     * Constructs a new {@code OpenAction}.
     *
-    * @param caller the calling application
-    * @param frame application main window
+    * @param frame application main window frame
     */
-   public OpenAction(final TitaniumBackupMessageViewer caller, final JFrame frame)
+   public OpenAction(final BackupMessageViewerFrame frame)
    {
       putValue(Action.NAME, "Open ...");
       putValue(Action.MNEMONIC_KEY, KeyEvent.VK_O);
       putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
 
-      m_Caller = caller;
       m_Frame = frame;
 
       UIManager.put("FileChooser.readOnly", Boolean.TRUE);
@@ -96,7 +92,7 @@ public class OpenAction extends AbstractAction
       if (null != strMessageFilePath)
       {
          final String strContactDatabaseFilePath = chooseContactsDBFilePath(strMessageFilePath);
-         new LoadMessagesWorker(m_Caller, m_Frame, new Pair<>(strMessageFilePath, strContactDatabaseFilePath)).execute();
+         new LoadMessagesWorker(m_Frame, new Pair<>(strMessageFilePath, strContactDatabaseFilePath)).execute();
       }
    }
 
