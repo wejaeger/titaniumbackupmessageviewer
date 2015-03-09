@@ -24,7 +24,7 @@
 package com.wj.android.messageviewer.gui.workers;
 
 import com.wj.android.messageviewer.util.Pair;
-import com.wj.android.messageviewer.gui.TitaniumBackupMessageViewer;
+import com.wj.android.messageviewer.gui.BackupMessageViewerFrame;
 import com.wj.android.messageviewer.io.IMessageReader;
 import com.wj.android.messageviewer.io.TitaniumBackupMessageReader;
 import java.io.File;
@@ -36,7 +36,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 /**
@@ -49,25 +48,22 @@ public class LoadMessagesWorker extends AbstractDisabelingUIWorker<Integer, Inte
    private static final Logger LOGGER = Logger.getLogger(LoadMessagesWorker.class.getName());
 
    private final IMessageReader m_Reader;
-   private final TitaniumBackupMessageViewer m_Caller;
-   private final JFrame m_ReaderFrame;
+   private final BackupMessageViewerFrame m_Frame;
    private final Pair<String, String> m_FileLocations;
 
    /**
     * Constructs a new {@code LoadMessagesWorker}.
     *
-    * @param caller the calling application
-    * @param readerFrame application main window
+    * @param frame application main window frame
     * @param fileLocations message and contact database file path
     */
-   public LoadMessagesWorker(final TitaniumBackupMessageViewer caller, final JFrame readerFrame, final Pair<String, String> fileLocations)
+   public LoadMessagesWorker(final BackupMessageViewerFrame frame, final Pair<String, String> fileLocations)
    {
-      super(readerFrame, 0);
+      super(frame, 0);
 
       m_Reader = new TitaniumBackupMessageReader();
 
-      m_Caller = caller;
-      m_ReaderFrame = readerFrame;
+      m_Frame = frame;
       m_FileLocations = fileLocations;
    }
 
@@ -161,12 +157,12 @@ public class LoadMessagesWorker extends AbstractDisabelingUIWorker<Integer, Inte
          switch (iResult)
          {
             case 0:
-               m_Caller.onMessagesLoaded(m_Reader.getThreadArray(), m_Reader.getNumberOfMessages(), m_FileLocations);
+               m_Frame.onMessagesLoaded(m_Reader.getThreadArray(), m_Reader.getNumberOfMessages(), m_FileLocations);
                break;
 
             case -1:
                strErrorMessage = strErrorMessage + "Error Code " + iResult + ": Problem message file not found!\n";
-               m_Caller.onMessageFileNotFound(m_FileLocations);
+               m_Frame.onMessageFileNotFound(m_FileLocations);
                break;
 
             case -2:
@@ -175,7 +171,7 @@ public class LoadMessagesWorker extends AbstractDisabelingUIWorker<Integer, Inte
 
             case -3:
                strErrorMessage = strErrorMessage + "Error Code " + iResult + ": Problem contact database file file not found!\n";
-               m_Caller.onMessageFileNotFound(m_FileLocations);
+               m_Frame.onMessageFileNotFound(m_FileLocations);
                break;
 
             case 1:
@@ -196,7 +192,7 @@ public class LoadMessagesWorker extends AbstractDisabelingUIWorker<Integer, Inte
          }
 
          if (iResult != 0)
-            JOptionPane.showMessageDialog(m_ReaderFrame, strErrorMessage);
+            JOptionPane.showMessageDialog(m_Frame, strErrorMessage);
       }
       catch (final ExecutionException ex)
       {

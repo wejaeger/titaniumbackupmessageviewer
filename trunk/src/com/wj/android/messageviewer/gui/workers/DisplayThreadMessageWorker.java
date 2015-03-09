@@ -41,20 +41,20 @@ import javax.swing.JFrame;
 public class DisplayThreadMessageWorker extends AbstractDisabelingUIWorker<Void, Void>
 {
    private static final Logger LOGGER = Logger.getLogger(ExportWorker.class.getName());
-   
+
    private final MessageThread m_SelectedMessageThread;
    private final MessageViewer m_MessageViewer;
 
    /**
     * Constructs a new {@code DisplayThreadMessageWorker}.
     *
-    * @param readerFrame the view main. Must not be {@code null}.
+    * @param frame the view main. Must not be {@code null}.
     * @param selectedThread the selected thread. Must not be {@code null}.
     * @param messageViewer the pane that displays thread message.
     */
-   public DisplayThreadMessageWorker(final JFrame readerFrame, final MessageThread selectedThread, final MessageViewer messageViewer)
+   public DisplayThreadMessageWorker(final JFrame frame, final MessageThread selectedThread, final MessageViewer messageViewer)
    {
-      super(readerFrame, null);
+      super(frame, null);
 
       m_SelectedMessageThread = selectedThread;
       m_MessageViewer = messageViewer;
