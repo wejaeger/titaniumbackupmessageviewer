@@ -23,9 +23,12 @@
  */
 package com.wj.android.messageviewer.resources;
 
+import com.wj.android.messageviewer.io.IOUtils;
 import java.awt.Image;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +44,8 @@ import javax.swing.JOptionPane;
  */
 public class Resources
 {
+   private final static String DEFAULTCHARSET = Charset.defaultCharset().name();
+
    /** 32 pixel application icon */
    public static final String APPICON32 = "app-icon32.png";
    /** 48 pixel application icon */
@@ -51,6 +56,8 @@ public class Resources
    public static final String USER16 = "user16.png";
 
    private static final String APPPROPFILENAME = "application.properties";
+   private static final String SMSBACKUPXSD = "sms.xsd";
+   private static final String TITANIUMBACKUPXSD = "titanium.xsd";
    private static final String APPNAMEKEY = "project.name";
    private static final String APPVERSIONKEY = "version.num";
    private static final String RELEASEDATEKEY = "version.dat";
@@ -87,7 +94,7 @@ public class Resources
             }
             catch (Exception ex)
             {
-               JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", 0);
+               JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
          }
       }
@@ -148,6 +155,56 @@ public class Resources
       return(getProperty(RELEASEDATEKEY));
    }
 
+   /**
+    * Get the XSD for validating SMS Backup and Restore
+    * message XML files.
+    *
+    * @return the XSD {@code null} if schema is not found.
+    */
+   public static String getSMSBackaupSchema()
+   {
+      String strRet = null;
+
+      try (final InputStream is = Resources.class.getResourceAsStream(SMSBACKUPXSD))
+      {
+         final StringWriter writer = new StringWriter();
+         IOUtils.copy(is, writer, DEFAULTCHARSET);
+         strRet = writer.toString();
+
+      }
+      catch (final IOException ex)
+      {
+         JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+      }
+
+      return(strRet);
+   }
+
+   /**
+    * Get the XSD for validating Titanium Backup
+    * message XML files.
+    *
+    * @return the XSD or {@code null} if schema is not found.
+    */
+   public static String getTitaniumBackaupSchema()
+   {
+      String strRet = null;
+
+      try (final InputStream is = Resources.class.getResourceAsStream(TITANIUMBACKUPXSD))
+      {
+         final StringWriter writer = new StringWriter();
+         IOUtils.copy(is, writer, DEFAULTCHARSET);
+         strRet = writer.toString();
+
+      }
+      catch (final IOException ex)
+      {
+         JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+      }
+
+      return(strRet);
+   }
+
    private static String getProperty(final String strKey)
    {
       String strProp = m_AppProps.getProperty(strKey, "");
@@ -172,7 +229,7 @@ public class Resources
       }
       catch (final IOException ex)
       {
-         JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", 0);
+         JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
       }
 
       return(fRet);

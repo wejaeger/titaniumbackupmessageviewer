@@ -26,7 +26,6 @@ package com.wj.android.messageviewer.gui.workers;
 import com.wj.android.messageviewer.util.Pair;
 import com.wj.android.messageviewer.gui.BackupMessageViewerFrame;
 import com.wj.android.messageviewer.io.IMessageReader;
-import com.wj.android.messageviewer.io.TitaniumBackupMessageReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -49,22 +48,24 @@ public class LoadMessagesWorker extends AbstractDisabelingUIWorker<Integer, Inte
 
    private final IMessageReader m_Reader;
    private final BackupMessageViewerFrame m_Frame;
-   private final Pair<String, String> m_FileLocations;
+   private final Pair<String, String> m_Files2Open;
 
    /**
     * Constructs a new {@code LoadMessagesWorker}.
     *
     * @param frame application main window frame
-    * @param fileLocations message and contact database file path
+    * @param files2Open message and contact database file path
+    * @param messageReaderType the type of reader appropriate to read specified
+    *        files.
     */
-   public LoadMessagesWorker(final BackupMessageViewerFrame frame, final Pair<String, String> fileLocations)
+   public LoadMessagesWorker(final BackupMessageViewerFrame frame, final Pair<String, String> files2Open, IMessageReader.MessageFileType messageReaderType)
    {
       super(frame, 0);
 
-      m_Reader = new TitaniumBackupMessageReader();
+      m_Reader = messageReaderType.reader();
 
       m_Frame = frame;
-      m_FileLocations = fileLocations;
+      m_Files2Open = files2Open;
    }
 
    /**
@@ -93,15 +94,15 @@ public class LoadMessagesWorker extends AbstractDisabelingUIWorker<Integer, Inte
 
          try
          {
-            final File messageFile = new File(m_FileLocations.getFirst());
+            final File messageFile = new File(m_Files2Open.getFirst());
 
-            if (m_FileLocations.getFirst().endsWith(".gz"))
+            if (m_Files2Open.getFirst().endsWith(".gz"))
                is = new GZIPInputStream(new FileInputStream(messageFile));
             else
                is = new FileInputStream(messageFile);
 
             final File contactsDBFile;
-            final String strContactsDBFileName = m_FileLocations.getSecond();
+            final String strContactsDBFileName = m_Files2Open.getSecond();
             if (null != strContactsDBFileName && !strContactsDBFileName.trim().isEmpty())
                contactsDBFile= new File(strContactsDBFileName);
             else
@@ -157,12 +158,12 @@ public class LoadMessagesWorker extends AbstractDisabelingUIWorker<Integer, Inte
          switch (iResult)
          {
             case 0:
-               m_Frame.onMessagesLoaded(m_Reader.getThreadArray(), m_Reader.getNumberOfMessages(), m_FileLocations);
+               m_Frame.onMessagesLoaded(m_Reader.getThreadArray(), m_Reader.getNumberOfMessages(), m_Files2Open);
                break;
 
             case -1:
                strErrorMessage = strErrorMessage + "Error Code " + iResult + ": Problem message file not found!\n";
-               m_Frame.onMessageFileNotFound(m_FileLocations);
+               m_Frame.onMessageFileNotFound(m_Files2Open);
                break;
 
             case -2:
@@ -171,7 +172,7 @@ public class LoadMessagesWorker extends AbstractDisabelingUIWorker<Integer, Inte
 
             case -3:
                strErrorMessage = strErrorMessage + "Error Code " + iResult + ": Problem contact database file file not found!\n";
-               m_Frame.onMessageFileNotFound(m_FileLocations);
+               m_Frame.onMessageFileNotFound(m_Files2Open);
                break;
 
             case 1:
@@ -192,7 +193,7 @@ public class LoadMessagesWorker extends AbstractDisabelingUIWorker<Integer, Inte
          }
 
          if (iResult != 0)
-            JOptionPane.showMessageDialog(m_Frame, strErrorMessage);
+            JOptionPane.showMessageDialog(m_Frame, strErrorMessage, "Error", JOptionPane.ERROR_MESSAGE);
       }
       catch (final ExecutionException ex)
       {

@@ -90,9 +90,9 @@ public class ExportAllMessagesAction extends AbstractAction
                new ExportWorker(m_Frame, true, m_SaveChooser.getSelectedFile(), m_ThreadListBox).execute();
          }
          else
-            JOptionPane.showMessageDialog(m_Frame, "Select a thread first!");
+            JOptionPane.showMessageDialog(m_Frame, "Select a thread first!", "Info", JOptionPane.INFORMATION_MESSAGE);
       }
       else
-         JOptionPane.showMessageDialog(m_Frame, "Load messages first!");
+         JOptionPane.showMessageDialog(m_Frame, "Load messages first!", "Info", JOptionPane.INFORMATION_MESSAGE);
    }
 }

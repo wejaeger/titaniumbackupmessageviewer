@@ -65,9 +65,9 @@ public class AboutAction extends AbstractAction
                {
                   Desktop.getDesktop().browse(evt.getURL().toURI());
                }
-               catch (final IOException | URISyntaxException e)
+               catch (final IOException | URISyntaxException ex)
                {
-                  LOGGER.log(Level.SEVERE, e.toString(), e);
+                  LOGGER.log(Level.SEVERE, ex.toString(), ex);
                }
             }
          }

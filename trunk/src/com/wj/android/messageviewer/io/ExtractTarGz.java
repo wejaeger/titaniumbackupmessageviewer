@@ -49,7 +49,6 @@ import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 public class ExtractTarGz
 {
    private static final Logger LOGGER = Logger.getLogger(ExtractTarGz.class.getName());
-   private static final int DEFAULT_BUFFER_SIZE = 8192;
 
    /**
     * Creates new {@code ExtractTarGz}.
@@ -190,7 +189,7 @@ public class ExtractTarGz
             {
                try (OutputStream outputFileStream = new FileOutputStream(outputFile))
                {
-                  io(debInputStream, outputFileStream);
+                  IOUtils.io(debInputStream, outputFileStream);
                }
             }
             untaredFiles.add(outputFile);
@@ -198,38 +197,5 @@ public class ExtractTarGz
       }
 
       return(untaredFiles);
-   }
-
-   /**
-    * Copies the specified input stream to the specified output stream using
-    * the default buffer size of 8192.
-    *
-    * @param in contains the data that are written to {@code out}.
-    * @param out the output stream that receives the data from the specified input stream.
-    *
-    * @throws IOException if the underlying read or write methods fails.
-    */
-   private static void io(final InputStream in, final OutputStream out) throws IOException
-   {
-      io(in, out, DEFAULT_BUFFER_SIZE);
-   }
-
-   /**
-    * Copies the specified input stream to the specified output stream using
-    * the specified buffer size.
-    *
-    * @param in contains the data that are written to {@code out}.
-    * @param out the output stream that receives the data from the specified input stream.
-    * @param iBufferSize the size of the buffer to use in bytes.
-    *
-    * @throws IOException if the underlying read or write methods fails.
-    */
-   private static void io(final InputStream in, final OutputStream out, final int iBufferSize) throws IOException
-   {
-      final byte[] abBuffer = new byte[iBufferSize];
-      int iAmount;
-
-      while ((iAmount = in.read(abBuffer)) >= 0)
-         out.write(abBuffer, 0, iAmount);
    }
 }

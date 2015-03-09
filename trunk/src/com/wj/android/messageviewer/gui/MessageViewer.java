@@ -156,12 +156,13 @@ public class MessageViewer extends JPanel
          final SMSMessage messageInfo = new SMSMessage(message.getServiceCenter(), message.getMessageAddress(), message.getMessageDate(), message.getFormattedMessageDate(), message.getMessageBox());
 
          final Bubble b;
-         if (IMessage.MessageBox.SENT == message.getMessageBox())
+         final IMessage.MessageBox msgB0x = message.getMessageBox();
+         if (IMessage.MessageBox.SENT == msgB0x)
          {
             setLocation(Bubble.Type.RIGHTARROW.newBubble(message, this));
             b = Bubble.Type.RIGHTINFO.newBubble(messageInfo, this);
          }
-         else if (IMessage.MessageBox.DRAFT == message.getMessageBox())
+         else if (IMessage.MessageBox.DRAFT == msgB0x || IMessage.MessageBox.OUTBOX == msgB0x || IMessage.MessageBox.FAILED == msgB0x || IMessage.MessageBox.QUEED == msgB0x)
          {
             setLocation(Bubble.Type.DRAFT.newBubble(message, this));
             b = Bubble.Type.RIGHTINFO.newBubble(messageInfo, this);
@@ -245,7 +246,7 @@ public class MessageViewer extends JPanel
 
    /**
     * Draw all contained bubbles.
-    * 
+    *
     * @param g the Graphics object to protect.
     */
    @Override

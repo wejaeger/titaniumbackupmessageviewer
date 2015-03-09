@@ -25,6 +25,7 @@ package com.wj.android.messageviewer;
 
 import com.wj.android.messageviewer.gui.BackupMessageViewerFrame;
 import com.wj.android.messageviewer.gui.workers.LoadMessagesWorker;
+import com.wj.android.messageviewer.io.IMessageReader;
 import com.wj.android.messageviewer.util.Pair;
 import com.wj.android.messageviewer.util.RecentCollection;
 import java.util.logging.Level;
@@ -32,6 +33,7 @@ import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 /**
@@ -173,9 +175,23 @@ public class BackupMessageViewerApplication
       });
 
       if (asArgs.length == 1)
-         new LoadMessagesWorker(m_AppFrame, new Pair<String, String>(asArgs[0], null)).execute();
+      {
+         IMessageReader.MessageFileType messageReaderType = IMessageReader.MessageFileType.getMessageFileType(asArgs[0]);
+
+         if (null != messageReaderType)
+            new LoadMessagesWorker(m_AppFrame, new Pair<String, String>(asArgs[0], null), messageReaderType).execute();
+         else
+            JOptionPane.showMessageDialog(m_AppFrame, "Specified file is a unknown backup message file", "Error", JOptionPane.ERROR_MESSAGE);
+      }
       else if (asArgs.length == 2)
-         new LoadMessagesWorker(m_AppFrame, new Pair<>(asArgs[0], asArgs[1])).execute();
+      {
+         IMessageReader.MessageFileType messageReaderType = IMessageReader.MessageFileType.getMessageFileType(asArgs[0]);
+
+         if (null != messageReaderType)
+            new LoadMessagesWorker(m_AppFrame, new Pair<>(asArgs[0], asArgs[1]), messageReaderType).execute();
+         else
+            JOptionPane.showMessageDialog(m_AppFrame, "Specified file is a unknown backup message file", "Error", JOptionPane.ERROR_MESSAGE);
+      }
    }
 
    private void initAppFrameFromPrefs()

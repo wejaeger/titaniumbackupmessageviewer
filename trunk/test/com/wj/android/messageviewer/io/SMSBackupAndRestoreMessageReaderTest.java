@@ -1,10 +1,10 @@
 /*
  * $Id$
  *
- * File:   TitaniumBackupMessageReaderTest.java
+ * File:   SMSBackupAndRestoreMessageReaderTest.java
  * Author: Werner Jaeger
  *
- * Created on Mar 5, 2015, 8:00:30 AM
+ * Created on Mar 9, 2015, 2:57:03 PM
  *
  * Copyright (C) 2015 Werner Jaeger
  *
@@ -29,10 +29,7 @@ import com.wj.android.messageviewer.message.SMSMessage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Collection;
 import java.util.Date;
-import java.util.TimeZone;
 import static org.hamcrest.CoreMatchers.is;
 import org.junit.After;
 import org.junit.Assert;
@@ -42,11 +39,11 @@ import static org.junit.Assert.*;
 import org.junit.BeforeClass;
 
 /**
- *Various test for class {@link TitaniumBackupMessageReader}.
+ *Various test for class {@link SMSBackupAndRestoreMessageReader}.
  *
  * @author <a href="mailto:werner.jaeger@t-systems.com">Werner Jaeger</a>
  */
-public final class TitaniumBackupMessageReaderTest
+public final class SMSBackupAndRestoreMessageReaderTest
 {
    private static IMessage[] m_aCheckMessages;
 
@@ -54,9 +51,9 @@ public final class TitaniumBackupMessageReaderTest
    private IMessageReader m_MessageReader;
 
    /**
-    * Constructs a new {@code TitaniumBackupMessageReaderTest} object.
+    * Constructs a new {@code SMSBackupAndRestoreMessageReaderTest} object.
     */
-   public TitaniumBackupMessageReaderTest()
+   public SMSBackupAndRestoreMessageReaderTest()
    {
    }
 
@@ -74,29 +71,17 @@ public final class TitaniumBackupMessageReaderTest
    {
       IMessage.MessageBox sent = IMessage.MessageBox.fromString("sent");
       IMessage.MessageBox inbox = IMessage.MessageBox.fromString("inbox");
-      IMessage.MessageBox draft = IMessage.MessageBox.fromString("draft");
-
-      final SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // e.g. 2015-01-12T08:43:30.830Z
-      dateFmt.setTimeZone(TimeZone.getTimeZone("GMT"));
-      final Date date1 = dateFmt.parse("2015-01-10T20:01:00.00Z");
-      final Date date2 = dateFmt.parse("2015-01-10T20:02:10.00Z");
-      final Date date3 = dateFmt.parse("2015-01-10T20:03:10.00Z");
-      final Date date4 = dateFmt.parse("2015-01-10T20:04:00.00Z");
-      final Date date5 = dateFmt.parse("2015-01-10T20:05:00.00Z");
 
       final IMessage aMsg[] = {
-         new SMSMessage("", "Test", date1, "I have sent a test message. Only for test purposes to demonstrate the look and feel of the message viewer", sent),
-         new SMSMessage("Test", "Test", date2, "This is a message I have received", inbox),
-         new SMSMessage("Test", "Test", date3, "Yet another received text message", inbox),
-         new SMSMessage("", "Test", date4, "I have replied to a test message", sent),
-         new SMSMessage("", "Test", date5, "Not yet sent. Just a draft", draft)
+         new SMSMessage("", "332", new Date(1285799668193L), "Sample Message Sent from the phone", sent),
+         new SMSMessage("", "4433221123", new Date(1289643415810L), "Sample Message received by the phone", inbox),
       };
 
       m_aCheckMessages = aMsg;
    }
 
    /**
-    * Acquire an {@code InputStream} and a {@code TitaniumBackupMessageReader}
+    * Acquire an {@code InputStream} and a {@code SMSBackupAndRestoreMessageReader}
     * instance.
     *
     * <p>
@@ -106,10 +91,10 @@ public final class TitaniumBackupMessageReaderTest
    @Before
    public void setUp()
    {
-      m_InputStram = getClass().getResourceAsStream("testdata/com.keramidas.virtual.XML_MESSAGES-00000000-000000.xml");
-      Assert.assertNotNull("Resource testdata/com.keramidas.virtual.XML_MESSAGES-00000000-000000.xml not found.", m_InputStram);
+      m_InputStram = getClass().getResourceAsStream("testdata/sms-2015-03-09.xml");
+      Assert.assertNotNull("Resource testdata/sms-2015-03-09.xml not found.", m_InputStram);
 
-      m_MessageReader = new TitaniumBackupMessageReader();
+      m_MessageReader = new SMSBackupAndRestoreMessageReader();
    }
 
    /**
@@ -133,7 +118,7 @@ public final class TitaniumBackupMessageReaderTest
 
    /**
     * Test of {@code loadMessages} method, of class
-    * {@code TitaniumBackupMessageReader}.
+    * {@code SMSBackupAndRestoreMessageReader}.
     */
    @Test
    public void testLoadMessages()
@@ -144,7 +129,7 @@ public final class TitaniumBackupMessageReaderTest
 
    /**
     * Test of {@code getThreadArray} method, of class
-    * {@code TitaniumBackupMessageReader}.
+    * {@code SMSBackupAndRestoreMessageReader}.
     */
    @Test
    public void testGetThreadArray()
@@ -152,14 +137,14 @@ public final class TitaniumBackupMessageReaderTest
       final int iResult = m_MessageReader.loadMessages(m_InputStram, null);
       assertEquals(0, iResult);
 
-      final MessageThread[] aExpThread = {new MessageThread(null, "Test")};
+      final MessageThread[] aExpThread = {new MessageThread("(Unknown)", "332"), new MessageThread("(Unknown)", "4433221123")};
       final MessageThread[] aThreads = m_MessageReader.getThreadArray();
       assertArrayEquals(aExpThread, aThreads);
    }
 
    /**
     * Test of {@code getNumberOfMessages} method, of class
-    * {@code TitaniumBackupMessageReader}.
+    * {@code SMSBackupAndRestoreMessageReader}.
     */
    @Test
    public void testGetNumberOfMessages()
@@ -168,12 +153,12 @@ public final class TitaniumBackupMessageReaderTest
       assertEquals(0, iResult);
 
       final int iNoOfMessages = m_MessageReader.getNumberOfMessages();
-      assertEquals(5, iNoOfMessages);
+      assertEquals(2, iNoOfMessages);
    }
 
    /**
     * Test the messages returned by {@code getThreadArray} method, of class
-    * {@code TitaniumBackupMessageReader}.
+    * {@code SMSBackupAndRestoreMessageReader}.
     */
    @Test
    public void testGetThreadArrayMessages()
@@ -182,12 +167,14 @@ public final class TitaniumBackupMessageReaderTest
       assertEquals(0, iResult);
 
       final MessageThread[] aThreads = m_MessageReader.getThreadArray();
-      final MessageThread thread = aThreads[0];
-      assertEquals(5, thread.getMessages().size());
-      final Collection<IMessage> messages = thread.getMessages();
+      assertEquals(2, aThreads.length);
 
       int i = 0;
-      for (final IMessage msg : messages)
-         assertThat(msg, is(m_aCheckMessages[i++]));
+      for (final MessageThread thread : aThreads)
+      {
+         assertEquals(1, thread.getMessages().size());
+         for (final IMessage msg : thread.getMessages())
+            assertThat(msg, is(m_aCheckMessages[i++]));
+      }
    }
 }
