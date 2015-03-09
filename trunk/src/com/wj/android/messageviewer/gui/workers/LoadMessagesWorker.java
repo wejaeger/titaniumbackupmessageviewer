@@ -25,6 +25,7 @@ package com.wj.android.messageviewer.gui.workers;
 
 import com.wj.android.messageviewer.util.Pair;
 import com.wj.android.messageviewer.gui.TitaniumBackupMessageViewer;
+import com.wj.android.messageviewer.io.IMessageReader;
 import com.wj.android.messageviewer.io.TitaniumBackupMessageReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -47,7 +48,7 @@ public class LoadMessagesWorker extends AbstractDisabelingUIWorker<Integer, Inte
 {
    private static final Logger LOGGER = Logger.getLogger(LoadMessagesWorker.class.getName());
 
-   private final TitaniumBackupMessageReader m_Reader;
+   private final IMessageReader m_Reader;
    private final TitaniumBackupMessageViewer m_Caller;
    private final JFrame m_ReaderFrame;
    private final Pair<String, String> m_FileLocations;
@@ -160,7 +161,7 @@ public class LoadMessagesWorker extends AbstractDisabelingUIWorker<Integer, Inte
          switch (iResult)
          {
             case 0:
-               m_Caller.onMessagesLoaded(m_Reader.getThreadArray(), iResult, m_FileLocations);
+               m_Caller.onMessagesLoaded(m_Reader.getThreadArray(), m_Reader.getNumberOfMessages(), m_FileLocations);
                break;
 
             case -1:

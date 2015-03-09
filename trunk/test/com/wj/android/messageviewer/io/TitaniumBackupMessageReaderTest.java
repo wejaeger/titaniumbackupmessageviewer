@@ -51,7 +51,7 @@ public final class TitaniumBackupMessageReaderTest
    private static IMessage[] m_aCheckMessages;
 
    private InputStream m_InputStram;
-   private TitaniumBackupMessageReader m_MessageReader;
+   private IMessageReader m_MessageReader;
 
    /**
     * Constructs a new {@code TitaniumBackupMessageReaderTest} object.
@@ -158,16 +158,16 @@ public final class TitaniumBackupMessageReaderTest
    }
 
    /**
-    * Test of {@code getNumberOfSMS} method, of class
+    * Test of {@code getNumberOfMessages} method, of class
     * {@code TitaniumBackupMessageReader}.
     */
    @Test
-   public void testGetNumberOfSMS()
+   public void testGetNumberOfMessages()
    {
       final int iResult = m_MessageReader.loadMessages(m_InputStram, null);
       assertEquals(0, iResult);
 
-      final int iNoOfSMSs = m_MessageReader.getNumberOfSMS();
+      final int iNoOfSMSs = m_MessageReader.getNumberOfMessages();
       assertEquals(5, iNoOfSMSs);
    }
 
