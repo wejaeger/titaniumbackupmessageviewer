@@ -39,7 +39,7 @@ import java.util.TreeSet;
  *
  * @author Werner Jaeger
  */
-public class MessageThread
+public class MessageThread implements Comparable<MessageThread>
 {
    final private String m_strName;
    final private String m_strAddress;
@@ -136,12 +136,7 @@ public class MessageThread
          if (o != null && Objects.equals(getClass(), o.getClass()))
          {
             final MessageThread thread = (MessageThread)o;
-
-            if (m_strName != null ? m_strName.equals(thread.m_strName) : thread.m_strName == null)
-            {
-               if (m_strAddress != null ? m_strAddress.equals(thread.m_strAddress) : thread.m_strAddress == null)
-                  fRet = true;
-            }
+            fRet = toString().equals(thread.toString());
          }
       }
       else
@@ -158,10 +153,21 @@ public class MessageThread
    @Override
    public int hashCode()
    {
-      int iResult = m_strName != null ? m_strName.hashCode() : 0;
+      return(35 * toString().hashCode());
+   }
 
-      iResult = 35 * iResult + (m_strAddress != null ? m_strAddress.hashCode() : 0);
-
-      return(iResult);
+   /**
+    * Compares this message date with the specified message date.
+    *
+    * @param thread the thread to be compared. Must not be {@code null}.
+    *
+    * @return a negative integer, zero, or a positive integer as this tread
+    *          name+address is less than, equal to, or greater than the specified
+    *          tread name+address.
+    */
+   @Override
+   public int compareTo(final MessageThread thread)
+   {
+      return(toString().compareTo(thread.toString()));
    }
 }
