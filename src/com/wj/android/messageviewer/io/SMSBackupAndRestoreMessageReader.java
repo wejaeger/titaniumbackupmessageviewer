@@ -32,11 +32,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
@@ -44,7 +44,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -71,7 +70,7 @@ public class SMSBackupAndRestoreMessageReader implements IMessageReader
 
    private final static String DEFAULTCHARSET = Charset.defaultCharset().name();
 
-   final private List<MessageThread> m_ThreadList;
+   final private Set<MessageThread> m_ThreadList;
    private int m_iNumberOfSMS;
 
    /**
@@ -79,7 +78,7 @@ public class SMSBackupAndRestoreMessageReader implements IMessageReader
     */
    public SMSBackupAndRestoreMessageReader()
    {
-      m_ThreadList = new ArrayList<>();
+      m_ThreadList = new TreeSet<>();
       m_iNumberOfSMS = 0;
    }
 
@@ -145,20 +144,17 @@ public class SMSBackupAndRestoreMessageReader implements IMessageReader
 
                for(int i = 0 ; i < nl.getLength(); i++)
                {
-                  if (Node.ELEMENT_NODE == nl.item(i).getNodeType())
+                  final Element element = (Element)nl.item(i);
+                  final IMessage msg = elementToMessage(element);
+                  m_iNumberOfSMS ++;
+                  if (!contactsMap.containsKey(msg.getMessageAddress()))
                   {
-                     final Element element = (Element)nl.item(i);
-                     final IMessage msg = elementToMessage(element);
-                     m_iNumberOfSMS ++;
-                     if (!contactsMap.containsKey(msg.getMessageAddress()))
-                     {
-                        final MessageThread thread = new MessageThread(element.getAttribute("contact_name"), msg.getMessageAddress());
-                        thread.addMessage(msg);
-                        contactsMap.put(msg.getMessageAddress(), thread);
-                     }
-                     else
-                        contactsMap.get(msg.getMessageAddress()).addMessage(msg);
+                     final MessageThread thread = new MessageThread(element.getAttribute("contact_name"), msg.getMessageAddress());
+                     thread.addMessage(msg);
+                     contactsMap.put(msg.getMessageAddress(), thread);
                   }
+                  else
+                     contactsMap.get(msg.getMessageAddress()).addMessage(msg);
                }
                m_ThreadList.addAll(contactsMap.values());
                iError = 0;
@@ -181,23 +177,11 @@ public class SMSBackupAndRestoreMessageReader implements IMessageReader
    private IMessage elementToMessage(final Element element)
    {
       final String strServiceCenter = element.getAttribute("service_center");
-      final String strAddress = removeExtraDigits(element.getAttribute("address")) ;
+      final String strAddress = element.getAttribute("address");
       final long lTime = Long.parseLong(element.getAttribute("date"));
       final String strBody = element.getAttribute("body");
       final IMessage.MessageBox msgBox = IMessage.MessageBox.fromString(element.getAttribute("type"));
 
-      return(new SMSMessage(strServiceCenter.equals("null") ? "" : strServiceCenter, strAddress.isEmpty() ? "0" : strAddress, new Date(lTime), strBody, msgBox));
-   }
-
-   private String removeExtraDigits(final String strAddress)
-   {
-      final String strRet ;
-
-      if (!strAddress.equalsIgnoreCase("null"))
-         strRet = strAddress.replaceAll("\\D", "");
-      else
-         strRet = "0";
-
-      return(strRet);
+      return(new SMSMessage(strServiceCenter.equals("null") ? "" : strServiceCenter, strAddress, new Date(lTime), strBody, msgBox));
    }
 }
