@@ -31,11 +31,12 @@ Change log:
  - various bug fixes
 
 0.9.3
+ - Now also supports backup message XML files from SMS Backup and Restore App by
+   Ritesh (not only Titanium Backup)
+ - display recent files path names shortened
+ - left and right aligned message bubbles in message viewer, width of bubbles no
+   longer fixed, adapts now do the text width.
+ - shows message file name in frame window title
  - fixed bug: wrong number of messages displayed in some cases
  - fixed bug: mms are alway the last in order, they do not correctly appear in
               date/time order
- - left and right aligned message bubbles in message viewer, width of bubbles no
-   longer fixed, adapts now do the text width.
- - display long recent files path names shortened
- - Now also supports backup message XML files from SMS Backup and Restore App by
-   Ritesh (not only Titanium Backup)

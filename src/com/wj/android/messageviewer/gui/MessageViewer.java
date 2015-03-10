@@ -175,7 +175,6 @@ public class MessageViewer extends JPanel
 
          b.setBorderWidth(0);
          setLocation(b);
-         repaint();
       }
    }
 
