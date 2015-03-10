@@ -163,21 +163,7 @@ public class Resources
     */
    public static String getSMSBackaupSchema()
    {
-      String strRet = null;
-
-      try (final InputStream is = Resources.class.getResourceAsStream(SMSBACKUPXSD))
-      {
-         final StringWriter writer = new StringWriter();
-         IOUtils.copy(is, writer, DEFAULTCHARSET);
-         strRet = writer.toString();
-
-      }
-      catch (final IOException ex)
-      {
-         JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-      }
-
-      return(strRet);
+      return(getSchema(SMSBACKUPXSD));
    }
 
    /**
@@ -188,21 +174,7 @@ public class Resources
     */
    public static String getTitaniumBackaupSchema()
    {
-      String strRet = null;
-
-      try (final InputStream is = Resources.class.getResourceAsStream(TITANIUMBACKUPXSD))
-      {
-         final StringWriter writer = new StringWriter();
-         IOUtils.copy(is, writer, DEFAULTCHARSET);
-         strRet = writer.toString();
-
-      }
-      catch (final IOException ex)
-      {
-         JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-      }
-
-      return(strRet);
+      return(getSchema(TITANIUMBACKUPXSD));
    }
 
    private static String getProperty(final String strKey)
@@ -234,4 +206,24 @@ public class Resources
 
       return(fRet);
    }
+
+   private static String getSchema(final String strSchemaName)
+   {
+      String strRet = null;
+
+      try (final InputStream is = Resources.class.getResourceAsStream(strSchemaName))
+      {
+         final StringWriter writer = new StringWriter();
+         IOUtils.copy(is, writer, DEFAULTCHARSET);
+         strRet = writer.toString();
+
+      }
+      catch (final IOException ex)
+      {
+         JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+      }
+
+      return(strRet);
+   }
+
 }

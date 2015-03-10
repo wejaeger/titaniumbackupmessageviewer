@@ -23,6 +23,6 @@
  */
 
 /**
- * Provides the classes necessary to load and export android message files.
+ * Provides the classes necessary to load various types of message files.
  */
 package com.wj.android.messageviewer.io;

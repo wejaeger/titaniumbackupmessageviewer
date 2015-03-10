@@ -87,14 +87,11 @@ public class DisplayThreadMessageWorker extends AbstractDisabelingUIWorker<Void,
       {
          final Collection<IMessage> selectedMessages = m_SelectedMessageThread.getMessages();
          m_MessageViewer.clear();
-         m_MessageViewer.setScroll(false);
 
          for (IMessage selectedMessage : selectedMessages)
             m_MessageViewer.appendMessage(selectedMessage);
-
-         m_MessageViewer.setScroll(true);
-         m_MessageViewer.scrollRectToVisible(new Rectangle(0, 0, 0, 0));
       }
+
       return(result);
    }
 
@@ -124,7 +121,9 @@ public class DisplayThreadMessageWorker extends AbstractDisabelingUIWorker<Void,
          LOGGER.log(Level.SEVERE, ex.toString(), ex);
       }
 
-      super.done();
+      m_MessageViewer.scrollRectToVisible(new Rectangle(0, 0, 0, 0));
       m_MessageViewer.setVisible(true);
+      
+      super.done();
    }
 }

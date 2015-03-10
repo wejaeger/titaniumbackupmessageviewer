@@ -42,6 +42,7 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -151,6 +152,7 @@ public final class BackupMessageViewerFrame extends JFrame
     */
    public void onMessagesLoaded(final MessageThread[] threads, final int iNoOfMessages, final Pair<String, String> files2load)
    {
+      m_MessageViewer.clear();
       m_ThreadListBox.clearSelection();
       m_ThreadListBox.setListData(threads);
       m_ThreadListBox.setEnabled(true);
@@ -158,8 +160,8 @@ public final class BackupMessageViewerFrame extends JFrame
          m_ThreadListBox.setSelectedIndex(0);
 
       m_NumberOfMessagesField.setText(Integer.toString(iNoOfMessages));
-      m_MessageViewer.clear();
 
+      setTitle(Resources.getApplicationName() + " - " + new File(files2load.getFirst()).getName());
       BackupMessageViewerApplication.getInstance().add2RecentFileList(files2load);
       syncRecentFiles();
    }
