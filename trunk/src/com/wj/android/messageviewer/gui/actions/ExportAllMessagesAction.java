@@ -83,7 +83,7 @@ public class ExportAllMessagesAction extends AbstractAction
       {
          if (m_ThreadListBox.getSelectedIndex() != -1)
          {
-            m_SaveChooser.setSelectedFile(new File("TitaniumAllMessagesExport.txt"));
+            m_SaveChooser.setSelectedFile(new File("AllMessagesExport.txt"));
 
             final int iRet = m_SaveChooser.showSaveDialog(m_Frame);
             if (iRet == 0)
