@@ -72,7 +72,7 @@
     -->
 
    <property name="project.name" value="Backup Message Viewer" />
-   <property name="version.num" value="0.9.3" />
+   <property name="version.num" value="0.9.4" />
    <tstamp>
       <format property="version.dat" pattern="yyyy-MM-dd" />
    </tstamp>

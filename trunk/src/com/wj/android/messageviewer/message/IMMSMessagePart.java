@@ -44,6 +44,8 @@ public interface IMMSMessagePart extends Serializable
       IMAMGEJPEG ("image/jpeg"),
      /** A PNG image */
       IMAMGEPNG ("image/png"),
+     /** A GIF image */
+      IMAMGEGIF ("image/gif"),
       /** Plain text */
       TEXTPLAIN ("text/plain"),
       /** SMIL document */
@@ -93,6 +95,7 @@ public interface IMMSMessagePart extends Serializable
          {
             case IMAMGEJPEG:
             case IMAMGEPNG:
+            case IMAMGEGIF:
                mmsMessagePart = new ImagePart(contentType, strContentId, strContentLocation, abContent, strCharset);
                break;
 

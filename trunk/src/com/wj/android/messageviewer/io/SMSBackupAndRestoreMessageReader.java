@@ -23,22 +23,29 @@
  */
 package com.wj.android.messageviewer.io;
 
+import com.wj.android.messageviewer.message.IMMSMessagePart;
 import com.wj.android.messageviewer.message.IMessage;
+import com.wj.android.messageviewer.message.MMSMessage;
 import com.wj.android.messageviewer.message.MessageThread;
+import com.wj.android.messageviewer.message.SMILMessage;
 import com.wj.android.messageviewer.message.SMSMessage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.bind.DatatypeConverter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -71,7 +78,7 @@ public class SMSBackupAndRestoreMessageReader implements IMessageReader
    private final static String DEFAULTCHARSET = Charset.defaultCharset().name();
 
    final private Set<MessageThread> m_ThreadList;
-   private int m_iNumberOfSMS;
+   private int m_iNumberOfMessages;
 
    /**
     * Constructs a new {@code SMSBackupAndRestoreMessageReader}.
@@ -79,7 +86,7 @@ public class SMSBackupAndRestoreMessageReader implements IMessageReader
    public SMSBackupAndRestoreMessageReader()
    {
       m_ThreadList = new TreeSet<>();
-      m_iNumberOfSMS = 0;
+      m_iNumberOfMessages = 0;
    }
 
    /**
@@ -90,7 +97,7 @@ public class SMSBackupAndRestoreMessageReader implements IMessageReader
    @Override
    public int getNumberOfMessages()
    {
-      return(m_iNumberOfSMS);
+      return(m_iNumberOfMessages);
    }
 
    /**
@@ -122,7 +129,7 @@ public class SMSBackupAndRestoreMessageReader implements IMessageReader
       if (is != null)
       {
          m_ThreadList.clear();
-         m_iNumberOfSMS = 0;
+         m_iNumberOfMessages = 0;
 
          try
          {
@@ -137,24 +144,70 @@ public class SMSBackupAndRestoreMessageReader implements IMessageReader
             final Element docEle = doc.getDocumentElement();
 
             // Get a nodelist of elements in the XML file
-            final NodeList nl = docEle.getElementsByTagName("sms");
+            final NodeList nl = docEle.getElementsByTagName("*");
             if(nl != null && nl.getLength() > 0)
             {
                final Map<String, MessageThread> contactsMap = new LinkedHashMap<>(32, 0.7f, true);
 
                for(int i = 0 ; i < nl.getLength(); i++)
                {
-                  final Element element = (Element)nl.item(i);
-                  final IMessage msg = elementToMessage(element);
-                  m_iNumberOfSMS ++;
-                  if (!contactsMap.containsKey(msg.getMessageAddress()))
+                  final Element messageElement = (Element)nl.item(i);
+                  final String  strTagName = messageElement.getTagName();
+
+                  final String strAddress       = messageElement.getAttribute("address");
+                  final String strServiceCenter = messageElement.getAttribute("service_center");
+
+                  final IMessage message;
+                  switch(strTagName)
                   {
-                     final MessageThread thread = new MessageThread(element.getAttribute("contact_name"), msg.getMessageAddress());
-                     thread.addMessage(msg);
-                     contactsMap.put(msg.getMessageAddress(), thread);
+                     case "sms":
+                     {
+                        final IMessage.MessageBox msgBox = IMessage.MessageBox.fromString(messageElement.getAttribute("type"));
+                        if (null == msgBox)
+                        {
+                           message = null;
+                           LOGGER.log(Level.WARNING, "Unknown message box type: ''{0}''", messageElement.getAttribute("type"));
+                        }
+                        else
+                           message = elementToMessage(msgBox, strServiceCenter, strAddress, messageElement);
+                     }
+                     break;
+
+                     case "mms":
+                     {
+                        final IMessage.MessageBox msgBox = IMessage.MessageBox.fromString(messageElement.getAttribute("msg_box"));
+                        if (null == msgBox)
+                        {
+                           message = null;
+                           LOGGER.log(Level.WARNING, "Unknown message box type: ''{0}''", messageElement.getAttribute("msg_box"));
+                        }
+                        else
+                           message = elementToMMSMessage(msgBox, strServiceCenter, messageElement);
+                     }
+                     break;
+
+                     case "part":
+                     case "parts":
+                        message = null;
+                        break;
+
+                     default:
+                        LOGGER.log(Level.WARNING, "Unexpected tagname: ''{0}''", strTagName);
+                        message = null;
                   }
-                  else
-                     contactsMap.get(msg.getMessageAddress()).addMessage(msg);
+
+                  if (null != message)
+                  {
+                     m_iNumberOfMessages ++;
+                     if (!contactsMap.containsKey(strAddress))
+                     {
+                        final MessageThread thread = new MessageThread(messageElement.getAttribute("contact_name"), strAddress);
+                        thread.addMessage(message);
+                        contactsMap.put(strAddress, thread);
+                     }
+                     else
+                        contactsMap.get(strAddress).addMessage(message);
+                  }
                }
                m_ThreadList.addAll(contactsMap.values());
                iError = 0;
@@ -174,14 +227,95 @@ public class SMSBackupAndRestoreMessageReader implements IMessageReader
       return(iError);
    }
 
-   private IMessage elementToMessage(final Element element)
+
+   private IMessage elementToMessage(final IMessage.MessageBox msgBox, final String strServiceCenter, final String strAddress, final Element element)
    {
-      final String strServiceCenter = element.getAttribute("service_center");
-      final String strAddress = element.getAttribute("address");
       final long lTime = Long.parseLong(element.getAttribute("date"));
       final String strBody = element.getAttribute("body");
-      final IMessage.MessageBox msgBox = IMessage.MessageBox.fromString(element.getAttribute("type"));
 
       return(new SMSMessage(strServiceCenter.equals("null") ? "" : strServiceCenter, strAddress, new Date(lTime), strBody, msgBox));
+   }
+
+   private IMessage elementToMMSMessage(final IMessage.MessageBox msgBox, final String strServiceCenter, final Element element) throws UnsupportedEncodingException
+   {
+      final MMSMessage msg;
+
+      final String strAddress = element.getAttribute("address");
+      final List<IMMSMessagePart> parts = retrieveParts(element);
+      final long lTime = Long.parseLong(element.getAttribute("date"));
+      final String strSubject = element.getAttribute("sub");
+
+      if (hasSMILPart(parts))
+      {
+         msg = new SMILMessage(parts, strServiceCenter, strAddress, new Date(lTime), msgBox);
+         msg.setSubject(strSubject.equals("null") ? "" : strSubject);
+      }
+      else
+      {
+         msg = new MMSMessage(parts, strServiceCenter, strAddress, new Date(lTime), msgBox);
+         msg.setSubject(strSubject.equals("null") ? "" : strSubject);
+      }
+
+      return(msg);
+   }
+
+   private static List<IMMSMessagePart> retrieveParts(final Element element) throws UnsupportedEncodingException
+   {
+      final List<IMMSMessagePart> partsRet = new ArrayList<>();
+
+      final NodeList parts = element.getElementsByTagName("part");
+
+      if (null != parts)
+      {
+         for (int i = 0; i < parts.getLength(); i++)
+         {
+            final Element partElement        = (Element)parts.item(i);
+            final String  strContentType     = partElement.getAttribute("ct");
+            final String  strContentId       = partElement.getAttribute("cid");
+            final String  strContentLocation = partElement.getAttribute("cl");
+
+            final IMMSMessagePart.ContentType contentType = IMMSMessagePart.ContentType.fromString(strContentType);
+            if (null != contentType)
+            {
+               final IMessage.Encoding encoding;
+               if (contentType == IMMSMessagePart.ContentType.APPLICATIONSMIL || contentType == IMMSMessagePart.ContentType.TEXTPLAIN)
+                  encoding = IMessage.Encoding.PLAIN;
+               else
+                  encoding = IMessage.Encoding.BAS64;
+
+               final byte[] abContent;
+               if (encoding == IMessage.Encoding.BAS64)
+                  abContent = DatatypeConverter.parseBase64Binary(partElement.getAttribute("data"));
+               else
+                  abContent = partElement.getAttribute("text").getBytes(DEFAULTCHARSET);
+
+               final IMMSMessagePart messagePart = contentType.newMessagePart(contentType, strContentId, strContentLocation, abContent, DEFAULTCHARSET);
+               if (null != messagePart)
+                  partsRet.add(messagePart);
+               else
+                  LOGGER.log(Level.WARNING, "Failed to instantiate message part for content typ: ''{0}''", strContentType);
+            }
+            else
+               LOGGER.log(Level.WARNING, "Unknown content typ: ''{0}''", strContentType);
+         }
+      }
+
+      return(partsRet);
+   }
+
+   private static boolean hasSMILPart(final List<IMMSMessagePart> parts)
+   {
+      boolean fRet = false;
+
+      for (final IMMSMessagePart part : parts)
+      {
+         if (part.getContentType() == IMMSMessagePart.ContentType.APPLICATIONSMIL)
+         {
+            fRet = true;
+            break;
+         }
+      }
+
+      return(true);
    }
 }
