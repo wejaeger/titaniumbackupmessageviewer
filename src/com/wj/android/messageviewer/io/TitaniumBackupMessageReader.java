@@ -81,7 +81,7 @@ public class TitaniumBackupMessageReader implements IMessageReader
    final private SimpleDateFormat m_DateFmt;
    final private List<MessageThread> m_ThreadList;
    private SQLLiteContactsReader m_ContactReader;
-   private int m_iNumberOfSMS;
+   private int m_iNumberOfMessages;
 
    /**
     * Creates new {@code TitaniumBackupMessageReader}.
@@ -91,7 +91,7 @@ public class TitaniumBackupMessageReader implements IMessageReader
       m_DateFmt = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // e.g. 2015-01-12T08:43:30.830Z
       m_ThreadList = new ArrayList<>();
       m_ContactReader = null;
-      m_iNumberOfSMS = 0;
+      m_iNumberOfMessages = 0;
       m_DateFmt.setTimeZone(TimeZone.getTimeZone("GMT"));
    }
 
@@ -114,7 +114,7 @@ public class TitaniumBackupMessageReader implements IMessageReader
       if (is != null)
       {
          m_ThreadList.clear();
-         m_iNumberOfSMS = 0;
+         m_iNumberOfMessages = 0;
 
          if (null != contactsDB)
          {
@@ -177,14 +177,14 @@ public class TitaniumBackupMessageReader implements IMessageReader
                                        break;
 
                                     default:
-                                       LOGGER.log(Level.WARNING, "Unknown message type: ''{0}''", strTagName);
+                                       LOGGER.log(Level.WARNING, "Unexpected tagname: ''{0}''", strTagName);
                                        message = null;
                                  }
 
                                  if (null != message)
                                  {
                                     thread.addMessage(message);
-                                    m_iNumberOfSMS++;
+                                    m_iNumberOfMessages++;
                                  }
                               }
                               else
@@ -240,7 +240,7 @@ public class TitaniumBackupMessageReader implements IMessageReader
    @Override
    public int getNumberOfMessages()
    {
-      return(m_iNumberOfSMS);
+      return(m_iNumberOfMessages);
    }
 
    private IMessage elementToMessage(final IMessage.MessageBox msgBox, final String strServiceCenter, final String strAddress, final Element element) throws ParseException, UnsupportedEncodingException
@@ -379,7 +379,7 @@ public class TitaniumBackupMessageReader implements IMessageReader
                   if (null != messagePart)
                      partsRet.add(messagePart);
                   else
-                     LOGGER.log(Level.WARNING, "Failed to instatiate message part for content typ: ''{0}''", strContentType);
+                     LOGGER.log(Level.WARNING, "Failed to instantiate message part for content typ: ''{0}''", strContentType);
                }
                else
                   LOGGER.log(Level.WARNING, "Unknown content typ: ''{0}''", strContentType);

@@ -1,11 +1,26 @@
-
 Run the stand-alone distribution from the command line using:
         java -jar -Xmx256m AndroidMessageReader-all.jar
 
 
 Change log:
-0.9.0
- - first release
+0.9.4
+ - MMS support for SMS Backup and Restore messages
+ - added image/gif support
+ -
+0.9.3
+ - Now also supports backup message XML files from SMS Backup and Restore App by
+   Ritesh (not only Titanium Backup)
+ - display recent files path names shortened
+ - left and right aligned message bubbles in message viewer, width of bubbles no
+   longer fixed, adapts now do the text width.
+ - shows message file name in frame window title
+ - fixed bug: wrong number of messages displayed in some cases
+ - fixed bug: mms are alway the last in order, they do not correctly appear in
+              date/time order
+
+0.9.2
+ - handle draft messages
+ - various bug fixes
 
 0.9.1
  - removed time offset
@@ -23,20 +38,9 @@ Change log:
  - changed application title
  - save/restore main window state in preferences
  - added recent file list to file menu
- - added image/png
+ - added image/png support
  - wait cursor for possibly lengthy actions
 
-0.9.2
- - handle draft messages
- - various bug fixes
+0.9.0
+ - first release
 
-0.9.3
- - Now also supports backup message XML files from SMS Backup and Restore App by
-   Ritesh (not only Titanium Backup)
- - display recent files path names shortened
- - left and right aligned message bubbles in message viewer, width of bubbles no
-   longer fixed, adapts now do the text width.
- - shows message file name in frame window title
- - fixed bug: wrong number of messages displayed in some cases
- - fixed bug: mms are alway the last in order, they do not correctly appear in
-              date/time order
