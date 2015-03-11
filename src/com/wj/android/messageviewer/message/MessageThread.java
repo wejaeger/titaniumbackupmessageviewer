@@ -41,9 +41,9 @@ import java.util.TreeSet;
  */
 public class MessageThread implements Comparable<MessageThread>
 {
-   final private String m_strName;
-   final private String m_strAddress;
-   final private Set<IMessage> m_MessageList;
+   private final String m_strName;
+   private final String m_strAddress;
+   private final Set<IMessage> m_MessageList;
 
    /**
     * Creates new {@code MessageThread}.

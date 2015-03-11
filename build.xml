@@ -157,4 +157,17 @@ java -jar -Xmx256m ${standalone.jar.name}-all.jar
    <target name="-post-clean">
       <delete dir="${release.dir}" />
    </target>
+
+   <!-- =================================================================== -->
+   <!-- Ensures code conforms to design and programing guidelines           -->
+   <!-- =================================================================== -->
+   <target name="qa" depends="compile" description="Makes some test to ensure code conforms to our design- and programing guidlines">
+     <taskdef classname="com.puppycrawl.tools.checkstyle.CheckStyleTask" classpath="qa/checkstyle-all.jar" name="checkstyle"/>
+     <checkstyle config="qa/chestyleChecks.xml" classpath="${build.classes.dir};${javac.classpath};${build.test.classes.dir}">
+         <fileset dir="" includes="${src.dir}/com/wj/android/messageviewer/**/*.java" />
+         <fileset dir="" includes="${test.src.dir}/com/wj/android/messageviewer/**/*.java"/>
+         <property key="checkstyle.filter.file" value="${basedir}/qa/suppressions.xml"/>
+      </checkstyle>
+   </target>
+
 </project>

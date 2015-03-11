@@ -54,7 +54,7 @@ public class MessageViewer extends JPanel
    /**
     * Storage for all the ArrorBubbles drawn on the panel
     */
-   final private List<Bubble> m_Bubbles;
+   private final List<Bubble> m_Bubbles;
 
    private int m_iWidth;
    private int m_iHeight;
@@ -217,7 +217,7 @@ public class MessageViewer extends JPanel
 
    private int calcBubbleWidth()
    {
-      return((getWidth() - LEFT_MARGIN - RIGHT_MARGIN) * 5/6 - LEFT_MARGIN - RIGHT_MARGIN);
+      return((getWidth() - LEFT_MARGIN - RIGHT_MARGIN) * 5 / 6 - LEFT_MARGIN - RIGHT_MARGIN);
    }
 
    private void setWidth(final Bubble b)
@@ -261,6 +261,6 @@ public class MessageViewer extends JPanel
       {
          setLocation(bubble);
          bubble.draw(g2);
-       }
+      }
    }
 }

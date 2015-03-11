@@ -215,11 +215,11 @@ public class ConcurrentList<T> implements List< T>, Serializable
       m_ReadWriteLock.readLock().lock();
       try
       {
-          return(new ArrayList<>(m_List).iterator());
+         return(new ArrayList<>(m_List).iterator());
       }
       finally
       {
-          m_ReadWriteLock.readLock().unlock();
+         m_ReadWriteLock.readLock().unlock();
       }
    }
 
@@ -269,11 +269,11 @@ public class ConcurrentList<T> implements List< T>, Serializable
       m_ReadWriteLock.readLock().lock();
       try
       {
-          return(m_List.containsAll(c));
+         return(m_List.containsAll(c));
       }
       finally
       {
-          m_ReadWriteLock.readLock().unlock();
+         m_ReadWriteLock.readLock().unlock();
       }
    }
 
@@ -444,11 +444,11 @@ public class ConcurrentList<T> implements List< T>, Serializable
       m_ReadWriteLock.readLock().lock();
       try
       {
-          return(m_List.indexOf(o));
+         return(m_List.indexOf(o));
       }
       finally
       {
-          m_ReadWriteLock.readLock().unlock();
+         m_ReadWriteLock.readLock().unlock();
       }
    }
 
@@ -466,11 +466,11 @@ public class ConcurrentList<T> implements List< T>, Serializable
       m_ReadWriteLock.readLock().lock();
       try
       {
-          return(m_List.lastIndexOf(o));
+         return(m_List.lastIndexOf(o));
       }
       finally
       {
-          m_ReadWriteLock.readLock().unlock();
+         m_ReadWriteLock.readLock().unlock();
       }
    }
 

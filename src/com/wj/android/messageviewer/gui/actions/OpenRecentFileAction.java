@@ -44,7 +44,7 @@ public class OpenRecentFileAction extends AbstractAction
 
    private static final String FILELOCATIONSEPARATOR = ":";
 
-   private transient final BackupMessageViewerFrame m_Frame;
+   private final transient BackupMessageViewerFrame m_Frame;
 
    /**
     * Constructs a new {@code OpenRecentFileAction}.
@@ -86,13 +86,13 @@ public class OpenRecentFileAction extends AbstractAction
          strFirstFile = null;
 
       if (2 <= strFiles.length)
-        strSecondFile = strFiles[1];
+         strSecondFile = strFiles[1];
       else
          strSecondFile = null;
 
       if (null != strFirstFile)
       {
-         IMessageReader.MessageFileType messageReaderType = IMessageReader.MessageFileType.getMessageFileType(strFirstFile);
+         final IMessageReader.MessageFileType messageReaderType = IMessageReader.MessageFileType.getMessageFileType(strFirstFile);
 
          if (null == messageReaderType)
          {
@@ -140,7 +140,7 @@ public class OpenRecentFileAction extends AbstractAction
 
          if (strPath.length() > iSecondPartName)
          {
-            int iBeginIndex = strPath.length() - iSecondPartName;
+            final int iBeginIndex = strPath.length() - iSecondPartName;
             strEndName.append(strPath.substring(iBeginIndex));
          }
          else

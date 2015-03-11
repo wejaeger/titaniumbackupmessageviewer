@@ -50,7 +50,7 @@ public class ExportWorker extends AbstractDisabelingUIWorker<Boolean, Void>
 {
    private static final Logger LOGGER = Logger.getLogger(ExportWorker.class.getName());
 
-   private final static String DEFAULTCHARSET = Charset.defaultCharset().name();
+   private static final String DEFAULTCHARSET = Charset.defaultCharset().name();
 
    private final JFrame m_Frame;
    private final boolean m_fAll;
@@ -100,9 +100,9 @@ public class ExportWorker extends AbstractDisabelingUIWorker<Boolean, Void>
    protected Boolean doInBackground() throws Exception
    {
       boolean fResult = super.doInBackground();
-      if (true == fResult && null != m_FileToExport)
+      if (fResult && null != m_FileToExport)
       {
-         if (true == m_fAll)
+         if (m_fAll)
             fResult = exportAllMessages(m_FileToExport);
          else
             fResult = exportThreadMessages(m_FileToExport);
@@ -169,7 +169,7 @@ public class ExportWorker extends AbstractDisabelingUIWorker<Boolean, Void>
       {
          final ListModel<MessageThread> list = m_ThreadListBox.getModel();
          final int iNoThread = list.getSize();
-         for(int i = 0; i < iNoThread; i++)
+         for (int i = 0; i < iNoThread; i++)
          {
             final MessageThread thread = list.getElementAt(i);
             printThreadMessages(outputWriter, thread, i == (iNoThread - 1));

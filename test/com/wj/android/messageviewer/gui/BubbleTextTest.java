@@ -24,7 +24,7 @@
 package com.wj.android.messageviewer.gui;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Tests for class {@link BubbleText}.

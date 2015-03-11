@@ -47,7 +47,7 @@ public class OpenAction extends AbstractAction
 {
    private static final long serialVersionUID = -1759188821667390901L;
 
-   private transient final BackupMessageViewerFrame m_Frame;
+   private final transient BackupMessageViewerFrame m_Frame;
 
    private final JFileChooser m_MessageFileChooser;
    private final JFileChooser m_ContactsDatabaseChooser;
@@ -94,7 +94,7 @@ public class OpenAction extends AbstractAction
 
       if (null != strMessageFilePath)
       {
-         IMessageReader.MessageFileType messageReaderType = IMessageReader.MessageFileType.getMessageFileType(strMessageFilePath);
+         final IMessageReader.MessageFileType messageReaderType = IMessageReader.MessageFileType.getMessageFileType(strMessageFilePath);
 
          if (null != messageReaderType)
          {
@@ -141,5 +141,5 @@ public class OpenAction extends AbstractAction
          strContactDatabaseFilePath = null;
 
       return(strContactDatabaseFilePath);
-  }
+   }
 }

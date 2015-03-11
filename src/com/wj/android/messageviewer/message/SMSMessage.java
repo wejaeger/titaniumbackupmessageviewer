@@ -84,12 +84,12 @@ public class SMSMessage implements IMessage
       m_strMessageText = "";
       m_strMessageAddress = "";
       m_strServiceCenter = null;
-    }
+   }
 
    /**
     * Creates new {@code SMSMessage}.
     *
-    * @param strServiceCenter
+    * @param strServiceCenter the service center
     * @param strAddress the message address.
     * @param date the message date.
     * @param strBody the message text.
@@ -117,25 +117,25 @@ public class SMSMessage implements IMessage
    }
 
    @Override
-   final public void setMessageBox(final MessageBox msgBox)
+   public final void setMessageBox(final MessageBox msgBox)
    {
       m_msgBox = msgBox;
    }
 
    @Override
-   final public MessageBox getMessageBox()
+   public final MessageBox getMessageBox()
    {
       return(m_msgBox);
    }
 
    @Override
-   final public void setMessageDate(final Date msgDate)
+   public final void setMessageDate(final Date msgDate)
    {
       m_MessageDate = msgDate != null ? new Date(msgDate.getTime()) : null;
    }
 
    @Override
-   final public Date getMessageDate()
+   public final Date getMessageDate()
    {
       return(new Date(m_MessageDate.getTime()));
    }
@@ -160,19 +160,19 @@ public class SMSMessage implements IMessage
    }
 
    @Override
-   final public String getMessageAddress()
+   public final String getMessageAddress()
    {
       return(m_strMessageAddress);
    }
 
    @Override
-   final public void setServiceCenter(final String strServiceCenter)
+   public final void setServiceCenter(final String strServiceCenter)
    {
       m_strServiceCenter = strServiceCenter;
    }
 
    @Override
-   final public String getServiceCenter()
+   public final String getServiceCenter()
    {
       return(m_strServiceCenter);
    }

@@ -123,7 +123,7 @@ public interface IMMSMessagePart extends Serializable
        * Factory method to construct the appropriate enumeration type for this
        * content type
        *
-       * @param strContentType
+       * @param strContentType the content type string
        *
        * @return the appropriate content type or {@code null} if no content
        *         type is defined for the given {@code strContentType}.

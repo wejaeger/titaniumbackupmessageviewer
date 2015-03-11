@@ -69,7 +69,7 @@ public class ExportSelectedMessagesAction extends AbstractAction
       m_SaveChooser = new JFileChooser();
       m_SaveChooser.setDialogTitle("Choose a file to save as...");
       m_SaveChooser.setDialogType(JFileChooser.SAVE_DIALOG);
-  }
+   }
 
    /**
     * {@inheritDoc}

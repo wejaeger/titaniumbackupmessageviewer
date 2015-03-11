@@ -161,7 +161,7 @@ public class MessagePanel extends JPanel
    {
       final BufferedImage bi = new BufferedImage(iWdith, iHeight, BufferedImage.TRANSLUCENT);
 
-      Graphics2D g2d = (Graphics2D)bi.createGraphics();
+      final Graphics2D g2d = (Graphics2D)bi.createGraphics();
       g2d.addRenderingHints(new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY));
       g2d.drawImage(image, 0, 0, iWdith, iHeight, null);
       g2d.dispose();

@@ -77,7 +77,7 @@ public class ExtractTarGz
     *
     * <p>
     *    If input file can have {@code tar.gz}  or {@code .tar} extension.
-    * </p
+    * </p>
     *
     * @param inputFile the {@code tar} or {@code tar.gz} archive to extract.
     * @param outputDir the directory to extract the archive to.
@@ -127,7 +127,7 @@ public class ExtractTarGz
     *
     * <p>
     *    If input file can have {@code tar.gz}  or {@code .tar} extension.
-    * </p
+    * </p>
     *
     * @param inputFile the tar or tar.gz archive to extract.
     * @param outputDir the directory to extract the archive to.

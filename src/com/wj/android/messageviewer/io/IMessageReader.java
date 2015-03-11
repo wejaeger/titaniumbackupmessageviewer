@@ -167,7 +167,7 @@ public interface IMessageReader
 
          return(fRet);
       }
-  }
+   }
 
    /**
     * Get the number of all messages in all threads.

@@ -42,7 +42,7 @@ import javax.swing.filechooser.FileFilter;
  */
 class SMSBackupAndResoreMessageFileNameFilter extends FileFilter
 {
-   final static Pattern NAMEPATTERN = Pattern.compile("sms-.*\\.xml", Pattern.CASE_INSENSITIVE);
+   private static final Pattern NAMEPATTERN = Pattern.compile("sms-.*\\.xml", Pattern.CASE_INSENSITIVE);
 
    private final Matcher m_Matcher;
 

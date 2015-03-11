@@ -175,13 +175,13 @@ public class RecentCollection<E extends Serializable> implements Iterable<E>
     */
    public void clear()
    {
-       final ArrayList<String> keys = new ArrayList<>(m_Keys);
+      final ArrayList<String> keys = new ArrayList<>(m_Keys);
 
       for (final String strKey : keys)
          removeFromPreferences(strKey);
 
-       m_Recent.clear();
-       m_Keys.clear();
+      m_Recent.clear();
+      m_Keys.clear();
    }
 
    /**
@@ -241,16 +241,16 @@ public class RecentCollection<E extends Serializable> implements Iterable<E>
 
    private void sync()
    {
-       final ArrayList<E> values = new ArrayList<>(m_Recent);
+      final ArrayList<E> values = new ArrayList<>(m_Recent);
 
-       clear();
+      clear();
 
-       int i = 0;
-       for (final E eValue : values)
-       {
-          m_Recent.add(eValue);
-          add2Preferences(eValue, m_strKeyPrefix + i++);
-       }
+      int i = 0;
+      for (final E eValue : values)
+      {
+         m_Recent.add(eValue);
+         add2Preferences(eValue, m_strKeyPrefix + i++);
+      }
    }
 
    private void removeFromPreferences(final String strKey)
@@ -284,14 +284,14 @@ public class RecentCollection<E extends Serializable> implements Iterable<E>
          catch (final IOException | BackingStoreException | ClassNotFoundException ex)
          {
             LOGGER.log(Level.SEVERE, ex.toString(), ex);
-      }
+         }
       }
    }
 
    private static void putObject(final Preferences prefs, final String strKey, final Object o) throws IOException, BackingStoreException, ClassNotFoundException
    {
-      final byte abRaw[] = object2Bytes(o);
-      final byte abPieces[][] = breakIntoPieces(abRaw);
+      final byte[] abRaw = object2Bytes(o);
+      final byte[][] abPieces = breakIntoPieces(abRaw);
 
       writePieces(prefs, strKey + ".", abPieces);
    }
@@ -310,8 +310,8 @@ public class RecentCollection<E extends Serializable> implements Iterable<E>
     */
    Object getObject(final Preferences prefs, final String strKey) throws IOException, BackingStoreException
    {
-      final byte abPieces[][] = readPieces(prefs, strKey + ".");
-      final byte abRaw[] = combinePieces(abPieces);
+      final byte[][] abPieces = readPieces(prefs, strKey + ".");
+      final byte[] abRaw = combinePieces(abPieces);
 
       Object oRet = null;
 
@@ -328,10 +328,10 @@ public class RecentCollection<E extends Serializable> implements Iterable<E>
       return(oRet);
    }
 
-   private static byte[][] breakIntoPieces(final byte abRaw[])
+   private static byte[][] breakIntoPieces(final byte[] abRaw)
    {
       final int iNumPieces = (abRaw.length + PIECELENGTH - 1) / PIECELENGTH;
-      final byte abPieces[][] = new byte[iNumPieces][];
+      final byte[][] abPieces = new byte[iNumPieces][];
       for (int i = 0; i < iNumPieces; ++i)
       {
          final int iStartByte = i * PIECELENGTH;
@@ -347,13 +347,13 @@ public class RecentCollection<E extends Serializable> implements Iterable<E>
       return(abPieces);
    }
 
-   private static byte[] combinePieces(final byte abPieces[][])
+   private static byte[] combinePieces(final byte[][] abPieces)
    {
       int iLength = 0;
       for (int i = 0; i < abPieces.length; ++i)
          iLength += abPieces[i].length;
 
-      final byte abRaw[] = new byte[iLength];
+      final byte[] abRaw = new byte[iLength];
       int iCursor = 0;
       for (int i = 0; i < abPieces.length; ++i)
       {
@@ -371,7 +371,7 @@ public class RecentCollection<E extends Serializable> implements Iterable<E>
       return(baos.toByteArray());
    }
 
-   private static Object bytes2Object(final byte abRaw[]) throws IOException, ClassNotFoundException
+   private static Object bytes2Object(final byte[] abRaw) throws IOException, ClassNotFoundException
    {
       final Object o;
 

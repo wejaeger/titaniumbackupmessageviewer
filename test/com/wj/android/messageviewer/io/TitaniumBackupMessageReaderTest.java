@@ -38,7 +38,9 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import org.junit.BeforeClass;
 
 /**
@@ -64,17 +66,17 @@ public final class TitaniumBackupMessageReaderTest
     * Creates check messages
     *
     * <p>
-    *     Run once before any of the test methods.
-    * </p
+    *    Run once before any of the test methods.
+    * </p>
     *
-    * @throws ParseException if en error ocurs parsing a check date string.
+    * @throws ParseException if en error occurs parsing a check date string.
     */
    @BeforeClass
    public static void createCheckMesages() throws ParseException
    {
-      IMessage.MessageBox sent = IMessage.MessageBox.fromString("sent");
-      IMessage.MessageBox inbox = IMessage.MessageBox.fromString("inbox");
-      IMessage.MessageBox draft = IMessage.MessageBox.fromString("draft");
+      final IMessage.MessageBox sent = IMessage.MessageBox.fromString("sent");
+      final IMessage.MessageBox inbox = IMessage.MessageBox.fromString("inbox");
+      final IMessage.MessageBox draft = IMessage.MessageBox.fromString("draft");
 
       final SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // e.g. 2015-01-12T08:43:30.830Z
       dateFmt.setTimeZone(TimeZone.getTimeZone("GMT"));
@@ -84,12 +86,12 @@ public final class TitaniumBackupMessageReaderTest
       final Date date4 = dateFmt.parse("2015-01-10T20:04:00.00Z");
       final Date date5 = dateFmt.parse("2015-01-10T20:05:00.00Z");
 
-      final IMessage aMsg[] = {
-         new SMSMessage("", "Test", date1, "I have sent a test message. Only for test purposes to demonstrate the look and feel of the message viewer", sent),
-         new SMSMessage("Test", "Test", date2, "This is a message I have received", inbox),
-         new SMSMessage("Test", "Test", date3, "Yet another received text message", inbox),
-         new SMSMessage("", "Test", date4, "I have replied to a test message", sent),
-         new SMSMessage("", "Test", date5, "Not yet sent. Just a draft", draft)
+      final IMessage[] aMsg = {
+          new SMSMessage("", "Test", date1, "I have sent a test message. Only for test purposes to demonstrate the look and feel of the message viewer", sent),
+          new SMSMessage("Test", "Test", date2, "This is a message I have received", inbox),
+          new SMSMessage("Test", "Test", date3, "Yet another received text message", inbox),
+          new SMSMessage("", "Test", date4, "I have replied to a test message", sent),
+          new SMSMessage("", "Test", date5, "Not yet sent. Just a draft", draft)
       };
 
       m_aCheckMessages = aMsg;
@@ -101,7 +103,7 @@ public final class TitaniumBackupMessageReaderTest
     *
     * <p>
     *     Run once before any of the test methods.
-    * </p
+    * </p>
     */
    @Before
    public void setUp()

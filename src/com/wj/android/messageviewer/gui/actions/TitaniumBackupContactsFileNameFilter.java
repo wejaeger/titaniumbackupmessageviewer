@@ -42,7 +42,7 @@ import javax.swing.filechooser.FileFilter;
  */
 class TitaniumBackupContactsFileNameFilter extends FileFilter
 {
-   final static Pattern NAMEPATTERN = Pattern.compile("contacts2\\.db|com\\.android\\.providers\\.contacts\\-[0-9]{8}\\-[0-9]{6}\\.tar\\.gz", Pattern.CASE_INSENSITIVE);
+   private static final Pattern NAMEPATTERN = Pattern.compile("contacts2\\.db|com\\.android\\.providers\\.contacts\\-[0-9]{8}\\-[0-9]{6}\\.tar\\.gz", Pattern.CASE_INSENSITIVE);
 
    private final Matcher m_Matcher;
 

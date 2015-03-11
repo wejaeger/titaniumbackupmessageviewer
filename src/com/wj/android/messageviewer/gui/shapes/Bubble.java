@@ -108,20 +108,20 @@ public abstract class Bubble implements Serializable
    private static final int DEFAULT_WIDTH = 200;
    private static final int DEFAULT_BORDER_WIDTH = 10;
 
-   private final static int RADIUS = 10;
-   private final static int ARROWSIZE = 8;
-   private final static int STROKETHICKNES = 3;
-   private final static int PADDING = STROKETHICKNES / 2;
+   private static final int RADIUS = 10;
+   private static final int ARROWSIZE = 8;
+   private static final int STROKETHICKNES = 3;
+   private static final int PADDING = STROKETHICKNES / 2;
 
    /** The container for this bubble */
    protected MessageViewer m_Viewer;
 
-   final private Type m_Type;
-   final private MessagePanel m_MessagePanel;
-   final private RenderingHints m_RenderingHints;
-   final private Polygon m_Arrow;
-   final private BasicStroke m_Stroke;
-   final private RoundRectangle2D.Double m_Rect;
+   private final Type m_Type;
+   private final MessagePanel m_MessagePanel;
+   private final RenderingHints m_RenderingHints;
+   private final Polygon m_Arrow;
+   private final BasicStroke m_Stroke;
+   private final RoundRectangle2D.Double m_Rect;
 
    private int m_iBorderWidth;
    private int m_ivGap;

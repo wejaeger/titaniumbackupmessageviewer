@@ -75,9 +75,9 @@ public class SMSBackupAndRestoreMessageReader implements IMessageReader
 {
    private static final Logger LOGGER = Logger.getLogger(SMSBackupAndRestoreMessageReader.class.getName());
 
-   private final static String DEFAULTCHARSET = Charset.defaultCharset().name();
+   private static final String DEFAULTCHARSET = Charset.defaultCharset().name();
 
-   final private Set<MessageThread> m_ThreadList;
+   private final Set<MessageThread> m_ThreadList;
    private int m_iNumberOfMessages;
 
    /**
@@ -145,11 +145,11 @@ public class SMSBackupAndRestoreMessageReader implements IMessageReader
 
             // Get a nodelist of elements in the XML file
             final NodeList nl = docEle.getElementsByTagName("*");
-            if(nl != null && nl.getLength() > 0)
+            if (nl != null && nl.getLength() > 0)
             {
                final Map<String, MessageThread> contactsMap = new LinkedHashMap<>(32, 0.7f, true);
 
-               for(int i = 0 ; i < nl.getLength(); i++)
+               for (int i = 0; i < nl.getLength(); i++)
                {
                   final Element messageElement = (Element)nl.item(i);
                   final String  strTagName = messageElement.getTagName();
@@ -171,7 +171,7 @@ public class SMSBackupAndRestoreMessageReader implements IMessageReader
                         else
                            message = elementToMessage(msgBox, strServiceCenter, strAddress, messageElement);
                      }
-                     break;
+                        break;
 
                      case "mms":
                      {
@@ -184,7 +184,7 @@ public class SMSBackupAndRestoreMessageReader implements IMessageReader
                         else
                            message = elementToMMSMessage(msgBox, strServiceCenter, messageElement);
                      }
-                     break;
+                        break;
 
                      case "part":
                      case "parts":
@@ -198,7 +198,7 @@ public class SMSBackupAndRestoreMessageReader implements IMessageReader
 
                   if (null != message)
                   {
-                     m_iNumberOfMessages ++;
+                     m_iNumberOfMessages++;
                      if (!contactsMap.containsKey(strAddress))
                      {
                         final MessageThread thread = new MessageThread(messageElement.getAttribute("contact_name"), strAddress);
