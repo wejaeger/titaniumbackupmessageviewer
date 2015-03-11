@@ -17,7 +17,7 @@ Change log:
    longer fixed, adapts now do the text width.
  - shows message file name in frame window title
  - fixed bug: wrong number of messages displayed in some cases
- - fixed bug: mms are alway the last in order, they do not correctly appear in
+ - fixed bug: mms are always the last in order, they do not correctly appear in
               date/time order
 
 0.9.2

@@ -58,7 +58,7 @@ public class DisplayThreadMessageWorker extends AbstractDisabelingUIWorker<Void,
 
       m_SelectedMessageThread = selectedThread;
       m_MessageViewer = messageViewer;
-  }
+   }
 
    /**
     * Adds messages of a selected thread to the {@link MessageViewer}.
@@ -123,7 +123,7 @@ public class DisplayThreadMessageWorker extends AbstractDisabelingUIWorker<Void,
 
       m_MessageViewer.scrollRectToVisible(new Rectangle(0, 0, 0, 0));
       m_MessageViewer.setVisible(true);
-      
+
       super.done();
    }
 }

@@ -38,6 +38,11 @@ import javax.swing.SwingWorker;
  *   that disables/enables all menus and visible components of the frame.
  * </p>
  *
+ * @param <T> the result type returned by this SwingWorker's doInBackground and
+ *            get methods
+ * @param <V> the type used for carrying out intermediate results by this
+ *            SwingWorker's publish and process methods
+ *
  * @author <a href="mailto:werner.jaeger@t-systems.com">Werner Jaeger</a>
  */
 abstract class AbstractDisabelingUIWorker<T, V> extends SwingWorker<T, V>

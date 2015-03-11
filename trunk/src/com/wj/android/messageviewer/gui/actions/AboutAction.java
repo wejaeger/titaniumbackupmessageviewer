@@ -59,7 +59,7 @@ public class AboutAction extends AbstractAction
       {
          if (HyperlinkEvent.EventType.ACTIVATED == evt.getEventType())
          {
-            if(Desktop.isDesktopSupported())
+            if (Desktop.isDesktopSupported())
             {
                try
                {

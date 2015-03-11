@@ -71,7 +71,7 @@ import javax.swing.event.ListSelectionListener;
  *     way it groups messages from the same person and phone number together.
  * <p/>
  *
- * @author >Werner Jaeger
+ * @author Werner Jaeger
  */
 public final class BackupMessageViewerFrame extends JFrame
 {
@@ -80,7 +80,7 @@ public final class BackupMessageViewerFrame extends JFrame
    private static class AbstractListModelImpl extends AbstractListModel<MessageThread>
    {
       private static final long serialVersionUID = -3879053127396522633L;
-      final MessageThread m_Thread;
+      private final MessageThread m_Thread;
 
       public AbstractListModelImpl()
       {
@@ -94,7 +94,7 @@ public final class BackupMessageViewerFrame extends JFrame
       }
 
       @Override
-      public MessageThread getElementAt(int iIndex)
+      public MessageThread getElementAt(final int iIndex)
       {
          return(m_Thread);
       }
@@ -174,7 +174,7 @@ public final class BackupMessageViewerFrame extends JFrame
     * <p>
     *    Removes the files not found from the recent files list.
     * </p>
-    * @param files2load
+    * @param files2load at least on of this pair is not found
     */
    public void onMessageFileNotFound(final Pair<String, String> files2load)
    {

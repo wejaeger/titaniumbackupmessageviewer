@@ -40,6 +40,8 @@ import java.util.RandomAccess;
  * that, otherwise we wrap it with an {@code ArrayList}.
  * </p>
  *
+ * @param <E> the type of element maintained by this collection
+ *
  * @author <a href="mailto:werner.jaeger@t-systems.com">Werner Jaeger</a>
  */
 class ReverseCollection<E> extends AbstractCollection<E>
@@ -49,9 +51,7 @@ class ReverseCollection<E> extends AbstractCollection<E>
    /**
     * Constructs a new {@code ReverseCollection}; from a given collection.
     *
-    * @param the original collection. Must not be {@code null}.
-    *
-    * @param original
+    * @param original the original collection. Must not be {@code null}.
     */
    public ReverseCollection(final Collection<E> original)
    {

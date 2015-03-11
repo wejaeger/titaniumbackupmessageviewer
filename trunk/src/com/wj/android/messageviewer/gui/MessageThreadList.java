@@ -44,12 +44,15 @@ import javax.swing.JTextArea;
  */
 class MessageThreadList extends JList<MessageThread>
 {
-   final private static Icon ICON = Resources.getIcon(Resources.USER16);
+   private static final Icon ICON = Resources.getIcon(Resources.USER16);
    private static final long serialVersionUID = -1648776942721559318L;
 
+   /**
+    *  Class for receiving component events.
+    */
    final class MessageThreadComponentAdapter extends ComponentAdapter
    {
-      /** @inherited */
+      /** {@inheritDoc} */
       @Override
       public void componentResized(final ComponentEvent e)
       {
@@ -67,8 +70,8 @@ class MessageThreadList extends JList<MessageThread>
    static class MessageThreadListCellRenderer extends DefaultListCellRenderer
    {
       private static final long serialVersionUID = -2684873318524485434L;
-      final private JPanel m_Panel;
-      final private JTextArea m_TextArea;
+      private final JPanel m_Panel;
+      private final JTextArea m_TextArea;
 
       /**
        * Construct a new {@code MessageThreadListCellRenderer}.
@@ -91,9 +94,7 @@ class MessageThreadList extends JList<MessageThread>
          m_Panel.add(m_TextArea, BorderLayout.CENTER);
       }
 
-      /**
-       *
-       */
+      /** {@inheritDoc}*/
       @Override
       public Component getListCellRendererComponent(final JList<?> list, final Object oValue, final int iIndex, final boolean fIsSelected, final boolean fCellHasFocus)
       {
@@ -131,7 +132,7 @@ class MessageThreadList extends JList<MessageThread>
       setCellRenderer(new MessageThreadListCellRenderer(iInitialTextWidth));
    }
 
-   /** @inherited */
+   /** {@inheritDoc} */
    @Override
    public boolean getScrollableTracksViewportWidth()
    {

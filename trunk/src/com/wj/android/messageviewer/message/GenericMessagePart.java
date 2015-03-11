@@ -69,21 +69,21 @@ public abstract class GenericMessagePart implements IMMSMessagePart
 
    /** {@inheritDoc} */
    @Override
-   final public String getContentLocation()
+   public final String getContentLocation()
    {
       return(m_StrContentLocation);
    }
 
    /** {@inheritDoc} */
    @Override
-   final public String getContentId()
+   public final String getContentId()
    {
       return(m_StrContentId);
    }
 
    /** {@inheritDoc} */
    @Override
-   final public ContentType getContentType()
+   public final ContentType getContentType()
    {
       return(m_ContentType);
    }

@@ -51,13 +51,13 @@ public class BackupMessageViewerApplication
 
    private static final Preferences PREFERENCES = Preferences.userNodeForPackage(BackupMessageViewerApplication.class);
 
-   private static final String recentFilesKey = "recentfile";
-   private static final String windowXKey = "window.x";
-   private static final String windowYKey = "window.y";
-   private static final String windowWidthKey = "window.width";
-   private static final String windowHeightKey = "window.height";
-   private static final String windowStateKey = "window.state";
-   private static final String windowVisibleKey = "window.visible";
+   private static final String RECENTFILEKEY = "recentfile";
+   private static final String WINDOWXKEY = "window.x";
+   private static final String WINDOWYKEY = "window.y";
+   private static final String WINDOWWIDTHKEY = "window.width";
+   private static final String WINDOWHEIGTHKEY = "window.height";
+   private static final String WINDOWSTATEKEY = "window.state";
+   private static final String WINDOVISIBLE = "window.visible";
 
    private static BackupMessageViewerApplication m_Instance;
 
@@ -70,7 +70,7 @@ public class BackupMessageViewerApplication
     */
    private BackupMessageViewerApplication()
    {
-      m_RecentCollection = new RecentCollection<>(PREFERENCES, recentFilesKey);
+      m_RecentCollection = new RecentCollection<>(PREFERENCES, RECENTFILEKEY);
    }
 
    /**
@@ -92,7 +92,7 @@ public class BackupMessageViewerApplication
     */
    public static void main(final String[] asArgs)
    {
-      m_Instance= new BackupMessageViewerApplication();
+      m_Instance = new BackupMessageViewerApplication();
       m_Instance.init(asArgs);
    }
 
@@ -103,14 +103,14 @@ public class BackupMessageViewerApplication
    {
       if (JFrame.MAXIMIZED_BOTH != m_AppFrame.getExtendedState())
       {
-         PREFERENCES.putInt(windowXKey, m_AppFrame.getLocation().x);
-         PREFERENCES.putInt(windowYKey, m_AppFrame.getLocation().y);
-         PREFERENCES.putInt(windowWidthKey, m_AppFrame.getWidth());
-         PREFERENCES.putInt(windowHeightKey, m_AppFrame.getHeight());
+         PREFERENCES.putInt(WINDOWXKEY, m_AppFrame.getLocation().x);
+         PREFERENCES.putInt(WINDOWYKEY, m_AppFrame.getLocation().y);
+         PREFERENCES.putInt(WINDOWWIDTHKEY, m_AppFrame.getWidth());
+         PREFERENCES.putInt(WINDOWHEIGTHKEY, m_AppFrame.getHeight());
       }
 
-      PREFERENCES.putInt(windowStateKey, m_AppFrame.getExtendedState());
-      PREFERENCES.putBoolean(windowVisibleKey, m_AppFrame.isVisible());
+      PREFERENCES.putInt(WINDOWSTATEKEY, m_AppFrame.getExtendedState());
+      PREFERENCES.putBoolean(WINDOVISIBLE, m_AppFrame.isVisible());
 
       try
       {
@@ -118,7 +118,7 @@ public class BackupMessageViewerApplication
       }
       catch (final BackingStoreException ex)
       {
-          LOGGER.log(Level.SEVERE, ex.toString(), ex);
+         LOGGER.log(Level.SEVERE, ex.toString(), ex);
       }
    }
 
@@ -169,14 +169,14 @@ public class BackupMessageViewerApplication
          @Override
          public void run()
          {
-            final boolean fIsVisible = PREFERENCES.getBoolean(windowVisibleKey, true);
+            final boolean fIsVisible = PREFERENCES.getBoolean(WINDOVISIBLE, true);
             m_AppFrame.setVisible(fIsVisible);
          }
       });
 
       if (asArgs.length == 1)
       {
-         IMessageReader.MessageFileType messageReaderType = IMessageReader.MessageFileType.getMessageFileType(asArgs[0]);
+         final IMessageReader.MessageFileType messageReaderType = IMessageReader.MessageFileType.getMessageFileType(asArgs[0]);
 
          if (null != messageReaderType)
             new LoadMessagesWorker(m_AppFrame, new Pair<String, String>(asArgs[0], null), messageReaderType).execute();
@@ -185,7 +185,7 @@ public class BackupMessageViewerApplication
       }
       else if (asArgs.length == 2)
       {
-         IMessageReader.MessageFileType messageReaderType = IMessageReader.MessageFileType.getMessageFileType(asArgs[0]);
+         final IMessageReader.MessageFileType messageReaderType = IMessageReader.MessageFileType.getMessageFileType(asArgs[0]);
 
          if (null != messageReaderType)
             new LoadMessagesWorker(m_AppFrame, new Pair<>(asArgs[0], asArgs[1]), messageReaderType).execute();
@@ -196,13 +196,13 @@ public class BackupMessageViewerApplication
 
    private void initAppFrameFromPrefs()
    {
-      final int ix = PREFERENCES.getInt(windowXKey, 100);
-      final int iy = PREFERENCES.getInt(windowYKey, 100);
-      final int iWidth = PREFERENCES.getInt(windowWidthKey, 700);
-      final int iHeight = PREFERENCES.getInt(windowHeightKey, 500);
-      final int iState = PREFERENCES.getInt(windowStateKey, JFrame.NORMAL);
+      final int ix = PREFERENCES.getInt(WINDOWXKEY, 100);
+      final int iy = PREFERENCES.getInt(WINDOWYKEY, 100);
+      final int iWidth = PREFERENCES.getInt(WINDOWWIDTHKEY, 700);
+      final int iHeight = PREFERENCES.getInt(WINDOWHEIGTHKEY, 500);
+      final int iState = PREFERENCES.getInt(WINDOWSTATEKEY, JFrame.NORMAL);
       m_AppFrame.setLocation(ix, iy);
       m_AppFrame.setSize(iWidth, iHeight);
       m_AppFrame.setExtendedState(iState);
    }
- }
+}

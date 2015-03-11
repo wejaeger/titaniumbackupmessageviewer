@@ -76,10 +76,10 @@ public class TitaniumBackupMessageReader implements IMessageReader
 {
    private static final Logger LOGGER = Logger.getLogger(TitaniumBackupMessageReader.class.getName());
 
-   private final static String DEFAULTCHARSET = Charset.defaultCharset().name();
+   private static final String DEFAULTCHARSET = Charset.defaultCharset().name();
 
-   final private SimpleDateFormat m_DateFmt;
-   final private List<MessageThread> m_ThreadList;
+   private final SimpleDateFormat m_DateFmt;
+   private final List<MessageThread> m_ThreadList;
    private SQLLiteContactsReader m_ContactReader;
    private int m_iNumberOfMessages;
 
@@ -216,7 +216,7 @@ public class TitaniumBackupMessageReader implements IMessageReader
          }
       }
       else
-         iError =1 ;
+         iError = 1;
 
       return(iError);
    }
@@ -254,7 +254,7 @@ public class TitaniumBackupMessageReader implements IMessageReader
             final String strDateSent = element.getAttribute("dateSent");
             final Date date;
             if (!strDateSent.trim().isEmpty())
-               date= m_DateFmt.parse(strDateSent);
+               date = m_DateFmt.parse(strDateSent);
             else
                date = m_DateFmt.parse(element.getAttribute("date"));
 
@@ -328,7 +328,7 @@ public class TitaniumBackupMessageReader implements IMessageReader
       String strAddress = null;
 
       final NodeList address = element.getElementsByTagName("address");
-      if (null != address && address.getLength()== 2)
+      if (null != address && address.getLength() == 2)
       {
          for (int i = 0; i < address.getLength(); i++)
          {

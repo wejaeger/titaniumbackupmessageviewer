@@ -58,9 +58,9 @@ public class SMILMessage extends MMSMessage
    private static final Logger LOGGER = Logger.getLogger(ImagePart.class.getName());
    private static final String CIDPREFIX = "cid:";
 
-   final private Map<String, IMMSMessagePart> m_PartsMap;
-   final private SMILPart m_SMILPart;
-   final private Collection<IMMSMessagePart> m_OrderedParts;
+   private final Map<String, IMMSMessagePart> m_PartsMap;
+   private final SMILPart m_SMILPart;
+   private final Collection<IMMSMessagePart> m_OrderedParts;
 
    /**
     * Creates new {@code SMILMessage}.

@@ -64,7 +64,7 @@ public interface IMessage extends Comparable<IMessage>, Serializable
        * Creates the appropriate encoding instance for the given encoding
        * string.
        *
-       * @param strEncoding
+       * @param strEncoding the character encoding string
        * @return the appropriate encoding instance for the given encoding
        *         string or {@code null} if this if it is not defined in this
        *         enumeration.
@@ -132,7 +132,7 @@ public interface IMessage extends Comparable<IMessage>, Serializable
        * Factory method to construct the appropriate enumeration type for this
        * message box type
        *
-       * @param strMsgBox
+       * @param strMsgBox the message box string
        *
        * @return the appropriate message box  type or {@code null} if no message
        *         box type is defined for the given {@code strMsgBox}.

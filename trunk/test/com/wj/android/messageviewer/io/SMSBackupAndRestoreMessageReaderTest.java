@@ -33,9 +33,11 @@ import java.util.Date;
 import static org.hamcrest.CoreMatchers.is;
 import org.junit.After;
 import org.junit.Assert;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 import org.junit.BeforeClass;
 
 /**
@@ -61,20 +63,20 @@ public final class SMSBackupAndRestoreMessageReaderTest
     * Creates check messages
     *
     * <p>
-    *     Run once before any of the test methods.
-    * </p
+    *    Run once before any of the test methods.
+    * </p>
     *
-    * @throws ParseException if en error ocurs parsing a check date string.
+    * @throws ParseException if en error occurs parsing a check date string.
     */
    @BeforeClass
    public static void createCheckMesages() throws ParseException
    {
-      IMessage.MessageBox sent = IMessage.MessageBox.fromString("sent");
-      IMessage.MessageBox inbox = IMessage.MessageBox.fromString("inbox");
+      final IMessage.MessageBox sent = IMessage.MessageBox.fromString("sent");
+      final IMessage.MessageBox inbox = IMessage.MessageBox.fromString("inbox");
 
-      final IMessage aMsg[] = {
-         new SMSMessage("", "332", new Date(1285799668193L), "Sample Message Sent from the phone", sent),
-         new SMSMessage("", "4433221123", new Date(1289643415810L), "Sample Message received by the phone", inbox),
+      final IMessage[] aMsg = {
+          new SMSMessage("", "332", new Date(1285799668193L), "Sample Message Sent from the phone", sent),
+          new SMSMessage("", "4433221123", new Date(1289643415810L), "Sample Message received by the phone", inbox),
       };
 
       m_aCheckMessages = aMsg;
@@ -85,8 +87,8 @@ public final class SMSBackupAndRestoreMessageReaderTest
     * instance.
     *
     * <p>
-    *     Run once before any of the test methods.
-    * </p
+    *    Run once before any of the test methods.
+    * </p>
     */
    @Before
    public void setUp()

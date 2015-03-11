@@ -44,7 +44,7 @@ import javax.swing.JOptionPane;
  */
 public class Resources
 {
-   private final static String DEFAULTCHARSET = Charset.defaultCharset().name();
+   private static final String DEFAULTCHARSET = Charset.defaultCharset().name();
 
    /** 32 pixel application icon */
    public static final String APPICON32 = "app-icon32.png";
@@ -62,8 +62,8 @@ public class Resources
    private static final String APPVERSIONKEY = "version.num";
    private static final String RELEASEDATEKEY = "version.dat";
 
-   private static final Map<String, ImageIcon> m_IconMap = new HashMap<>();
-   private static final Properties m_AppProps = new Properties();
+   private static final Map<String, ImageIcon> ICONMAP = new HashMap<>();
+   private static final Properties APPPROPS = new Properties();
 
    /**
     * Prevent instantiation.
@@ -81,16 +81,16 @@ public class Resources
     */
    public static ImageIcon getIcon(final String strIconName)
    {
-      ImageIcon icon = m_IconMap.get(strIconName);
+      ImageIcon icon = ICONMAP.get(strIconName);
 
-      synchronized (m_IconMap)
+      synchronized (ICONMAP)
       {
          if (null == icon)
          {
             try
             {
                icon = new ImageIcon(Resources.class.getResource(strIconName));
-               m_IconMap.put(strIconName, icon);
+               ICONMAP.put(strIconName, icon);
             }
             catch (Exception ex)
             {
@@ -179,12 +179,12 @@ public class Resources
 
    private static String getProperty(final String strKey)
    {
-      String strProp = m_AppProps.getProperty(strKey, "");
+      String strProp = APPPROPS.getProperty(strKey, "");
 
       if (strProp.isEmpty())
       {
          if (loadProperties())
-             strProp = m_AppProps.getProperty(strKey, "");
+             strProp = APPPROPS.getProperty(strKey, "");
       }
 
       return(strProp);
@@ -196,7 +196,7 @@ public class Resources
 
       try (final InputStream is = Resources.class.getResourceAsStream(APPPROPFILENAME))
       {
-         m_AppProps.load(is);
+         APPPROPS.load(is);
          fRet = true;
       }
       catch (final IOException ex)

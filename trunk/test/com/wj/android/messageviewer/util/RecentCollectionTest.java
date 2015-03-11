@@ -30,8 +30,9 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import org.junit.After;
 import org.junit.AfterClass;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import org.junit.Test;
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.BeforeClass;
 
@@ -42,7 +43,7 @@ import org.junit.BeforeClass;
  */
 public class RecentCollectionTest
 {
-   private static Preferences PREFERENCES;
+   private static Preferences m_Preferences;
 
    private final RecentCollection<String> m_Recent;
 
@@ -51,7 +52,7 @@ public class RecentCollectionTest
     */
    public RecentCollectionTest()
    {
-      m_Recent = new RecentCollection<>(PREFERENCES, "recentTestFiles");
+      m_Recent = new RecentCollection<>(m_Preferences, "recentTestFiles");
    }
 
    /**
@@ -59,12 +60,12 @@ public class RecentCollectionTest
     *
     * <p>
     *     Run once before any of the test methods.
-    * </p
+    * </p>
     */
    @BeforeClass
    public static void setUPPreferences()
    {
-      PREFERENCES = Preferences.userNodeForPackage(RecentCollectionTest.class);
+      m_Preferences = Preferences.userNodeForPackage(RecentCollectionTest.class);
    }
 
    /**
@@ -74,12 +75,12 @@ public class RecentCollectionTest
     *    Run after all the tests in the class have been run.
     * </p>
     *
-    * @throws BackingStoreException
+    * @throws BackingStoreException if an error in the backing store occurs
     */
    @AfterClass
    public static void flushPreferences() throws BackingStoreException
    {
-      PREFERENCES.flush();
+      m_Preferences.flush();
    }
 
    /**
@@ -89,7 +90,7 @@ public class RecentCollectionTest
     *    run before every test method.
     * </p>
     *
-    * @throws BackingStoreException
+    * @throws BackingStoreException if an error in the backing store occurs
     */
    @Before
    public void setUp() throws BackingStoreException
@@ -104,7 +105,7 @@ public class RecentCollectionTest
     *    run after every test method.
     * </p>
     *
-    * @throws BackingStoreException
+    * @throws BackingStoreException if an error in the backing store occurs
     */
    @After
    public void tearDown() throws BackingStoreException
@@ -116,8 +117,9 @@ public class RecentCollectionTest
     * Test if added more then ten elements the least recently used are removed.
     *
     * @throws BackingStoreException in case of an error in backing store.
-    * @throws UnsupportedEncodingException
-    * @throws ClassNotFoundException
+    * @throws UnsupportedEncodingException if an unsupported encoding is used
+    * @throws IOException if an IO error occurred
+    * @throws ClassNotFoundException if a class could not be found
     */
    @Test
    public void testOverflow() throws BackingStoreException, UnsupportedEncodingException, IOException, ClassNotFoundException
@@ -134,10 +136,10 @@ public class RecentCollectionTest
 
       for (int i = 19; i >= 10; i--)
       {
-         final String str = m_Recent.getObject(PREFERENCES, "recentTestFiles." + (i -10)).toString();
+         final String str = m_Recent.getObject(m_Preferences, "recentTestFiles." + (i - 10)).toString();
          assertEquals("" + i, str);
       }
-    }
+   }
 
    /**
     * test file added that is there already.

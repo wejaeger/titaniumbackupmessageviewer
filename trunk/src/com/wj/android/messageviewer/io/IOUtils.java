@@ -123,7 +123,7 @@ public class IOUtils
    {
       final int iRet;
 
-      long lCount = copyLarge(input, output);
+      final long lCount = copyLarge(input, output);
 
       if (lCount > Integer.MAX_VALUE)
            iRet = -1;

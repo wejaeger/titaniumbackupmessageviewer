@@ -50,7 +50,7 @@ class BubbleText extends JTextArea
     * Constructs a new {@code BubbleText} with the specified text displayed.
     * A default model is created and rows/columns are set to 0.
     *
-    * @param  text  the text to be displayed, or {@code null}
+    * @param strText  the text to be displayed, or {@code null}
     */
    BubbleText(final String strText)
    {

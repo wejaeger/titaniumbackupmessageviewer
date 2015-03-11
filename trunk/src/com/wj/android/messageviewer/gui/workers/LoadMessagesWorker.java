@@ -58,7 +58,7 @@ public class LoadMessagesWorker extends AbstractDisabelingUIWorker<Integer, Inte
     * @param messageReaderType the type of reader appropriate to read specified
     *        files.
     */
-   public LoadMessagesWorker(final BackupMessageViewerFrame frame, final Pair<String, String> files2Open, IMessageReader.MessageFileType messageReaderType)
+   public LoadMessagesWorker(final BackupMessageViewerFrame frame, final Pair<String, String> files2Open, final IMessageReader.MessageFileType messageReaderType)
    {
       super(frame, 0);
 
@@ -104,7 +104,7 @@ public class LoadMessagesWorker extends AbstractDisabelingUIWorker<Integer, Inte
             final File contactsDBFile;
             final String strContactsDBFileName = m_Files2Open.getSecond();
             if (null != strContactsDBFileName && !strContactsDBFileName.trim().isEmpty())
-               contactsDBFile= new File(strContactsDBFileName);
+               contactsDBFile = new File(strContactsDBFileName);
             else
                contactsDBFile = null;
 

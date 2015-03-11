@@ -42,7 +42,7 @@ import javax.swing.filechooser.FileFilter;
  */
 class TitaniumBackupMessageFileNameFilter extends FileFilter
 {
-   final static Pattern NAMEPATTERN = Pattern.compile(".*\\.xml|com\\.keramidas\\.virtual\\.XML_MESSAGES\\-[0-9]{8}\\-[0-9]{6}\\.xml\\.gz", Pattern.CASE_INSENSITIVE);
+   private static final Pattern NAMEPATTERN = Pattern.compile(".*\\.xml|com\\.keramidas\\.virtual\\.XML_MESSAGES\\-[0-9]{8}\\-[0-9]{6}\\.xml\\.gz", Pattern.CASE_INSENSITIVE);
 
    private final Matcher m_Matcher;
 
