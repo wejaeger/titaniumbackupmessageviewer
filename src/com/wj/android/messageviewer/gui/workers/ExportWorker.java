@@ -32,12 +32,14 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.ListModel;
 
 /**
  * Exports selected or all messages to a plan text file.
@@ -165,22 +167,12 @@ public class ExportWorker extends AbstractDisabelingUIWorker<Boolean, Void>
 
       try (final BufferedWriter outputWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(saveFile), DEFAULTCHARSET)))
       {
-         for (final MessageThread selectedContact : m_ThreadListBox.getSelectedValuesList())
+         final ListModel<MessageThread> list = m_ThreadListBox.getModel();
+         final int iNoThread = list.getSize();
+         for(int i = 0; i < iNoThread; i++)
          {
-            final Collection<IMessage> selectedMessages = selectedContact.getMessages();
-
-            outputWriter.write(selectedContact.toString());
-            outputWriter.newLine();
-            outputWriter.newLine();
-
-            for (final IMessage selectedMessage : selectedMessages)
-            {
-               outputWriter.write(selectedMessage.toString());
-               outputWriter.newLine();
-            }
-
-            outputWriter.write("++++++++++++++++++++++++++++++++++++++++++++++++++");
-            outputWriter.newLine();
+            final MessageThread thread = list.getElementAt(i);
+            printThreadMessages(outputWriter, thread, i == (iNoThread - 1));
          }
       }
       catch (final IOException ex)
@@ -193,8 +185,8 @@ public class ExportWorker extends AbstractDisabelingUIWorker<Boolean, Void>
    }
 
    /**
-    * Export the messages as plain text of the thread given by the contact
-    * index to the specified file.
+    * Export the messages as plain text of all selected threads to the
+    * specified file.
     *
     * @param saveFile the file to save the messages to.
     *
@@ -208,20 +200,12 @@ public class ExportWorker extends AbstractDisabelingUIWorker<Boolean, Void>
       {
          try (final BufferedWriter outputWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(saveFile), DEFAULTCHARSET)))
          {
-            final MessageThread thread = m_ThreadListBox.getSelectedValuesList().get(m_ThreadListBox.getSelectedIndex());
-            final Collection<IMessage> selectedMessages = thread.getMessages();
+            final List<MessageThread> threads = m_ThreadListBox.getSelectedValuesList();
+            final int iNoThread = threads.size();
 
-            outputWriter.write(thread.toString());
-            outputWriter.newLine();
-            outputWriter.newLine();
-
-            for (IMessage selectedMessage : selectedMessages)
-            {
-               outputWriter.write(selectedMessage.toString());
-               outputWriter.newLine();
-            }
-
-            outputWriter.flush();
+            int i = 0;
+            for (final MessageThread thread : threads)
+               printThreadMessages(outputWriter, thread, i++ == (iNoThread - 1));
          }
       }
       catch (IOException ex)
@@ -233,4 +217,25 @@ public class ExportWorker extends AbstractDisabelingUIWorker<Boolean, Void>
       return(fRet);
    }
 
+   private void printThreadMessages(final BufferedWriter outputWriter, final MessageThread thread, final boolean fIsLast) throws IOException
+   {
+      final Collection<IMessage> selectedMessages = thread.getMessages();
+
+      outputWriter.write(thread.toString());
+      outputWriter.newLine();
+      outputWriter.newLine();
+
+      for (final IMessage selectedMessage : selectedMessages)
+      {
+         outputWriter.write(selectedMessage.toString());
+         outputWriter.newLine();
+      }
+
+      if (!fIsLast)
+      {
+         outputWriter.write("++++++++++++++++++++++++++++++++++++++++++++++++++");
+         outputWriter.newLine();
+         outputWriter.newLine();
+      }
+   }
 }

@@ -6,7 +6,9 @@ Change log:
 0.9.4
  - MMS support for SMS Backup and Restore messages
  - added image/gif support
- -
+ - fixed bug: IndexOutOfBoundsException thrown when exporting messages of
+   selected threads
+
 0.9.3
  - Now also supports backup message XML files from SMS Backup and Restore App by
    Ritesh (not only Titanium Backup)
