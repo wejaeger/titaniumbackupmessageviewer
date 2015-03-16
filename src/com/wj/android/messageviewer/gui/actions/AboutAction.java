@@ -86,7 +86,7 @@ public class AboutAction extends AbstractAction
     */
    public AboutAction(final JFrame frame)
    {
-      putValue(Action.NAME, "Abut " + Resources.getApplicationName());
+      putValue(Action.NAME, "About " + Resources.getApplicationTitle());
 
       m_Frame = frame;
    }
@@ -100,7 +100,7 @@ public class AboutAction extends AbstractAction
    public void actionPerformed(final ActionEvent e)
    {
       final StringBuffer strText = new StringBuffer("<html><body><center><h4>");
-      strText.append(Resources.getApplicationName());
+      strText.append(Resources.getApplicationTitle());
       strText.append("</h4></center>");
       strText.append("<center><h5>");
       strText.append(Resources.getApplicationVersion());
@@ -110,9 +110,15 @@ public class AboutAction extends AbstractAction
       strText.append("<p><center>View messages from your Android device in a conversation like style.</center></p>");
       strText.append("<p><center>Copyright &copy; ");
       strText.append(Resources.getReleaseDate().substring(0, 4));
-      strText.append(" Werner Jaeger</center></p>");
+      strText.append(" ");
+      strText.append(Resources.getApplicationVendor());
+      strText.append("</center></p>");
       strText.append("<p><center>For more information please visit</center>");
-      strText.append("<center><a href=\"https://sourceforge.net/projects/titaniumbackupmessageviewer/\">sourceforge.net/projects/titaniumbackupmessageviewer</a></center></p>");
+      strText.append("<center><a href=\"");
+      strText.append(Resources.getApplicationHomePage());
+      strText.append("\">");
+      strText.append(Resources.getApplicationHomePage());
+      strText.append("</a></center></p>");
       strText.append("</body></html>");
 
       final JEditorPane textPane = new JEditorPane();

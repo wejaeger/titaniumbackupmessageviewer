@@ -23,7 +23,6 @@
  */
 package com.wj.android.messageviewer.gui;
 
-import com.wj.android.messageviewer.BackupMessageViewerApplication;
 import com.wj.android.messageviewer.gui.actions.AboutAction;
 import com.wj.android.messageviewer.gui.actions.ExportAllMessagesAction;
 import com.wj.android.messageviewer.gui.actions.ExportSelectedMessagesAction;
@@ -61,7 +60,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 /**
- * Main class and window for this application.
+ * Main frame window for this application.
  *
  * <p>
  *    {@code BackupMessageViewerFrame} implements a threaded messaging
@@ -127,7 +126,7 @@ public final class BackupMessageViewerFrame extends JFrame
       setSize(new Dimension(iPreferredWidth, iPreferredHeight));
       setLocationRelativeTo(null);
 
-      setTitle(Resources.getApplicationName());
+      setTitle(Resources.getApplicationTitle());
       setIconImages(Resources.getFrameIcons());
       setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
@@ -161,7 +160,7 @@ public final class BackupMessageViewerFrame extends JFrame
 
       m_NumberOfMessagesField.setText(Integer.toString(iNoOfMessages));
 
-      setTitle(Resources.getApplicationName() + " - " + new File(files2load.getFirst()).getName());
+      setTitle(Resources.getApplicationTitle() + " - " + new File(files2load.getFirst()).getName());
       BackupMessageViewerApplication.getInstance().add2RecentFileList(files2load);
       syncRecentFiles();
    }

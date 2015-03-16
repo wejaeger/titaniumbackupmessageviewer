@@ -23,7 +23,7 @@
  */
 package com.wj.android.messageviewer.resources;
 
-import com.wj.android.messageviewer.io.IOUtils;
+import com.wj.android.messageviewer.util.IOUtils;
 import java.awt.Image;
 import java.io.IOException;
 import java.io.InputStream;
@@ -58,8 +58,10 @@ public class Resources
    private static final String APPPROPFILENAME = "application.properties";
    private static final String SMSBACKUPXSD = "sms.xsd";
    private static final String TITANIUMBACKUPXSD = "titanium.xsd";
-   private static final String APPNAMEKEY = "project.name";
+   private static final String APPTITLEKEY = "application.title";
    private static final String APPVERSIONKEY = "version.num";
+   private static final String APPVENDORKEY = "application.vendor";
+   private static final String APPHOMEPAGEKEY = "application.homepage";
    private static final String RELEASEDATEKEY = "version.dat";
 
    private static final Map<String, ImageIcon> ICONMAP = new HashMap<>();
@@ -130,19 +132,42 @@ public class Resources
     *
     * @return the application name or empty if could not be read.
     */
-   public static String getApplicationName()
+   public static String getApplicationTitle()
    {
-      return(getProperty(APPNAMEKEY));
+      return(getProperty(APPTITLEKEY));
    }
 
    /**
-    * Get the application version from the underlying application properties file.
+    * Get the application version from the underlying application properties
+    * file.
     *
     * @return the application version or empty if could not be read.
     */
    public static String getApplicationVersion()
    {
       return(getProperty(APPVERSIONKEY));
+   }
+
+   /**
+    * Get the application vendor from the underlying application properties
+    * file.
+    *
+    * @return the application vendor or empty if could not be read.
+    */
+   public static String getApplicationVendor()
+   {
+      return(getProperty(APPVENDORKEY));
+   }
+
+   /**
+    * Get the application home page from the underlying application properties
+    * file.
+    *
+    * @return the application home page or empty if could not be read.
+    */
+   public static String getApplicationHomePage()
+   {
+      return(getProperty(APPHOMEPAGEKEY));
    }
 
    /**
