@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+
+<!-- Copyright (c) 2015 Werner Jaeger. All rights reserved. -->
+<!-- $Id$ -->
+
+<!--
+   a set of suppress elements checkstyle should ignore
+-->
+
+
+<!DOCTYPE suppressions PUBLIC
+    "-//Puppy Crawl//DTD Suppressions 1.0//EN"
+    "http://www.puppycrawl.com/dtds/suppressions_1_0.dtd">
+
+<suppressions>
+</suppressions>

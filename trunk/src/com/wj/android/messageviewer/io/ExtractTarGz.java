@@ -23,6 +23,7 @@
  */
 package com.wj.android.messageviewer.io;
 
+import com.wj.android.messageviewer.util.IOUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
