@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book>
+  <bookinfo>
+    <title>Backup Message Viewer</title>
+
+    <author>
+      <firstname>Werner</firstname>
+
+      <surname>Jäger</surname>
+
+      <affiliation>
+        <orgname/>
+      </affiliation>
+    </author>
+
+    <pubdate/>
+  </bookinfo>
+
+  <chapter>
+    <title>Introduction</title>
+
+    <para><application>Backup Message Viewer</application> is a is a platform independent application to view the backup XML files created from the following <application>Android</application> Apps</para>
+
+    <itemizedlist>
+      <listitem>
+        <para><ulink url="http://matrixrewriter.com/android/">Titanium Backup</ulink></para>
+      </listitem>
+
+      <listitem>
+        <para><ulink url="http://android.riteshsahu.com/apps/sms-backup-restore">SMS Backup and Restore</ulink></para>
+      </listitem>
+    </itemizedlist>
+
+    <para><application>Titanium Backup</application><indexterm>
+        <primary>Titanium Backup</primary>
+      </indexterm> message XML files are located under the folder <filename>TitaniumBackup</filename> on the mobile phone and have following name pattern:</para>
+
+    <blockquote>
+      <para><filename>com.keramidas.virtual.XML_MESSAGES-YYYYMMDD-HHMMSS.xml.gz</filename></para>
+    </blockquote>
+
+    <para>Unfortunately, the Titanium Backup XML file does not contain the contact's name.Therefore you can optionally choose a contacts database to look up contact's name from phone number.</para>
+
+    <para>Contacts database is stored as <filename>contacts2.db</filename> in a archive file with name pattern:</para>
+
+    <blockquote>
+      <para><filename>com.android.providers.contacts-YYYYMMDD-HHMMSS.tar.gz</filename></para>
+    </blockquote>
+
+    <para>in the <filename>TitaniumBackup</filename> folder on the mobile phone.</para>
+
+    <para><application>SMS Backup and Restore</application> <indexterm>
+        <primary>SMS Backup and Restore</primary>
+      </indexterm> message XML files are located under the folder <filename>SMSBackupRestore</filename> on the mobile phone and have following name pattern:</para>
+
+    <blockquote>
+      <para><filename>sms-YYYYMMDDHHMMSS.xml</filename></para>
+    </blockquote>
+
+    <para>MMS Message currently only support message parts with following content type:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>text/plain</para>
+      </listitem>
+
+      <listitem>
+        <para>text/x-vCard</para>
+      </listitem>
+
+      <listitem>
+        <para>image/jpeg</para>
+      </listitem>
+
+      <listitem>
+        <para>image/png</para>
+      </listitem>
+
+      <listitem>
+        <para>image/gif</para>
+      </listitem>
+
+      <listitem>
+        <para>application/smil</para>
+      </listitem>
+    </itemizedlist>
+
+    <para><acronym>SMIL</acronym> implementation is rudimentary because it does not honor layout description, it only cares for correct order of message parts.</para>
+  </chapter>
+
+  <chapter>
+    <title>Getting Started</title>
+
+    <para>To be written</para>
+  </chapter>
+
+  <chapter>
+    <title>General Usage</title>
+
+    <section>
+      <title>Startup</title>
+
+      <para>To be written</para>
+    </section>
+  </chapter>
+</book>

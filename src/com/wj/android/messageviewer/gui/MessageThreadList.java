@@ -50,7 +50,7 @@ class MessageThreadList extends JList<MessageThread>
    /**
     *  Class for receiving component events.
     */
-   final class MessageThreadComponentAdapter extends ComponentAdapter
+   private final class MessageThreadComponentAdapter extends ComponentAdapter
    {
       /** {@inheritDoc} */
       @Override
@@ -67,7 +67,7 @@ class MessageThreadList extends JList<MessageThread>
     *
     * @author <a href="mailto:werner.jaeger@t-systems.com">Werner Jaeger</a>
     */
-   static class MessageThreadListCellRenderer extends DefaultListCellRenderer
+   private static class MessageThreadListCellRenderer extends DefaultListCellRenderer
    {
       private static final long serialVersionUID = -2684873318524485434L;
       private final JPanel m_Panel;
