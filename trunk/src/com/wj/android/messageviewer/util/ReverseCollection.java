@@ -81,7 +81,7 @@ class ReverseCollection<E> extends AbstractCollection<E>
             if (!hasNext())
                throw new NoSuchElementException();
 
-            return((E)m_Elements.get(--m_iIndex));
+            return(m_Elements.get(--m_iIndex));
          }
 
          @Override

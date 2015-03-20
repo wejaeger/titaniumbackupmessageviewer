@@ -31,7 +31,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
@@ -59,9 +58,9 @@ public class OpenAction extends AbstractAction
     */
    public OpenAction(final BackupMessageViewerFrame frame)
    {
-      putValue(Action.NAME, "Open ...");
-      putValue(Action.MNEMONIC_KEY, KeyEvent.VK_O);
-      putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
+      putValue(NAME, "Open ...");
+      putValue(MNEMONIC_KEY, KeyEvent.VK_O);
+      putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
 
       m_Frame = frame;
 

@@ -39,6 +39,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.Toolkit;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -263,7 +264,7 @@ public final class BackupMessageViewerFrame extends JFrame
       final JMenu mnHelp = new JMenu("Help");
       menuBar.add(mnHelp);
 
-      mnHelp.add(new JMenuItem(new HelpAction()));
+      mnHelp.add(new JMenuItem(new HelpAction(this, "Help Contents", KeyEvent.VK_F1, null, HelpAction.View.CONTENTS)));
       mnHelp.add(new JMenuItem(new AboutAction(this)));
    }
 
