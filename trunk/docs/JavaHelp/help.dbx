@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book id="Index">
+  <bookinfo id="OnlineHelp">
+    <title>Backup Message Viewer - Online Help</title>
+
+    <author>
+      <firstname>Werner</firstname>
+
+      <surname>Jäger</surname>
+    </author>
+
+    <pubdate>February 22, 2015</pubdate>
+  </bookinfo>
+
+  <chapter id="Introduction">
+    <title>Introduction</title>
+
+    <para><application>Backup Message Viewer</application> is a is a platform independent application to view the backup XML files created from the following <application>Android</application> Apps</para>
+
+    <itemizedlist>
+      <listitem>
+        <para><ulink url="http://matrixrewriter.com/android/">Titanium Backup</ulink></para>
+      </listitem>
+
+      <listitem>
+        <para><ulink url="http://android.riteshsahu.com/apps/sms-backup-restore">SMS Backup and Restore</ulink></para>
+      </listitem>
+    </itemizedlist>
+
+    <para><application>Titanium Backup</application> message XML files are located under the folder <filename>TitaniumBackup</filename> on the mobile phone and have following name pattern:</para>
+
+    <blockquote>
+      <para><filename>com.keramidas.virtual.XML_MESSAGES-YYYYMMDD-HHMMSS.xml.gz</filename></para>
+    </blockquote>
+
+    <para>Unfortunately, the Titanium Backup XML file does not contain the contact's name. Therefore you can optionally choose a contacts database to look up contact's name from phone number.</para>
+
+    <para>Contacts database is stored as <filename>contacts2.db</filename> in a archive file with name pattern:</para>
+
+    <blockquote>
+      <para><filename>com.android.providers.contacts-YYYYMMDD-HHMMSS.tar.gz</filename></para>
+    </blockquote>
+
+    <para>in the <filename>TitaniumBackup</filename> folder on the mobile phone.</para>
+
+    <para><application>SMS Backup and Restore</application> message XML files are located under the folder <filename>SMSBackupRestore</filename> on the mobile phone and have following name pattern:</para>
+
+    <blockquote>
+      <para><filename>sms-YYYYMMDDHHMMSS.xml</filename></para>
+    </blockquote>
+
+    <para>MMS Message currently only support message parts with following content type:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>text/plain</para>
+      </listitem>
+
+      <listitem>
+        <para>text/x-vCard</para>
+      </listitem>
+
+      <listitem>
+        <para>image/jpeg</para>
+      </listitem>
+
+      <listitem>
+        <para>image/png</para>
+      </listitem>
+
+      <listitem>
+        <para>image/gif</para>
+      </listitem>
+
+      <listitem>
+        <para>application/smil</para>
+      </listitem>
+    </itemizedlist>
+
+    <para><acronym>SMIL</acronym> implementation is rudimentary because it does not honor layout description, it only cares for correct order of message parts.</para>
+  </chapter>
+
+  <chapter id="GettingStarted">
+    <title>Getting Started</title>
+
+    <section id="Installing">
+      <title>Installing</title>
+
+      <simplesect>
+        <title>Requirements</title>
+
+        <itemizedlist>
+          <listitem>
+            <para>Oracle (ex Sun) or Apple <productname>Java</productname> runtime 1.7 or above.</para>
+          </listitem>
+
+          <listitem>
+            <para>At least 250Mb of memory and a 800MHz CPU.</para>
+          </listitem>
+
+          <listitem>
+            <para>10Mb of free disk space.</para>
+          </listitem>
+        </itemizedlist>
+      </simplesect>
+
+      <simplesect>
+        <title>Install on Linux or on the Mac</title>
+
+        <orderedlist>
+          <listitem>
+            <para>Download newest version from <ulink url="https://sourceforge.net/projects/titaniumbackupmessageviewer/">sourceforge.net</ulink> to a directory of your choice e..g <filename>/usr/local/bin</filename>.</para>
+          </listitem>
+
+          <listitem>
+            <para>Make sure that the <productname>Java</productname> bin/ directory is referenced in the <varname>$PATH</varname> and, at the same time, check that the <productname>Java</productname> runtime in the <varname>$PATH</varname> has a version of 1.7+:</para>
+
+            <programlisting>~$ java -version
+java version "1.7.0"
+Java(TM) SE Runtime Environment (build 1.7.0-b147)
+Java HotSpot(TM) 64-Bit Server VM (build 21.0-b17, mixed mode)</programlisting>
+          </listitem>
+
+          <listitem>
+            <para>Make the .jar file executable:</para>
+
+            <programlisting>~$ sudo chmod +x BackupMessageViewer_n.n.n-all.jar</programlisting>
+          </listitem>
+
+          <listitem>
+            <para>Make it so that you can run your .jar file by double-clicking it (optional). Create e,g a shell script <filename>BackupMessageViewer.sh</filename>:<programlisting>#!/bin/sh -e
+
+java -jar -Xmx256m BackupMessageViewer_n.n.n-all.jar</programlisting></para>
+
+            <para>Make the shell script executable:<programlisting>~$ sudo chmod +x BackupMessageViewer.sh</programlisting></para>
+          </listitem>
+        </orderedlist>
+      </simplesect>
+
+      <simplesect>
+        <title>Install on Windows</title>
+
+        <orderedlist>
+          <listitem>
+            <para>Download newest version from <ulink url="https://sourceforge.net/projects/titaniumbackupmessageviewer/">sourceforge.net</ulink> to a directory of your choice e..g <filename>C:\Program Files</filename>.</para>
+          </listitem>
+
+          <listitem>
+            <para>Make sure that you have a <productname>Java</productname> 1.7+ runtime installed on your machine. To check this, open a command window and type <command>java -version</command> followed by Enter. You should get something looking like this:<programlisting>C:\&gt;java -version
+java version "1.7.0"
+Java(TM) SE Runtime Environment (build 1.7.0-b147)
+Java HotSpot(TM) Client VM (build 21.0-b17, mixed mode, sharing)</programlisting></para>
+          </listitem>
+
+          <listitem>
+            <para>Make it so that you can run your .jar file by double-clicking it (optional). Create e,g a batch file <filename>BackupMessageViewer.bat</filename>:<programlisting>java -jar -Xmx256m BackupMessageViewer_n.n.n-all.jar</programlisting></para>
+          </listitem>
+        </orderedlist>
+      </simplesect>
+    </section>
+
+    <section id="GettingStartedWithBackupMessageViewer">
+      <title>Getting started with Backup Message Viewer</title>
+
+      <simplesect>
+        <title>Open a backed up message file</title>
+
+        <para>If not yet done connect your mobile device with your computer and copy the message backup folder to a directory of your choice to your hard disk.</para>
+
+        <para>For <application>Titanium Backup</application> the folder is <filename>TitaniumBackup</filename> and for <application>SMS Backup and Restore</application> the folder is <filename>SMSBackupRestore</filename>.</para>
+
+        <para>Use <guimenu>File</guimenu> → <guimenuitem>Open ...</guimenuitem>, in the file chooser dialog navigate to the backup folder, mark the desired type of files from the file filter drop down list, select the backup message file you want to open and than click <guibutton>Open</guibutton>.</para>
+
+        <note>
+          <para>The file filter is helpful for displaying the right message files only. The type of message file (<application>Titanium Backup</application> or <application>SMS Backup and Restore</application>) is recognized automatically and does not depend on the selected file filter.</para>
+        </note>
+
+        <note>
+          <para><application>Titanium Backup</application> message files are originally stored compressed (<filename>.gz</filename> extension) with the following name pattern:</para>
+
+          <blockquote>
+            <para>com.keramidas.virtual.XML_MESSAGES-YYYYMMDD-HHMMSS.xml.gz</para>
+          </blockquote>
+
+          <para>You do not need to decompress those files before. This is done for you automatically.</para>
+        </note>
+
+        <para>If you opened a <application>SMS Backup and Restore</application> message file you are done.</para>
+
+        <para>In case of a <application>Titanium Backup</application> message file a second file chooser dialog appears after you clicked the <application>Open</application> button. This is because <application>Titanium Backup</application> message files do not contain the contact's name (as opposed to <application>SMS Backup and Restore</application> files).</para>
+
+        <para>Here you can choose a contact database file to resolve phone numbers to contact names. Contact database file is also stored within the <filename>TitaniumBackup</filename> folder.</para>
+
+        <tip>
+          <para>If you don't need resolved phone numbers you can click on the <guibutton>Cancel</guibutton> button here.</para>
+        </tip>
+
+        <para>Navigate to the <filename>TitaniumBackup</filename> folder, select the desired contact database file and click the <guibutton>Open</guibutton> button.</para>
+
+        <note>
+          <para>Contacts database file is stored as <filename>contacts2.db</filename> in a archive file with name pattern:</para>
+
+          <para><blockquote>
+              <para>com.android.providers.contacts-YYYYMMDD-HHMMSS.tar.gz</para>
+            </blockquote>No need to decompress and untar the file. This is done for you automatically.</para>
+        </note>
+      </simplesect>
+    </section>
+  </chapter>
+
+  <chapter id="Reference">
+    <title>Reference</title>
+
+    <section id="Menus">
+      <title>Menus</title>
+
+      <para>To be written</para>
+
+      <section id="FileMenu">
+        <title>File Menu</title>
+
+        <simplesect>
+          <title>Open</title>
+
+          <para>Opens an existing message XML file. Displays standard file chooser dialog box. If a <application>Titanium Backup</application> message XML file was opened a second file chooser dialog box is displayed to optionally choose a contacts database file for resolving phone numbers to contact names.</para>
+        </simplesect>
+
+        <simplesect>
+          <title>Open Recent File</title>
+
+          <para>Displays a list of recently opened files for one click opening.</para>
+        </simplesect>
+
+        <simplesect>
+          <title>Export selected messages</title>
+
+          <para>Exports messages of selected threads to a text file. First select the threads (multi select possible, use <keysym>CTRL</keysym> Key) that messages you want to export then use <guimenu>File</guimenu> → <guimenuitem>Export selected messages ...</guimenuitem>, to display a standard file chooser dialog box to choose the file location</para>
+        </simplesect>
+
+        <simplesect>
+          <title>Export All messages</title>
+
+          <para>Exports all messages to a text file. Displays standard file chooser dialog box to choose the file location. Exported messages look like this:<programlisting>Test
+
+sent: Jan 10, 2015 9:01:00 PM CET:  I have sent a test message. Only for test purposes to demonstrate the look and feel of the message viewer
+inbox: Jan 10, 2015 9:02:10 PM CET:  This is a message I have received
+inbox: Jan 10, 2015 9:03:10 PM CET:  Yet another received text message
+sent: Jan 10, 2015 9:04:00 PM CET:  I have replied to a test message
+draft: Jan 10, 2015 9:05:00 PM CET:  Not yet sent. Just a draft</programlisting></para>
+        </simplesect>
+
+        <simplesect>
+          <title>Quit</title>
+
+          <para>Quit the application</para>
+        </simplesect>
+      </section>
+
+      <section id="HelpMenu">
+        <title>Help Menu</title>
+
+        <simplesect>
+          <title>Help Contents</title>
+
+          <para>Displays the help browser.</para>
+        </simplesect>
+
+        <simplesect>
+          <title>About Backup Message Viewer</title>
+
+          <para>Displays the About dialog</para>
+        </simplesect>
+      </section>
+    </section>
+  </chapter>
+
+  <appendix id="CommandLineOptions">
+    <title>Command line options</title>
+
+    <section id="CommandLine">
+      <title>Command line</title>
+
+      <para><command>java</command> -jar BackupMessageViewer_n.n.n-all.jar [ <option>message_file_to-be opened</option> [ <option>contact_db_file</option> ] ]</para>
+
+      <para>Options:</para>
+
+      <variablelist>
+        <varlistentry>
+          <term><option>message_file_to-be opened</option></term>
+
+          <listitem>
+            <para>Open specified message file, either a <application>Titanium Backup</application> message XML files (.gz or .xml) or a <application>SMS Backup and Restore</application> message XML file</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term><option>contact_db_file</option></term>
+
+          <listitem>
+            <para>Optional and only if <option>message_file_to-be opened</option> is a <application>Titanium Backup</application> message XML file, used to resolve phone numbers to contact names. Can be compressed tar (.tar.gz) or plain SQLite file (<filename>contacts2.db)</filename></para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+
+      <para>Example:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>Starts the application and opens the specified message file and uses the specified contact database file to resolve phone numbers to contact names</para>
+
+          <programlisting><command>java</command> -jar BackupMessageViewer_0.9.4-all.jar <filename>com.keramidas.virtual.XML_MESSAGES-20150214-HHMMSS.xml.gz <filename>com.android.providers.contacts-20150214-HHMMSS.tar.gz</filename></filename></programlisting>
+        </listitem>
+
+        <listitem>
+          <para>Starts the application and opens the specified message file. Phone numbers are not resolved to contact names</para>
+
+          <programlisting><command>java</command> -jar BackupMessageViewer_0.9.4-all.jar <filename>com.keramidas.virtual.XML_MESSAGES-20150214-HHMMSS.xml.gz</filename></programlisting>
+        </listitem>
+
+        <listitem>
+          <para>Starts the application and opens the specified message file</para>
+
+          <programlisting><command>java</command> -jar BackupMessageViewer_0.9.4-all.jar <filename>sms-YYYYMMDDHHMMSS.xml</filename></programlisting>
+        </listitem>
+
+        <listitem>
+          <para>Starts the application. Use <guimenu>File</guimenu> → <guimenuitem>Open ...</guimenuitem>, to open a message file</para>
+
+          <programlisting><command>java</command> -jar BackupMessageViewer_0.9.4-all.jar</programlisting>
+        </listitem>
+      </itemizedlist>
+    </section>
+  </appendix>
+
+  <index>
+    <indexterm>
+      <primary>Titanium Backup</primary>
+    </indexterm>
+
+    <indexterm>
+      <primary>SMS Backup and Restore</primary>
+    </indexterm>
+  </index>
+</book>
