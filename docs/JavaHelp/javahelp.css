@@ -1,0 +1,222 @@
+/*
+$Id$
+
+File:   javahelp.css
+Author: Werner Jaeger
+
+Created on Mar 21, 2015, 8:31:42 AM
+
+Copyright (C) 2015 Werner Jaeger
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+body
+{
+   font-family: sans-serif;
+   font-size: small;
+   color: black;
+   background-color: white;
+   margin-left: 5px;
+   margin-right: 5px;
+}
+
+h1, h2, h3, h4, h5, h6
+{
+   color: #394986;
+   font-weight: bold;
+   margin-top: 10px;
+   margin-bottom: 5px;
+}
+
+h1, h2
+{
+   font-size: large;
+}
+
+h3, h4
+{
+   font-size: medium;
+}
+
+table
+{
+   border-width: 1px;
+   border-style: solid;
+   border-color: silver;
+   background-color: silver;
+   padding-left: 0px;
+   padding-right: 0px;
+   padding-top: 0px;
+   padding-bottom: 0px;
+   margin-top: 5px;
+   margin-bottom: 5px;
+}
+
+th, td
+{
+   border-width: 1px;
+   border-style: solid;
+   border-color: silver;
+   padding-left: 2px;
+   padding-right: 2px;
+   padding-top: 2px;
+   padding-bottom: 2px;
+}
+
+th
+{
+   background-color: #F0F0F0;
+}
+
+td
+{
+   background-color: white;
+}
+
+div.note table, div.note th, div.note td,
+div.tip table, div.tip th, div.tip td,
+div.warning table, div.warning th, div.warning td,
+div.caution table, div.caution th, div.caution td,
+div.important table, div.important th, div.important td
+{
+   border-style: none;
+   background-color: transparent;
+}
+
+dl
+{
+   margin-top: 10px;
+   margin-bottom: 5px;
+}
+
+dt
+{
+   font-weight: bold;
+   margin-top: 0px;
+   margin-bottom: 0px;
+}
+
+dd
+{
+   margin-top: 2px;
+   margin-left: 24px;
+}
+
+ul, ol
+{
+   margin-top: 5px;
+   margin-bottom: 0px;
+}
+
+ul
+{
+   margin-left: 16px;
+}
+
+ol
+{
+   margin-left: 24px;
+}
+
+li
+{
+   margin-top: 0px;
+   margin-bottom: 5px;
+}
+
+li p
+{
+   margin-top: 5px;
+   margin-bottom: 0px;
+}
+
+p
+{
+   margin-top: 5px;
+   margin-bottom: 5px;
+}
+
+div.sidebar
+{
+   background-color: #F0F0FF;
+   border-width: 1px;
+   border-style: solid;
+   border-color: gray;
+   padding-top: 5px;
+   padding-bottom: 5px;
+   padding-left: 5px;
+   padding-right: 5px;
+   margin-top: 20px;
+   margin-bottom: 20px;
+   margin-left: 20px;
+   margin-right: 20px;
+}
+
+pre.programlisting, pre.screen
+{
+   background-color: #F0F0F0;
+   border-width: 1px;
+   border-style: solid;
+   border-color: gray;
+   padding-top: 2px;
+   padding-bottom: 2px;
+   padding-left: 2px;
+   padding-right: 2px;
+}
+
+small
+{
+   font-size: x-small;
+}
+
+big
+{
+   font-size: medium;
+}
+
+a
+{
+   color: #004668;
+}
+
+span.term
+{
+   font-weight: bold;
+}
+
+abbr, acronym
+{
+   font-weight: bold;
+}
+
+span.keycap, span.keycode, span.keysym, span.mousebutton
+{
+   font-family: monospace;
+   background-color: #EEEEEE;
+   padding-top: 1px;
+   padding-bottom: 1px;
+   padding-left: 1px;
+   padding-right: 1px;
+}
+
+span.guimenu, span.guisubmenu, span.guimenuitem, span.guibutton, span.guiicon, span.interface, span.guilabel
+{
+   font-weight: bold;
+}
+
+a img
+{
+   border-style: none;
+}

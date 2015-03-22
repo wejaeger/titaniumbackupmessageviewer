@@ -163,7 +163,7 @@ public class HelpAction extends AbstractAction
             final HelpSet helpSet = new HelpSet(null, helpSetURL);
             helpSet.setTitle(Resources.getApplicationTitle());
             m_HelpBroker = helpSet.createHelpBroker();
-            m_HelpBroker.enableHelpKey(m_Frame, "N1000E", helpSet);
+            m_HelpBroker.enableHelpKey(m_Frame.getRootPane(), "GettingStartedWithBackupMessageViewer", helpSet);
             m_DisplayHelp = new CSH.DisplayHelpFromSource(m_HelpBroker);
          }
          catch (final HelpSetException ex)

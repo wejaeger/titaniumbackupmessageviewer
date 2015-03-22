@@ -4,9 +4,9 @@
     <description>Builds, tests, and runs the project BackupMessageViewer.</description>
     <import file="nbproject/build-impl.xml"/>
 
-   <property name="version.num" value="0.9.4" />
+   <property name="version.num" value="0.9.4"/>
    <tstamp>
-      <format property="version.dat" pattern="yyyy-MM-dd" />
+      <format property="version.dat" pattern="yyyy-MM-dd"/>
    </tstamp>
 
    <!-- provide a path where executable distros should be saved  -->
@@ -35,18 +35,26 @@
    <!-- application.                                                        -->
    <!--                                                                     -->
    <!-- JavaHelp file set is genearated via docbook xsl stylesheet from the -->
-   <!-- docbook document help.dbx in docs folder.                           -->
+   <!-- docbook document help.dbx in docs/JavaHelp folder.                  -->
    <!-- =================================================================== -->
    <target name="genHelp" depends="init">
       <property environment="env"/>
       <delete dir="${src.help.dir}/JavaHelp"/>
-      <mkdir  dir="${src.help.dir}/JavaHelp" />
-      <xslt basedir="docs" destdir="${src.help.dir}/JavaHelp" includes="help.dbx" style="${env.DOCBOOK_XSL_HOME}/javahelp/javahelp.xsl">
+      <mkdir  dir="${src.help.dir}/JavaHelp"/>
+      <copy todir="${src.help.dir}/JavaHelp">
+         <fileset dir="docs/JavaHelp">
+            <exclude name="**/*.dbx"/>
+         </fileset>
+      </copy>
+      <replace file="${src.help.dir}/JavaHelp/javahelp.xsl" token="@docbook.home@" value="${env.DOCBOOK_XSL_HOME}"/>
+      <xslt basedir="docs/JavaHelp" destdir="${src.help.dir}/JavaHelp" includes="help.dbx" style="${src.help.dir}/JavaHelp/javahelp.xsl" reloadstylesheet="true">
+         <param name="docbook.home" expression="${env.DOCBOOK_XSL_HOME}"/>
          <factory name="org.apache.xalan.processor.TransformerFactoryImpl"/>
       </xslt>
       <delete file="${src.help.dir}/JavaHelp/help.html"/>
+      <delete file="${src.help.dir}/JavaHelp/javahelp.xsl"/>
 
-      <java jar="${env.JAVAHELP_HOME}/javahelp/bin/jhindexer.jar">
+      <java fork="true" jar="${env.JAVAHELP_HOME}/javahelp/bin/jhindexer.jar">
          <arg value="-db"/>
          <arg path="${src.help.dir}/JavaHelp/JavaHelpSearch"/>
          <arg path="${src.help.dir}/JavaHelp"/>
@@ -56,15 +64,15 @@
    <!-- =================================================================== -->
    <!-- Bundles a stand-alone OneJAR distribution for this application      -->
    <!-- =================================================================== -->
-   <import file="one-jar-ant-task.xml" />
+   <import file="one-jar-ant-task.xml"/>
    <target name="dist-all" depends="jar" description="Bundles a stand-alone OneJAR distribution">
       <echo level="info">Bundling: OneJAR is composing ${standalone.jar.name}-all.jar</echo>
       <tstamp>
-         <format property="NOW" pattern="yyyy-MM-dd HH:mm:ss z" />
+         <format property="NOW" pattern="yyyy-MM-dd HH:mm:ss z"/>
       </tstamp>
 
       <exec outputproperty="svna.version" executable="svnversion">
-         <arg value="-c" />
+         <arg value="-c"/>
          <redirector>
             <outputfilterchain>
                <tokenfilter>
@@ -83,19 +91,19 @@
             <attribute name="Main-Class" value="com.simontuffs.onejar.Boot"/>
             <attribute name="Class-Path" value="${javac.classpath}"/>
             <attribute name="One-Jar-Main-Class" value="${main.class}"/>
-            <attribute name="Bundle-Name" value="${application.title}" />
-            <attribute name="Bundle-Version" value="${version.num}" />
-            <attribute name="Bundle-Date" value="${NOW}" />
-            <attribute name="Bundle-Revision" value="${svna.version}" />
-            <attribute name="Implementation-Title" value="${application.title}" />
-            <attribute name="Implementation-Version" value="${version.num}" />
-            <attribute name="Implementation-Vendor" value="${application.vendor}" />
+            <attribute name="Bundle-Name" value="${application.title}"/>
+            <attribute name="Bundle-Version" value="${version.num}"/>
+            <attribute name="Bundle-Date" value="${NOW}"/>
+            <attribute name="Bundle-Revision" value="${svna.version}"/>
+            <attribute name="Implementation-Title" value="${application.title}"/>
+            <attribute name="Implementation-Version" value="${version.num}"/>
+            <attribute name="Implementation-Vendor" value="${application.vendor}"/>
             </manifest>
             <main>
-               <fileset dir="${build.classes.dir}/" />
+               <fileset dir="${build.classes.dir}/"/>
             </main>
             <lib>
-               <fileset file="${dist.jar.dir}/lib/*.*" />
+               <fileset file="${dist.jar.dir}/lib/*.*"/>
             </lib>
       </one-jar>
       <delete file="${dist.jar.dir}/README.TXT"/>
@@ -116,33 +124,33 @@
    <!-- =================================================================== -->
    <target name="dist-zip" depends="dist-all" description="Creating ZIP archives of the standalone OneJAR for windows, mac, linux">
       <echo level="info">Bundling: Creating JAR Launchers</echo>
-      <mkdir  dir="${release.dir}" />
-      <mkdir  dir="${release.dir}/${standalone.jar.name}-mac" />
-      <mkdir  dir="${release.dir}/${standalone.jar.name}-win" />
+      <mkdir  dir="${release.dir}"/>
+      <mkdir  dir="${release.dir}/${standalone.jar.name}-mac"/>
+      <mkdir  dir="${release.dir}/${standalone.jar.name}-win"/>
       <echo  file="${release.dir}/${standalone.jar.name}-win/${standalone.jar.name}.bat">
 java -jar -Xmx256m ${standalone.jar.name}-all.jar
       </echo>
-      <copy todir="${release.dir}/${standalone.jar.name}-win/" file="${dist.jar.dir}/${standalone.jar.name}-all.jar" />
-      <mkdir  dir="${release.dir}/${standalone.jar.name}-linux" />
+      <copy todir="${release.dir}/${standalone.jar.name}-win/" file="${dist.jar.dir}/${standalone.jar.name}-all.jar"/>
+      <mkdir  dir="${release.dir}/${standalone.jar.name}-linux"/>
       <echo  file="${release.dir}/${standalone.jar.name}-linux/${standalone.jar.name}.sh">#!/bin/sh -e
 
 java -jar -Xmx256m ${standalone.jar.name}-all.jar
       </echo>
       <chmod file="${release.dir}/${standalone.jar.name}-linux/${standalone.jar.name}.sh" perm="u+x"/>
-      <copy todir="${release.dir}/${standalone.jar.name}-linux/" file="${dist.jar.dir}/${standalone.jar.name}-all.jar" />
+      <copy todir="${release.dir}/${standalone.jar.name}-linux/" file="${dist.jar.dir}/${standalone.jar.name}-all.jar"/>
       <echo level="info">Bundling: Creating ZIP Archives</echo>
-      <zip destfile="${release.dir}/${standalone.jar.name}-win.zip" basedir="${release.dir}/${standalone.jar.name}-win" update="true" />
-      <zip destfile="${release.dir}/${standalone.jar.name}-linux.tar.gz" basedir="${release.dir}/${standalone.jar.name}-linux" update="true" />
-      <move todir="${release.dir}/${standalone.jar.name}-mac/" file="${dist.jar.dir}/${standalone.jar.name}-all.jar" />
-      <zip destfile="${release.dir}/${standalone.jar.name}-mac.tar.gz" basedir="${release.dir}/${standalone.jar.name}-mac" update="true" />
+      <zip destfile="${release.dir}/${standalone.jar.name}-win.zip" basedir="${release.dir}/${standalone.jar.name}-win" update="true"/>
+      <zip destfile="${release.dir}/${standalone.jar.name}-linux.tar.gz" basedir="${release.dir}/${standalone.jar.name}-linux" update="true"/>
+      <move todir="${release.dir}/${standalone.jar.name}-mac/" file="${dist.jar.dir}/${standalone.jar.name}-all.jar"/>
+      <zip destfile="${release.dir}/${standalone.jar.name}-mac.tar.gz" basedir="${release.dir}/${standalone.jar.name}-mac" update="true"/>
       <echo level="info">Bundling: Cleaning up temporary files</echo>
-      <delete dir="${release.dir}/${standalone.jar.name}-win" />
-      <delete dir="${release.dir}/${standalone.jar.name}-linux" />
-      <delete dir="${release.dir}/${standalone.jar.name}-mac" />
+      <delete dir="${release.dir}/${standalone.jar.name}-win"/>
+      <delete dir="${release.dir}/${standalone.jar.name}-linux"/>
+      <delete dir="${release.dir}/${standalone.jar.name}-mac"/>
    </target>
 
    <target name="-post-clean">
-      <delete dir="${release.dir}" />
+      <delete dir="${release.dir}"/>
    </target>
 
    <!-- =================================================================== -->
@@ -151,7 +159,7 @@ java -jar -Xmx256m ${standalone.jar.name}-all.jar
    <target name="qa" depends="compile" description="Makes some test to ensure code conforms to our design- and programing guidlines">
       <taskdef classname="com.puppycrawl.tools.checkstyle.CheckStyleTask" classpath="qa/checkstyle-all.jar" name="checkstyle"/>
       <checkstyle config="qa/chestyleChecks.xml" classpath="${build.classes.dir};${javac.classpath};${build.test.classes.dir}">
-         <fileset dir="" includes="${src.dir}/com/wj/android/messageviewer/**/*.java" />
+         <fileset dir="" includes="${src.dir}/com/wj/android/messageviewer/**/*.java"/>
          <fileset dir="" includes="${test.src.dir}/com/wj/android/messageviewer/**/*.java"/>
          <property key="checkstyle.filter.file" value="${basedir}/qa/suppressions.xml"/>
       </checkstyle>
@@ -183,8 +191,8 @@ java -jar -Xmx256m ${standalone.jar.name}-all.jar
          <factory name="org.apache.xalan.processor.TransformerFactoryImpl"/>
          <param name="excludeFromCycles" expression="com.wj.android.messageviewer.gui.actions com.wj.android.messageviewer.gui.shapes com.wj.android.messageviewer.gui.workers"/>
       </xslt>
-      <delete file="${jdepend.dir}/jdepend-report.xml" />
-      <delete file="${jdepend.dir}/jdepend-report.html" />
+      <delete file="${jdepend.dir}/jdepend-report.xml"/>
+      <delete file="${jdepend.dir}/jdepend-report.html"/>
    </target>
 
 </project>
