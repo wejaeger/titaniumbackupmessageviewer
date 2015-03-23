@@ -15,7 +15,6 @@
             encoding="utf-8"
             indent="yes"/>
 
-   <xsl:param name="docbook.home"/>
    <xsl:param name="generate.toc">
    appendix  nop
    article/appendix  nop
@@ -38,7 +37,6 @@
    <xsl:param name="chunk.quietly" select="1"/>
    <xsl:param name="chunk.first.sections" select="1"/>
    <xsl:param name="chunk.section.depth" select="2"/>
-   <xsl:param name="ulink.target" select="'_blank'"/>
    <xsl:param name="html.stylesheet" select="'javahelp.css'"/>
    <xsl:param name="admon.graphics" select="1"/>
    <xsl:param name="make.valid.html" select="1"/>

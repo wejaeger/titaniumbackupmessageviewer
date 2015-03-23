@@ -48,7 +48,7 @@ import org.xml.sax.SAXException;
 /**
  * Interface definition for message readers.
  *
- * @author <a href="mailto:werner.jaeger@t-systems.com">Werner Jaeger</a>
+ * @author Werner Jaeger
  */
 public interface IMessageReader
 {

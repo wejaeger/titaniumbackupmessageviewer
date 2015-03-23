@@ -60,7 +60,7 @@ import java.util.prefs.Preferences;
  *
  * @param <E> the type of elements maintained by this collection
  *
- * @author <a href="mailto:werner.jaeger@t-systems.com">Werner Jaeger</a>
+ * @author Werner Jaeger
  */
 public class RecentCollection<E extends Serializable> implements Iterable<E>
 {

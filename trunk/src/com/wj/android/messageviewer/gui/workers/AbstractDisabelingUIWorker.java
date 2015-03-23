@@ -43,7 +43,7 @@ import javax.swing.SwingWorker;
  * @param <V> the type used for carrying out intermediate results by this
  *            SwingWorker's publish and process methods
  *
- * @author <a href="mailto:werner.jaeger@t-systems.com">Werner Jaeger</a>
+ * @author Werner Jaeger
  */
 abstract class AbstractDisabelingUIWorker<T, V> extends SwingWorker<T, V>
 {

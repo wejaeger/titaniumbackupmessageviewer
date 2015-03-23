@@ -42,7 +42,7 @@ import java.util.RandomAccess;
  *
  * @param <E> the type of element maintained by this collection
  *
- * @author <a href="mailto:werner.jaeger@t-systems.com">Werner Jaeger</a>
+ * @author Werner Jaeger
  */
 class ReverseCollection<E> extends AbstractCollection<E>
 {

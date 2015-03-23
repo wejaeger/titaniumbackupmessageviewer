@@ -3,7 +3,7 @@
 "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
 <book id="Index">
   <bookinfo id="OnlineHelp">
-    <title>Backup Message Viewer - Online Help</title>
+    <title>@application.title@ - Online Help</title>
 
     <author>
       <firstname>Werner</firstname>
@@ -11,13 +11,13 @@
       <surname>Jäger</surname>
     </author>
 
-    <pubdate>February 22, 2015</pubdate>
+    <pubdate>@version.dat@</pubdate>
   </bookinfo>
 
   <chapter id="Introduction">
     <title>Introduction</title>
 
-    <para><application>Backup Message Viewer</application> is a is a platform independent application to view the backup XML files created from the following <application>Android</application> Apps</para>
+    <para><application>@application.title@</application> is a is a platform independent application to view the backup XML files created from the following <application>Android</application> Apps</para>
 
     <itemizedlist>
       <listitem>
@@ -111,7 +111,7 @@
 
         <orderedlist>
           <listitem>
-            <para>Download newest version from <ulink url="https://sourceforge.net/projects/titaniumbackupmessageviewer/">sourceforge.net</ulink> to a directory of your choice e..g <filename>/usr/local/bin</filename>.</para>
+            <para>Download newest version from <ulink url="@application.homepage@">@application.homepage@</ulink> to a directory of your choice e..g <filename>/usr/local/bin</filename>.</para>
           </listitem>
 
           <listitem>
@@ -126,15 +126,15 @@ Java HotSpot(TM) 64-Bit Server VM (build 21.0-b17, mixed mode)</programlisting>
           <listitem>
             <para>Make the .jar file executable:</para>
 
-            <programlisting>~$ sudo chmod +x BackupMessageViewer_n.n.n-all.jar</programlisting>
+            <programlisting>~$ sudo chmod +x @dist.jar.name@</programlisting>
           </listitem>
 
           <listitem>
-            <para>Make it so that you can run your .jar file by double-clicking it (optional). Create e,g a shell script <filename>BackupMessageViewer.sh</filename>:<programlisting>#!/bin/sh -e
+            <para>Make it so that you can run your .jar file by double-clicking it (optional). Create e,g a shell script <filename>@dist.base.name@.sh</filename>:<programlisting>#!/bin/sh -e
 
-java -jar -Xmx256m BackupMessageViewer_n.n.n-all.jar</programlisting></para>
+java -jar -Xmx256m @dist.jar.name@</programlisting></para>
 
-            <para>Make the shell script executable:<programlisting>~$ sudo chmod +x BackupMessageViewer.sh</programlisting></para>
+            <para>Make the shell script executable:<programlisting>~$ sudo chmod +x @dist.base.name@.sh</programlisting></para>
           </listitem>
         </orderedlist>
       </simplesect>
@@ -144,7 +144,7 @@ java -jar -Xmx256m BackupMessageViewer_n.n.n-all.jar</programlisting></para>
 
         <orderedlist>
           <listitem>
-            <para>Download newest version from <ulink url="https://sourceforge.net/projects/titaniumbackupmessageviewer/">sourceforge.net</ulink> to a directory of your choice e..g <filename>C:\Program Files</filename>.</para>
+            <para>Download newest version from <ulink url="@application.homepage@">@application.homepage@</ulink> to a directory of your choice e..g <filename>C:\Program Files</filename>.</para>
           </listitem>
 
           <listitem>
@@ -155,14 +155,14 @@ Java HotSpot(TM) Client VM (build 21.0-b17, mixed mode, sharing)</programlisting
           </listitem>
 
           <listitem>
-            <para>Make it so that you can run your .jar file by double-clicking it (optional). Create e,g a batch file <filename>BackupMessageViewer.bat</filename>:<programlisting>java -jar -Xmx256m BackupMessageViewer_n.n.n-all.jar</programlisting></para>
+            <para>Make it so that you can run your .jar file by double-clicking it (optional). Create e,g a batch file <filename>@dist.base.name@.bat</filename>:<programlisting>java -jar -Xmx256m @dist.jar.name@</programlisting></para>
           </listitem>
         </orderedlist>
       </simplesect>
     </section>
 
     <section id="GettingStartedWithBackupMessageViewer">
-      <title>Getting started with Backup Message Viewer</title>
+      <title>Getting started with @application.title@</title>
 
       <simplesect>
         <title>Open a backed up message file</title>
@@ -171,7 +171,11 @@ Java HotSpot(TM) Client VM (build 21.0-b17, mixed mode, sharing)</programlisting
 
         <para>For <application>Titanium Backup</application> the folder is <filename>TitaniumBackup</filename> and for <application>SMS Backup and Restore</application> the folder is <filename>SMSBackupRestore</filename>.</para>
 
-        <para>Use <guimenu>File</guimenu> → <guimenuitem>Open ...</guimenuitem>, in the file chooser dialog navigate to the backup folder, mark the desired type of files from the file filter drop down list, select the backup message file you want to open and than click <guibutton>Open</guibutton>.</para>
+        <para>Use <menuchoice>
+            <guimenu>File</guimenu>
+
+            <guimenuitem>Open..</guimenuitem>
+          </menuchoice> , in the file chooser dialog navigate to the backup folder, mark the desired type of files from the file filter drop down list, select the backup message file you want to open and than click <guibutton>Open</guibutton>.</para>
 
         <note>
           <para>The file filter is helpful for displaying the right message files only. The type of message file (<application>Titanium Backup</application> or <application>SMS Backup and Restore</application>) is recognized automatically and does not depend on the selected file filter.</para>
@@ -236,7 +240,11 @@ Java HotSpot(TM) Client VM (build 21.0-b17, mixed mode, sharing)</programlisting
         <simplesect>
           <title>Export selected messages</title>
 
-          <para>Exports messages of selected threads to a text file. First select the threads (multi select possible, use <keysym>CTRL</keysym> Key) that messages you want to export then use <guimenu>File</guimenu> → <guimenuitem>Export selected messages ...</guimenuitem>, to display a standard file chooser dialog box to choose the file location</para>
+          <para>Exports messages of selected threads to a text file. First select the threads (multi select possible, use <keycap>CTRL</keycap> Key) that messages you want to export then use <menuchoice>
+              <guimenu>File</guimenu>
+
+              <guisubmenu>Export selected messages ...</guisubmenu>
+            </menuchoice>, to display a standard file chooser dialog box to choose the file location</para>
         </simplesect>
 
         <simplesect>
@@ -268,7 +276,7 @@ draft: Jan 10, 2015 9:05:00 PM CET:  Not yet sent. Just a draft</programlisting>
         </simplesect>
 
         <simplesect>
-          <title>About Backup Message Viewer</title>
+          <title>About @application.title@</title>
 
           <para>Displays the About dialog</para>
         </simplesect>
@@ -282,7 +290,7 @@ draft: Jan 10, 2015 9:05:00 PM CET:  Not yet sent. Just a draft</programlisting>
     <section id="CommandLine">
       <title>Command line</title>
 
-      <para><command>java</command> -jar BackupMessageViewer_n.n.n-all.jar [ <option>message_file_to-be opened</option> [ <option>contact_db_file</option> ] ]</para>
+      <para><command>java</command> -jar @dist.jar.name@ [ <option>message_file_to-be opened</option> [ <option>contact_db_file</option> ] ]</para>
 
       <para>Options:</para>
 
@@ -310,25 +318,29 @@ draft: Jan 10, 2015 9:05:00 PM CET:  Not yet sent. Just a draft</programlisting>
         <listitem>
           <para>Starts the application and opens the specified message file and uses the specified contact database file to resolve phone numbers to contact names</para>
 
-          <programlisting><command>java</command> -jar BackupMessageViewer_0.9.4-all.jar <filename>com.keramidas.virtual.XML_MESSAGES-20150214-HHMMSS.xml.gz <filename>com.android.providers.contacts-20150214-HHMMSS.tar.gz</filename></filename></programlisting>
+          <programlisting><command>java</command> -jar @dist.jar.name@ <filename>com.keramidas.virtual.XML_MESSAGES-20150214-HHMMSS.xml.gz <filename>com.android.providers.contacts-20150214-HHMMSS.tar.gz</filename></filename></programlisting>
         </listitem>
 
         <listitem>
           <para>Starts the application and opens the specified message file. Phone numbers are not resolved to contact names</para>
 
-          <programlisting><command>java</command> -jar BackupMessageViewer_0.9.4-all.jar <filename>com.keramidas.virtual.XML_MESSAGES-20150214-HHMMSS.xml.gz</filename></programlisting>
+          <programlisting><command>java</command> -jar @dist.jar.name@ <filename>com.keramidas.virtual.XML_MESSAGES-20150214-HHMMSS.xml.gz</filename></programlisting>
         </listitem>
 
         <listitem>
           <para>Starts the application and opens the specified message file</para>
 
-          <programlisting><command>java</command> -jar BackupMessageViewer_0.9.4-all.jar <filename>sms-YYYYMMDDHHMMSS.xml</filename></programlisting>
+          <programlisting><command>java</command> -jar @dist.jar.name@ <filename>sms-YYYYMMDDHHMMSS.xml</filename></programlisting>
         </listitem>
 
         <listitem>
-          <para>Starts the application. Use <guimenu>File</guimenu> → <guimenuitem>Open ...</guimenuitem>, to open a message file</para>
+          <para>Starts the application. Use <menuchoice>
+              <guimenu>File</guimenu>
 
-          <programlisting><command>java</command> -jar BackupMessageViewer_0.9.4-all.jar</programlisting>
+              <guimenuitem>Open..</guimenuitem>
+            </menuchoice>, to open a message file</para>
+
+          <programlisting><command>java</command> -jar @dist.jar.name@</programlisting>
         </listitem>
       </itemizedlist>
     </section>

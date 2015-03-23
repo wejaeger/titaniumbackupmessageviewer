@@ -30,7 +30,7 @@ import javax.swing.JTextArea;
 /**
  * Used in {@link MessagePanel} to display message texts.
  *
- * @author <a href="mailto:werner.jaeger@t-systems.com">Werner Jaeger</a>
+ * @author Werner Jaeger
  */
 class BubbleText extends JTextArea
 {

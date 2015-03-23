@@ -69,7 +69,7 @@ import org.xml.sax.SAXException;
  *    <a href="http://android.riteshsahu.com/apps/sms-backup-restore">here</a>
  * </p>
  *
- * @author <a href="mailto:werner.jaeger@t-systems.com">Werner Jaeger</a>
+ * @author Werner Jaeger
  */
 public class SMSBackupAndRestoreMessageReader implements IMessageReader
 {

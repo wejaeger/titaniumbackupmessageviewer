@@ -44,7 +44,7 @@ import javax.swing.event.HyperlinkListener;
 /**
  * Display the about dialog.
  *
- * @author <a href="mailto:werner.jaeger@t-systems.com">Werner Jaeger</a>
+ * @author Werner Jaeger
  */
 public class AboutAction extends AbstractAction
 {

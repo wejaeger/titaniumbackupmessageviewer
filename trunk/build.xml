@@ -11,8 +11,10 @@
 
    <!-- provide a path where executable distros should be saved  -->
    <property name="release.dir" value="${basedir}/release"/>
-   <!-- provide a base name for your executable. -->
-   <property name="standalone.jar.name" value="BackupMessageViewer_${version.num}"/>
+   <!-- provide name parts for your executable. -->
+   <property name="dist.base.name" value="BackupMessageViewer"/>
+   <property name="standalone.jar.name" value="${dist.base.name}_${version.num}"/>
+   <property name="dist.jar.name" value="${standalone.jar.name}-all.jar"/>
 
    <target name="-post-compile">
       <delete>
@@ -42,17 +44,23 @@
       <delete dir="${src.help.dir}/JavaHelp"/>
       <mkdir  dir="${src.help.dir}/JavaHelp"/>
       <copy todir="${src.help.dir}/JavaHelp">
-         <fileset dir="docs/JavaHelp">
-            <exclude name="**/*.dbx"/>
-         </fileset>
+         <fileset dir="docs/JavaHelp"/>
       </copy>
+      <replace file="${src.help.dir}/JavaHelp/help.dbx">
+         <replacefilter token="@application.vendor@" value="${application.vendor}"/>
+         <replacefilter token="@application.title@" value="${application.title}"/>
+         <replacefilter token="@application.homepage@" value="${application.homepage}"/>
+         <replacefilter token="@version.dat@" value="${version.dat}"/>
+         <replacefilter token="@dist.base.name@" value="${dist.base.name}"/>
+         <replacefilter token="@dist.jar.name@" value="${dist.jar.name}"/>
+      </replace>
       <replace file="${src.help.dir}/JavaHelp/javahelp.xsl" token="@docbook.home@" value="${env.DOCBOOK_XSL_HOME}"/>
-      <xslt basedir="docs/JavaHelp" destdir="${src.help.dir}/JavaHelp" includes="help.dbx" style="${src.help.dir}/JavaHelp/javahelp.xsl" reloadstylesheet="true">
-         <param name="docbook.home" expression="${env.DOCBOOK_XSL_HOME}"/>
+      <xslt basedir="${src.help.dir}/JavaHelp" destdir="${src.help.dir}/JavaHelp" includes="help.dbx" style="${src.help.dir}/JavaHelp/javahelp.xsl" reloadstylesheet="true">
          <factory name="org.apache.xalan.processor.TransformerFactoryImpl"/>
       </xslt>
       <delete file="${src.help.dir}/JavaHelp/help.html"/>
       <delete file="${src.help.dir}/JavaHelp/javahelp.xsl"/>
+      <delete file="${src.help.dir}/JavaHelp/help.dbx"/>
 
       <java fork="true" jar="${env.JAVAHELP_HOME}/javahelp/bin/jhindexer.jar">
          <arg value="-db"/>
@@ -66,7 +74,7 @@
    <!-- =================================================================== -->
    <import file="one-jar-ant-task.xml"/>
    <target name="dist-all" depends="jar" description="Bundles a stand-alone OneJAR distribution">
-      <echo level="info">Bundling: OneJAR is composing ${standalone.jar.name}-all.jar</echo>
+      <echo level="info">Bundling: OneJAR is composing ${dist.jar.name}</echo>
       <tstamp>
          <format property="NOW" pattern="yyyy-MM-dd HH:mm:ss z"/>
       </tstamp>
@@ -83,7 +91,7 @@
          </redirector>
       </exec>
 
-      <one-jar destfile="${dist.jar.dir}/${standalone.jar.name}-all.jar" update="false">
+      <one-jar destfile="${dist.jar.dir}/${dist.jar.name}" update="false">
          <manifest>
             <attribute name="Manifest-Version" value="1.0"/>
             <attribute name="Built-By" value="${application.vendor}"/>
@@ -107,10 +115,10 @@
             </lib>
       </one-jar>
       <delete file="${dist.jar.dir}/README.TXT"/>
-      <echo level="info">adding execute permission to ${standalone.jar.name}-all.jar</echo>
-      <chmod file="${dist.jar.dir}/${standalone.jar.name}-all.jar" perm="u+x"/>
+      <echo level="info">adding execute permission to ${dist.jar.name}</echo>
+      <chmod file="${dist.jar.dir}/${dist.jar.name}" perm="u+x"/>
       <echo file="${dist.jar.dir}/README.txt" append="false">Run the stand-alone distribution from the command line using:
-      java -jar -Xmx256m ${standalone.jar.name}-all.jar
+      java -jar -Xmx256m ${dist.jar.name}
       </echo>
       <concat destfile="${dist.jar.dir}/README.txt" append="true">
          <filelist dir="${basedir}/docs" files="changelog"/>
@@ -127,21 +135,21 @@
       <mkdir  dir="${release.dir}"/>
       <mkdir  dir="${release.dir}/${standalone.jar.name}-mac"/>
       <mkdir  dir="${release.dir}/${standalone.jar.name}-win"/>
-      <echo  file="${release.dir}/${standalone.jar.name}-win/${standalone.jar.name}.bat">
-java -jar -Xmx256m ${standalone.jar.name}-all.jar
+      <echo  file="${release.dir}/${standalone.jar.name}-win/${dist.base.name}.bat">
+java -jar -Xmx256m ${dist.jar.name}
       </echo>
-      <copy todir="${release.dir}/${standalone.jar.name}-win/" file="${dist.jar.dir}/${standalone.jar.name}-all.jar"/>
+      <copy todir="${release.dir}/${standalone.jar.name}-win/" file="${dist.jar.dir}/${dist.jar.name}"/>
       <mkdir  dir="${release.dir}/${standalone.jar.name}-linux"/>
-      <echo  file="${release.dir}/${standalone.jar.name}-linux/${standalone.jar.name}.sh">#!/bin/sh -e
+      <echo  file="${release.dir}/${standalone.jar.name}-linux/${dist.base.name}.sh">#!/bin/sh -e
 
-java -jar -Xmx256m ${standalone.jar.name}-all.jar
+java -jar -Xmx256m ${dist.jar.name}
       </echo>
-      <chmod file="${release.dir}/${standalone.jar.name}-linux/${standalone.jar.name}.sh" perm="u+x"/>
-      <copy todir="${release.dir}/${standalone.jar.name}-linux/" file="${dist.jar.dir}/${standalone.jar.name}-all.jar"/>
+      <chmod file="${release.dir}/${standalone.jar.name}-linux/${dist.base.name}.sh" perm="u+x"/>
+      <copy todir="${release.dir}/${standalone.jar.name}-linux/" file="${dist.jar.dir}/${dist.jar.name}"/>
       <echo level="info">Bundling: Creating ZIP Archives</echo>
       <zip destfile="${release.dir}/${standalone.jar.name}-win.zip" basedir="${release.dir}/${standalone.jar.name}-win" update="true"/>
       <zip destfile="${release.dir}/${standalone.jar.name}-linux.tar.gz" basedir="${release.dir}/${standalone.jar.name}-linux" update="true"/>
-      <move todir="${release.dir}/${standalone.jar.name}-mac/" file="${dist.jar.dir}/${standalone.jar.name}-all.jar"/>
+      <copy todir="${release.dir}/${standalone.jar.name}-mac/" file="${dist.jar.dir}/${dist.jar.name}"/>
       <zip destfile="${release.dir}/${standalone.jar.name}-mac.tar.gz" basedir="${release.dir}/${standalone.jar.name}-mac" update="true"/>
       <echo level="info">Bundling: Cleaning up temporary files</echo>
       <delete dir="${release.dir}/${standalone.jar.name}-win"/>

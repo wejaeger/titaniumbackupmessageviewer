@@ -32,7 +32,7 @@ import java.awt.Polygon;
  * Subclass of Bubble that will display a draft message as a
  conversation bubble with arrow on the right.
  *
- * @author <a href="mailto:werner.jaeger@t-systems.com">Werner Jaeger</a>
+ * @author Werner Jaeger
  */
 class DraftBubble extends Bubble
 {
