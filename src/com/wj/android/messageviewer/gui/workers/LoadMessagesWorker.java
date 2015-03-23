@@ -40,7 +40,7 @@ import javax.swing.JOptionPane;
 /**
  * Read and Load message files in the background.
  *
- * @author <a href="mailto:werner.jaeger@t-systems.com">Werner Jaeger</a>
+ * @author Werner Jaeger
  */
 public class LoadMessagesWorker extends AbstractDisabelingUIWorker<Integer, Integer>
 {

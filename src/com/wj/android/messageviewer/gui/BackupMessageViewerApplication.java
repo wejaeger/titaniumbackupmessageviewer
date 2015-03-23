@@ -42,7 +42,7 @@ import javax.swing.SwingUtilities;
  *    This class is designed as singleton.
  * </p>
  *
- * @author <a href="mailto:werner.jaeger@t-systems.com">Werner Jaeger</a>
+ * @author Werner Jaege
  */
 public class BackupMessageViewerApplication
 {

@@ -36,7 +36,7 @@ import javax.swing.JFrame;
 /**
  * Adds messages of a selected thread to the {@link MessageViewer}.
  *
- * @author <a href="mailto:werner.jaeger@t-systems.com">Werner Jaeger</a>
+ * @author Werner Jaeger
  */
 public class DisplayThreadMessageWorker extends AbstractDisabelingUIWorker<Void, Void>
 {

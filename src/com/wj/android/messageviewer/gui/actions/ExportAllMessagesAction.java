@@ -40,7 +40,7 @@ import javax.swing.UIManager;
 /**
  * Triggered by the export menu item to export message.
  *
- * @author <a href="mailto:werner.jaeger@t-systems.com">Werner Jaeger</a>
+ * @author Werner Jaeger
  */
 public class ExportAllMessagesAction extends AbstractAction
 {

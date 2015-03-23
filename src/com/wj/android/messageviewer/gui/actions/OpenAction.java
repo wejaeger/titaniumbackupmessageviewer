@@ -40,7 +40,7 @@ import javax.swing.UIManager;
  * Triggered by the open files menu item to load the message and optionally
  * the contacts database file recently used.
  *
- * @author <a href="mailto:werner.jaeger@t-systems.com">Werner Jaeger</a>
+ * @author Werner Jaeger
  */
 public class OpenAction extends AbstractAction
 {

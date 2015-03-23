@@ -44,7 +44,7 @@ import javax.swing.ListModel;
 /**
  * Exports selected or all messages to a plan text file.
  *
- * @author <a href="mailto:werner.jaeger@t-systems.com">Werner Jaeger</a>
+ * @author Werner Jaeger
  */
 public class ExportWorker extends AbstractDisabelingUIWorker<Boolean, Void>
 {

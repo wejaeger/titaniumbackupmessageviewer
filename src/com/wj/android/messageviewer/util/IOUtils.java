@@ -33,7 +33,7 @@ import java.io.Writer;
 /**
  * Various IO Helper methods.
  *
- * @author <a href="mailto:werner.jaeger@t-systems.com">Werner Jaeger</a>
+ * @author Werner Jaeger
  */
 public class IOUtils
 {

@@ -38,7 +38,7 @@ import javax.swing.filechooser.FileFilter;
  *    name pattern and all files with {@code .xml} extension.
  * </p>
  *
- * @author <a href="mailto:werner.jaeger@t-systems.com">Werner Jaeger</a>
+ * @author Werner Jaeger
  */
 class TitaniumBackupMessageFileNameFilter extends FileFilter
 {

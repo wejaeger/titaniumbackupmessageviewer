@@ -40,7 +40,7 @@ import javax.swing.JTextArea;
  * Customized list used to display
  * {@link com.wj.android.messageviewer.message.MessageThread message treads}.
  *
- * @author <a href="mailto:werner.jaeger@t-systems.com">Werner Jaeger</a>
+ * @author Werner Jaeger
  */
 class MessageThreadList extends JList<MessageThread>
 {
@@ -65,7 +65,7 @@ class MessageThreadList extends JList<MessageThread>
    /**
     * Wraps the list item text.
     *
-    * @author <a href="mailto:werner.jaeger@t-systems.com">Werner Jaeger</a>
+    * @author Werner Jaeger
     */
    private static class MessageThreadListCellRenderer extends DefaultListCellRenderer
    {

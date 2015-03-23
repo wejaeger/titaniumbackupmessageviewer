@@ -31,7 +31,7 @@ import java.io.Serializable;
  * @param <First> the type of the first data item.
  * @param <Second> the type of the second data item.
  *
- * @author <a href="mailto:werner.jaeger@t-systems.com">Werner Jaeger</a>
+ * @author Werner Jaeger
  */
 public class Pair<First extends Serializable, Second extends Serializable> implements Serializable
 {
@@ -88,7 +88,7 @@ public class Pair<First extends Serializable, Second extends Serializable> imple
       {
          if (o != null && getClass() == o.getClass())
          {
-            final Pair pair = (Pair)o;
+            final Pair<?, ?> pair = (Pair<?, ?>)o;
 
             if (m_First != null ? m_First.equals(pair.m_First) : pair.m_First == null)
             {

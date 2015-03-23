@@ -33,6 +33,7 @@ import javax.help.CSH;
 import javax.help.HelpBroker;
 import javax.help.HelpSet;
 import javax.help.HelpSetException;
+import javax.help.SwingHelpUtilities;
 import javax.swing.AbstractAction;
 import static javax.swing.Action.ACCELERATOR_KEY;
 import javax.swing.Icon;
@@ -62,7 +63,7 @@ import javax.swing.KeyStroke;
  *    centering would make this problem worse.
  * </p>
  *
- * @author <a href="mailto:werner.jaeger@t-systems.com">Werner Jaeger</a>
+ * @author Werner Jaeger
  */
 public class HelpAction extends AbstractAction
 {
@@ -160,6 +161,8 @@ public class HelpAction extends AbstractAction
 
          try
          {
+            SwingHelpUtilities.setContentViewerUI("com.wj.android.messageviewer.gui.actions.ExternalLinkContentViewerUI");
+
             final HelpSet helpSet = new HelpSet(null, helpSetURL);
             helpSet.setTitle(Resources.getApplicationTitle());
             m_HelpBroker = helpSet.createHelpBroker();
