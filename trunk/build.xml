@@ -70,6 +70,16 @@
    </target>
 
    <!-- =================================================================== -->
+   <!--  Brings up the help set in the JavaHelp viewer                      -->
+   <!-- =================================================================== -->
+   <target name="viewHelp" depends="genHelp" description="Brings up the help set in the JavaHelp viewer">
+      <java fork="true" jar="${env.JAVAHELP_HOME}/demos/bin/hsviewer.jar">
+         <arg value="-helpset"/>
+         <arg path="${src.help.dir}/JavaHelp/jhelpset.hs"/>
+      </java>
+   </target>
+
+   <!-- =================================================================== -->
    <!-- Bundles a stand-alone OneJAR distribution for this application      -->
    <!-- =================================================================== -->
    <import file="one-jar-ant-task.xml"/>

@@ -25,12 +25,10 @@ package com.wj.android.messageviewer.gui.actions;
 
 import com.wj.android.messageviewer.gui.BackupMessageViewerFrame;
 import com.wj.android.messageviewer.gui.workers.LoadMessagesWorker;
-import com.wj.android.messageviewer.io.IMessageReader;
 import com.wj.android.messageviewer.util.Pair;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JOptionPane;
 
 /**
  * Triggered by the recent files menu item to load the message and optionally
@@ -91,17 +89,7 @@ public class OpenRecentFileAction extends AbstractAction
          strSecondFile = null;
 
       if (null != strFirstFile)
-      {
-         final IMessageReader.MessageFileType messageReaderType = IMessageReader.MessageFileType.getMessageFileType(strFirstFile);
-
-         if (null == messageReaderType)
-         {
-            JOptionPane.showMessageDialog(m_Frame, "Specified file is a unknown backup message file", "Error", JOptionPane.ERROR_MESSAGE);
-            m_Frame.onMessageFileNotFound(new Pair<>(strFirstFile, strSecondFile));
-         }
-         else
-            new LoadMessagesWorker(m_Frame, new Pair<>(strFirstFile, strSecondFile), messageReaderType).execute();
-      }
+         new LoadMessagesWorker(m_Frame, new Pair<>(strFirstFile, strSecondFile), null).execute();
    }
 
    private static String makeName(final Pair<String, String> files2Open)

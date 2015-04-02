@@ -1,0 +1,578 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:element name="smses">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="sms"/>
+        <xs:element maxOccurs="unbounded" ref="mms"/>
+      </xs:sequence>
+      <xs:attribute name="count" use="required" type="xs:integer">
+        <xs:annotation>
+          <xs:documentation>Number of messages</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="sms">
+    <xs:complexType>
+      <xs:attribute name="address" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">The phone number of the sender/recipient.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="body" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">The content of the message.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="contact_name" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Optional field that has the name of the contact.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="date" use="required" type="xs:integer">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">The Java date representation (including millisecond) of the time when the message was sent/received.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="date_sent" use="required">
+        <xs:annotation>
+          <xs:documentation>The Java date representation (including millisecond) of the time when the message was sent.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:integer"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="locked" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">LLocked 0 or 1.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:integer">
+            <xs:minInclusive value="0"/>
+            <xs:maxInclusive value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="protocol" use="required" type="xs:integer">
+        <xs:annotation>
+          <xs:documentation>Protocol used by the message, its mostly 0 in case of SMS messages.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="read" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Read Message = 1, Unread Message = 0.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:integer">
+            <xs:minInclusive value="0"/>
+            <xs:maxInclusive value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="readable_date" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Optional field that has the date in a human readable format.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="sc_toa" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">n/a, default to null.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:NCName">
+            <xs:enumeration value="null"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="service_center" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">The service center for the received message, null in case of sent messages.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="status" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en"> None = -1, Complete = 0, Pending = 32, Failed = 64.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:integer">
+            <xs:pattern value="\-1|0|32|64"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="subject" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Subject of the message, its always null in case of SMS messages.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:NCName">
+            <xs:enumeration value="null"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="toa" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">n/a, default to null.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:NCName">
+            <xs:enumeration value="null"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="type" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">1 = Received, 2 = Sent, 3 = Draft, 4 = Outbox, 5 = Failed, 6 = Queued</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:integer">
+            <xs:minInclusive value="1"/>
+            <xs:maxInclusive value="6"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="mms">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="parts"/>
+      </xs:sequence>
+      <xs:attribute name="address" use="required" type="xs:integer">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Contains address information for an MMS message. </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="app_id" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Application ID. here always "0".</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:integer">
+            <xs:minInclusive value="0"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="callback_set" use="required">
+        <xs:annotation>
+          <xs:documentation>Callback Set. Here always "0".</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:integer">
+            <xs:minInclusive value="0"/>
+            <xs:maxInclusive value="0"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="contact_name" use="required">
+        <xs:annotation>
+          <xs:documentation>The contac's name or "(Unknown)"</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="ct_cls" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Content class. Here always "null".</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:NCName">
+            <xs:enumeration value="null"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="ct_l" use="required">
+        <xs:annotation>
+          <xs:documentation>Content location. Here always "null.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:NCName">
+            <xs:enumeration value="null"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="ct_t" use="required">
+        <xs:annotation>
+          <xs:documentation>Content type eg. "application/vnd.wap.multipart.related"</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="d_rpt" use="required" type="xs:integer">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Delivery report.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="d_tm" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Delivery time. Here always "null".</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:NCName">
+            <xs:enumeration value="null"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="date" use="required" type="xs:integer">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">The Java date representation (including millisecond) of the time when the message was sent/received.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="date_sent" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">The Java date representation (including millisecond) of the time when the message was sent.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:integer"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="deletable" use="required">
+        <xs:annotation>
+          <xs:documentation>Here always "0".</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:integer">
+            <xs:minInclusive value="0"/>
+            <xs:maxInclusive value="0"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="exp" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Expiry. Here always "null".</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:NCName">
+            <xs:enumeration value="null"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="hidden" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Hidden. Here always "0".</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:integer">
+            <xs:minInclusive value="0"/>
+            <xs:maxInclusive value="0"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="locked" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Locked. Here always "0.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:integer">
+            <xs:minInclusive value="0"/>
+            <xs:maxInclusive value="0"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="m_cls" use="required" type="xs:NCName">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Message class eg. "personal".</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="m_id" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Message ID eg. "956294616@mdg1".</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="m_size" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Message size. Here always "null".</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:NCName">
+            <xs:enumeration value="null"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="m_type" use="required" type="xs:integer">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Message type eg. "132"</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="msg_box" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">1 = Received, 2 = Sent, 3 = Draft, 4 = Outbox, 5 = Failed, 6 = Queued</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:integer">
+            <xs:minInclusive value="1"/>
+            <xs:maxInclusive value="6"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="msg_id" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Here always "0".</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:integer">
+            <xs:minInclusive value="0"/>
+            <xs:maxInclusive value="0"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="pri" use="required" type="xs:integer">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Priority eg. "129".</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="read" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Read: 1 or 0.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:integer">
+            <xs:minInclusive value="0"/>
+            <xs:maxInclusive value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="read_status" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Read status. Here always "null".</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:NCName">
+            <xs:enumeration value="null"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="readable_date" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Optional field that has the date in a human readable format.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="reserved" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Here always "0".</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:integer">
+            <xs:minInclusive value="0"/>
+            <xs:maxInclusive value="0"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="resp_st" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Response status. Here always "null".</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:NCName">
+            <xs:enumeration value="null"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="resp_txt" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Response text. Here always "null".</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:NCName">
+            <xs:enumeration value="null"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="retr_st" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Retrive status. Here always "null".</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:NCName">
+            <xs:enumeration value="null"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="retr_txt" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Retrieve text. Here always "null".</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:NCName">
+            <xs:enumeration value="null"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="retr_txt_cs" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Retrieve texr charset. Here always "null".</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:NCName">
+            <xs:enumeration value="null"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="rpt_a" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Report allowed. Here always "null".</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:NCName">
+            <xs:enumeration value="null"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="rr" use="required" type="xs:integer">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Read report eg. "129".</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="seen" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Seen, 0 or 1</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:integer">
+            <xs:minInclusive value="0"/>
+            <xs:maxInclusive value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="st" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Status. Here always "null".</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:NCName">
+            <xs:enumeration value="null"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="sub" use="required" type="xs:NCName">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Subject, "null" if there is no subject.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="sub_cs" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Subject charset. Here always "null".</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:NCName">
+            <xs:enumeration value="null"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="text_only" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Text only, 0 or 1</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:integer">
+            <xs:minInclusive value="0"/>
+            <xs:maxInclusive value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="tr_id" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Transaction ID.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="v" use="required" type="xs:integer">
+        <xs:annotation>
+          <xs:documentation>MMS version eg. "18"</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="parts">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="part"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="part">
+    <xs:complexType>
+      <xs:attribute name="cd" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">The content disposition of the part. Here always "null".</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:NCName">
+            <xs:enumeration value="null"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="chset" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">The charset of the part eg. "3"</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:NMTOKEN"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="cid" use="required">
+        <xs:annotation>
+          <xs:documentation>content identifier eg. "&lt;dsc_0010_a621950.jpeg&gt;"</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="cl" use="required" type="xs:NCName">
+        <xs:annotation>
+          <xs:documentation>content location eg. "dsc_0010_a621950.jpeg"</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="ct" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">content type eg. "image/jpeg"</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="ctt_s" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">The start of content-type of the message. Here always "null"</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:NCName">
+            <xs:enumeration value="null"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="ctt_t" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">The type of content-type of the message. Here always "null".</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:NCName">
+            <xs:enumeration value="null"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="data" type="xs:base64Binary">
+        <xs:annotation>
+          <xs:documentation>The binary data for all non text parts base64 encoded</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="fn" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">The file name of the part. Here always "null"</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:NCName">
+            <xs:enumeration value="null"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="name" use="required" type="xs:NCName">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">The name of the part. </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="seq" use="required" type="xs:integer">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">The order of the part. </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="text" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">If contenttype is ""text/..." the message text. </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

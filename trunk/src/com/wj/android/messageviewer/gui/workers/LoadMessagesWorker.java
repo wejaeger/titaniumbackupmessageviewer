@@ -46,23 +46,23 @@ public class LoadMessagesWorker extends AbstractDisabelingUIWorker<Integer, Inte
 {
    private static final Logger LOGGER = Logger.getLogger(LoadMessagesWorker.class.getName());
 
-   private final IMessageReader m_Reader;
+   private IMessageReader m_Reader;
    private final BackupMessageViewerFrame m_Frame;
    private final Pair<String, String> m_Files2Open;
 
    /**
     * Constructs a new {@code LoadMessagesWorker}.
     *
-    * @param frame application main window frame
+    * @param frame application main window frame. Must no be {@code null}.
     * @param files2Open message and contact database file path
     * @param messageReaderType the type of reader appropriate to read specified
-    *        files.
+    *        files, if {@code null} it is determined.
     */
    public LoadMessagesWorker(final BackupMessageViewerFrame frame, final Pair<String, String> files2Open, final IMessageReader.MessageFileType messageReaderType)
    {
       super(frame, 0);
 
-      m_Reader = messageReaderType.reader();
+      m_Reader = messageReaderType != null ? messageReaderType.reader() : null;
 
       m_Frame = frame;
       m_Files2Open = files2Open;
@@ -108,7 +108,10 @@ public class LoadMessagesWorker extends AbstractDisabelingUIWorker<Integer, Inte
             else
                contactsDBFile = null;
 
-            iRet = m_Reader.loadMessages(is, contactsDBFile);
+            if (initReader())
+               iRet = m_Reader.loadMessages(is, contactsDBFile);
+            else
+               iRet = 2;
          }
          catch (FileNotFoundException ex)
          {
@@ -180,6 +183,7 @@ public class LoadMessagesWorker extends AbstractDisabelingUIWorker<Integer, Inte
                break;
 
             case 2:
+               m_Frame.onMessageFileNotFound(m_Files2Open);
                strErrorMessage = strErrorMessage + "Error Code " + iResult + ": Invalid Message file!\n";
                break;
 
@@ -206,5 +210,18 @@ public class LoadMessagesWorker extends AbstractDisabelingUIWorker<Integer, Inte
       }
 
       super.done();
+   }
+
+   private boolean initReader()
+   {
+      if (null == m_Reader)
+      {
+         final IMessageReader.MessageFileType messageReaderType = IMessageReader.MessageFileType.getMessageFileType(m_Files2Open.getFirst());
+
+         if (null != messageReaderType)
+            m_Reader = messageReaderType.reader();
+      }
+
+      return(null != m_Reader);
    }
 }
