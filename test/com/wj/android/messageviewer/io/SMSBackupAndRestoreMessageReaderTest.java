@@ -43,7 +43,7 @@ import org.junit.BeforeClass;
 /**
  *Various test for class {@link SMSBackupAndRestoreMessageReader}.
  *
- * @author <a href="mailto:werner.jaeger@t-systems.com">Werner Jaeger</a>
+ * @author Werner Jaeger
  */
 public final class SMSBackupAndRestoreMessageReaderTest
 {

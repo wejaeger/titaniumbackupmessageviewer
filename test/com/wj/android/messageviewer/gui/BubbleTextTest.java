@@ -29,7 +29,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Tests for class {@link BubbleText}.
  *
- * @author <a href="mailto:werner.jaeger@t-systems.com">Werner Jaeger</a>
+ * @author Werner Jaeger
  */
 public class BubbleTextTest
 {
@@ -42,8 +42,6 @@ public class BubbleTextTest
    {
       m_Text = new BubbleText();
       m_Text.setEditable(false);
-      m_Text.setLineWrap(true);
-      m_Text.setWrapStyleWord(true);
    }
 
    /**
@@ -57,7 +55,7 @@ public class BubbleTextTest
       m_Text.setSize(500, 50);
 
       final int iPreferredWidth = m_Text.getPreferredSize().width;
-      assertEquals(104, iPreferredWidth);
+      assertEquals(119, iPreferredWidth);
    }
 
    /**

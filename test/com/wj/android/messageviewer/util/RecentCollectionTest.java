@@ -39,7 +39,7 @@ import org.junit.BeforeClass;
 /**
  * Various test for class {@link RecentCollection}.
  *
- * @author <a href="mailto:werner.jaeger@t-systems.com">Werner Jaeger</a>
+ * @author Werner Jaeger
  */
 public class RecentCollectionTest
 {

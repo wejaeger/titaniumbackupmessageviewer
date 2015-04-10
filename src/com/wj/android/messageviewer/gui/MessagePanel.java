@@ -97,19 +97,12 @@ public class MessagePanel extends JPanel
    @Override
    public void setSize(final Dimension d)
    {
-      final int iCount = getComponentCount();
-      for (int i = 0; i < iCount; i++)
-      {
-         final Component comp = getComponent(i);
-         final Dimension preferredSize = comp.getPreferredSize();
-         comp.setSize(d.width, preferredSize.height);
-      }
-
-      super.setSize(d);
+      setSize(d.width, d.height);
    }
 
    /**
-    * Resizes this component so that it has width width and height height.
+    * Resizes this component so that it has width {@code iWidth} and height
+    * {@code iHeight}.
     *
     * <p>
     *    This method changes layout-related information, and therefore,
@@ -196,8 +189,6 @@ public class MessagePanel extends JPanel
                final TextPart textPart = (TextPart)part;
                final BubbleText text = new BubbleText(textPart.getText());
                text.setEditable(false);
-               text.setLineWrap(true);
-               text.setWrapStyleWord(true);
                text.setLocation(loc);
                add(text);
                loc.y += text.getPreferredSize().height + VGAP;
@@ -207,8 +198,6 @@ public class MessagePanel extends JPanel
                final VCardPart textPart = (VCardPart)part;
                final BubbleText text = new BubbleText(textPart.getText());
                text.setEditable(false);
-               text.setLineWrap(true);
-               text.setWrapStyleWord(true);
                text.setLocation(loc);
                add(text);
                loc.y += text.getPreferredSize().height + VGAP;
@@ -250,8 +239,6 @@ public class MessagePanel extends JPanel
       {
          final BubbleText text = new BubbleText(m_Message.getMessageText());
          text.setEditable(false);
-         text.setLineWrap(true);
-         text.setWrapStyleWord(true);
          add(text);
       }
    }

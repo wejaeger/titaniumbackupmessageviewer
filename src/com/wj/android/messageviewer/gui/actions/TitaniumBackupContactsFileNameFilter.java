@@ -35,7 +35,7 @@ import javax.swing.filechooser.FileFilter;
  * <p>
  *    Accepts files with this
  *    {@code com.android.providers.contacts-YYYYMMDD-HHMMSS.tar.gz}
- *    name pattern and all files with {@code contacts2.db} extension.
+ *    name pattern and all files named {@code contacts2.db}.
  * </p>
  *
  * @author Werner Jaeger
@@ -62,7 +62,7 @@ class TitaniumBackupContactsFileNameFilter extends FileFilter
     * <p>
     *    Accepts files with this
     *    {@code com.android.providers.contacts-YYYYMMDD-HHMMSS.tar.gz}
-    *    name pattern and all files with {@code contacts2.db} extension.
+    *    name pattern and all files named {@code contacts2.db}.
     * </p>
     *
     * @param f the File to test, if {@code null} {@code false} is returned.

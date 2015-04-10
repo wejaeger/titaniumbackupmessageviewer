@@ -31,12 +31,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
       This document is the API specification for the Backup Message
       Viewer application.
       <p>
-         This is a GUI application to view the backup XML files created from
-         the following Android Apps
+         This is a GUI application to view conversation files created from the
+         following Applications:
       </p>
       <ul>
          <li><a href="http://matrixrewriter.com/android/">Titanium Backup</a></li>
-         <li><a href="http://android.riteshsahu.com/apps/sms-backup-restore/">SMS Backup and Restore.</a></li>
+         <li><a href="http://android.riteshsahu.com/apps/sms-backup-restore/">SMS Backup and Restore</a></li>
+         <li><a href="http://www.skype.com/">Skype</a></li>
       </ul>
       <p>
          Titanium Backup message XML files are located under the folder
@@ -60,6 +61,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
          <b>SMSBackupRestore</b> on the mobile phone and have following name
          pattern:
          <code>sms-YYYYMMDDHHMMSS.xml</code>
+      </p>
+      <p>
+         Skype conversations are stored in a <b>SQLite</b> database file named
+         <b>main.db</b> that can be archived in a file with the following name
+         pattern <b>com.skype.raider-YYYYMMDD-HHMMSS.tar.gz</b> in the
+         <b>TitaniumBackup</b> folder on the mobile phone.
       </p>
       <p>
          MMS Message currently only support message parts with following

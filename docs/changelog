@@ -1,5 +1,9 @@
 
 Change log:
+0.9.5
+ - added Skype conversation reader
+ - display emoticons
+
 0.9.4
  - MMS support for SMS Backup and Restore messages
  - added image/gif support
