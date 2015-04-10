@@ -161,7 +161,15 @@ public final class BackupMessageViewerFrame extends JFrame
 
       m_NumberOfMessagesField.setText(Integer.toString(iNoOfMessages));
 
-      setTitle(Resources.getApplicationTitle() + " - " + new File(files2load.getFirst()).getName());
+      final String strTitle;
+      if (null != files2load.getFirst() && !files2load.getFirst().trim().isEmpty())
+         strTitle = new File(files2load.getFirst()).getName();
+      else if (null != files2load.getSecond())
+         strTitle = new File(files2load.getSecond()).getName();
+      else
+         strTitle = "";
+
+      setTitle(Resources.getApplicationTitle() + " - " + strTitle);
       BackupMessageViewerApplication.getInstance().add2RecentFileList(files2load);
       syncRecentFiles();
    }

@@ -46,13 +46,13 @@ import org.junit.BeforeClass;
 /**
  *Various test for class {@link TitaniumBackupMessageReader}.
  *
- * @author <a href="mailto:werner.jaeger@t-systems.com">Werner Jaeger</a>
+ * @author Werner Jaeger
  */
 public final class TitaniumBackupMessageReaderTest
 {
    private static IMessage[] m_aCheckMessages;
 
-   private InputStream m_InputStram;
+   private InputStream m_InputStream;
    private IMessageReader m_MessageReader;
 
    /**
@@ -108,8 +108,8 @@ public final class TitaniumBackupMessageReaderTest
    @Before
    public void setUp()
    {
-      m_InputStram = getClass().getResourceAsStream("testdata/com.keramidas.virtual.XML_MESSAGES-00000000-000000.xml");
-      Assert.assertNotNull("Resource testdata/com.keramidas.virtual.XML_MESSAGES-00000000-000000.xml not found.", m_InputStram);
+      m_InputStream = getClass().getResourceAsStream("testdata/com.keramidas.virtual.XML_MESSAGES-00000000-000000.xml");
+      Assert.assertNotNull("Resource testdata/com.keramidas.virtual.XML_MESSAGES-00000000-000000.xml not found.", m_InputStream);
 
       m_MessageReader = new TitaniumBackupMessageReader();
    }
@@ -126,11 +126,11 @@ public final class TitaniumBackupMessageReaderTest
    @After
    public void tearDown() throws IOException
    {
-      if (null != m_InputStram)
-         m_InputStram.close();
+      if (null != m_InputStream)
+         m_InputStream.close();
 
       m_MessageReader = null;
-      m_InputStram = null;
+      m_InputStream = null;
    }
 
    /**
@@ -140,7 +140,7 @@ public final class TitaniumBackupMessageReaderTest
    @Test
    public void testLoadMessages()
    {
-      final int iResult = m_MessageReader.loadMessages(m_InputStram, null);
+      final int iResult = m_MessageReader.loadMessages(m_InputStream, null);
       assertEquals(0, iResult);
    }
 
@@ -151,7 +151,7 @@ public final class TitaniumBackupMessageReaderTest
    @Test
    public void testGetThreadArray()
    {
-      final int iResult = m_MessageReader.loadMessages(m_InputStram, null);
+      final int iResult = m_MessageReader.loadMessages(m_InputStream, null);
       assertEquals(0, iResult);
 
       final MessageThread[] aExpThread = {new MessageThread(null, "Test")};
@@ -166,7 +166,7 @@ public final class TitaniumBackupMessageReaderTest
    @Test
    public void testGetNumberOfMessages()
    {
-      final int iResult = m_MessageReader.loadMessages(m_InputStram, null);
+      final int iResult = m_MessageReader.loadMessages(m_InputStream, null);
       assertEquals(0, iResult);
 
       final int iNoOfMessages = m_MessageReader.getNumberOfMessages();
@@ -180,7 +180,7 @@ public final class TitaniumBackupMessageReaderTest
    @Test
    public void testGetThreadArrayMessages()
    {
-      final int iResult = m_MessageReader.loadMessages(m_InputStram, null);
+      final int iResult = m_MessageReader.loadMessages(m_InputStream, null);
       assertEquals(0, iResult);
 
       final MessageThread[] aThreads = m_MessageReader.getThreadArray();

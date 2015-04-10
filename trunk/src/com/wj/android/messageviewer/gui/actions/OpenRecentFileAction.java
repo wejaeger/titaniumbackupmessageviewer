@@ -88,8 +88,7 @@ public class OpenRecentFileAction extends AbstractAction
       else
          strSecondFile = null;
 
-      if (null != strFirstFile)
-         new LoadMessagesWorker(m_Frame, new Pair<>(strFirstFile, strSecondFile), null).execute();
+      new LoadMessagesWorker(m_Frame, new Pair<>(strFirstFile, strSecondFile), null).execute();
    }
 
    private static String makeName(final Pair<String, String> files2Open)
@@ -99,6 +98,8 @@ public class OpenRecentFileAction extends AbstractAction
       final String strName;
       if (0 == strSecondShortName.length())
          strName = strFirtShortName.toString();
+      else if (0 == strFirtShortName.length())
+         strName = strSecondShortName.toString();
       else
          strName = strFirtShortName.append(" && ").append(strSecondShortName).toString();
 

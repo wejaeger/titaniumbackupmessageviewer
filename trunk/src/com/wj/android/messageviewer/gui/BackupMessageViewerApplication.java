@@ -86,8 +86,12 @@ public class BackupMessageViewerApplication
     * Launch the application and display the main window.
     *
     * @param asArgs the first optional argument is the full path to the message
-    *               file to open at start up, the second optional argument is
-    *               the full path to a contacts database file.
+    *               file to open at start up. It can be a {@code Titanium } or
+    *               {@code SMS Backup and Restore} XML Message file (compressed
+    *               or  not) or a {@code Skype} main.db file.
+    *               The second optional argument is the full path to a contacts
+    *               database file if the first file is a {@code Titanium Backup}
+    *               message file.
     */
    public static void main(final String[] asArgs)
    {
@@ -173,24 +177,22 @@ public class BackupMessageViewerApplication
          }
       });
 
-      if (asArgs.length == 1)
-      {
-         final IMessageReader.MessageFileType messageReaderType = IMessageReader.MessageFileType.getMessageFileType(asArgs[0]);
+      final IMessageReader.MessageFileType messageReaderType = IMessageReader.MessageFileType.getMessageFileType(asArgs[0]);
 
-         if (null != messageReaderType)
-            new LoadMessagesWorker(m_AppFrame, new Pair<String, String>(asArgs[0], null), messageReaderType).execute();
-         else
-            JOptionPane.showMessageDialog(m_AppFrame, "Specified file is a unknown backup message file", "Error", JOptionPane.ERROR_MESSAGE);
-      }
-      else if (asArgs.length == 2)
+      if (null != messageReaderType)
       {
-         final IMessageReader.MessageFileType messageReaderType = IMessageReader.MessageFileType.getMessageFileType(asArgs[0]);
-
-         if (null != messageReaderType)
+         if (asArgs.length == 1)
+         {
+            if (messageReaderType == IMessageReader.MessageFileType.SKYPE)
+               new LoadMessagesWorker(m_AppFrame, new Pair<String, String>(null, asArgs[0]), messageReaderType).execute();
+            else
+               new LoadMessagesWorker(m_AppFrame, new Pair<String, String>(asArgs[0], null), messageReaderType).execute();
+         }
+         else if (asArgs.length == 2)
             new LoadMessagesWorker(m_AppFrame, new Pair<>(asArgs[0], asArgs[1]), messageReaderType).execute();
-         else
-            JOptionPane.showMessageDialog(m_AppFrame, "Specified file is a unknown backup message file", "Error", JOptionPane.ERROR_MESSAGE);
       }
+      else
+         JOptionPane.showMessageDialog(m_AppFrame, "Specified file is a unknown backup message file", "Error", JOptionPane.ERROR_MESSAGE);
    }
 
    private void initAppFrameFromPrefs()

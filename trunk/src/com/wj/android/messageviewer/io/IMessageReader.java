@@ -61,7 +61,9 @@ public interface IMessageReader
       /** A Titanium Backup message file. */
       TITANIUM (new TitaniumBackupMessageReader()),
       /** a SMS Backup and Restore message file */
-      SMSBACKUPANDRESTORE (new SMSBackupAndRestoreMessageReader());
+      SMSBACKUPANDRESTORE (new SMSBackupAndRestoreMessageReader()),
+      /** a Skype message reader */
+      SKYPE (new SkypeMessageReader());
 
       private final IMessageReader m_MessageReader;
 
@@ -91,27 +93,33 @@ public interface IMessageReader
       {
          MessageFileType messageType = null;
 
-         final String strSMSSchema = Resources.getSMSBackaupSchema();
-         final String strTitaniumSchema = Resources.getTitaniumBackaupSchema();
-         if (null != strAbsoluteFileNamePath && null != strSMSSchema && null != strTitaniumSchema)
+         if (null == strAbsoluteFileNamePath || (!strAbsoluteFileNamePath.contains("com.skype.raider-") && !strAbsoluteFileNamePath.endsWith("main.db")))
          {
-            if (strAbsoluteFileNamePath.startsWith("sms-"))
+            final String strSMSSchema = Resources.getSMSBackaupSchema();
+            final String strTitaniumSchema = Resources.getTitaniumBackaupSchema();
+            if (null != strAbsoluteFileNamePath && null != strSMSSchema && null != strTitaniumSchema)
             {
-               // try check for SMS Backup Reader and Restore first
-               if (isValid(strAbsoluteFileNamePath, strSMSSchema))
-                  messageType = MessageFileType.SMSBACKUPANDRESTORE;
-               else if (isValid(strAbsoluteFileNamePath, strTitaniumSchema))
-                  messageType = MessageFileType.TITANIUM;
-            }
-            else
-            {
-               // try check for Titanium Backup Reader and Restore first
-               if (isValid(strAbsoluteFileNamePath, strTitaniumSchema))
-                  messageType = MessageFileType.TITANIUM;
-               else if (isValid(strAbsoluteFileNamePath, strSMSSchema))
-                  messageType = MessageFileType.SMSBACKUPANDRESTORE;
+               if (strAbsoluteFileNamePath.startsWith("sms-"))
+               {
+                  // try check for SMS Backup Reader and Restore first
+                  if (isValid(strAbsoluteFileNamePath, strSMSSchema))
+                     messageType = MessageFileType.SMSBACKUPANDRESTORE;
+                  else if (isValid(strAbsoluteFileNamePath, strTitaniumSchema))
+                     messageType = MessageFileType.TITANIUM;
+               }
+               else
+               {
+                  // try check for Titanium Backup Reader and Restore first
+                  if (isValid(strAbsoluteFileNamePath, strTitaniumSchema))
+                     messageType = MessageFileType.TITANIUM;
+                  else if (isValid(strAbsoluteFileNamePath, strSMSSchema))
+                     messageType = MessageFileType.SMSBACKUPANDRESTORE;
+               }
             }
          }
+         else
+            messageType =  MessageFileType.SKYPE;
+
          return(messageType);
       }
 

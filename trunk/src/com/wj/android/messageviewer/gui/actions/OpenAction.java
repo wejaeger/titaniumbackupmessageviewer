@@ -69,6 +69,7 @@ public class OpenAction extends AbstractAction
       m_MessageFileChooser.setDialogTitle("Open message file");
       m_MessageFileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
       m_MessageFileChooser.addChoosableFileFilter(new SMSBackupAndResoreMessageFileNameFilter());
+      m_MessageFileChooser.addChoosableFileFilter(new SkypeFileNameFilter());
       m_MessageFileChooser.setFileFilter(new TitaniumBackupMessageFileNameFilter());
       m_MessageFileChooser.setApproveButtonToolTipText("You can open the commpressd (.gz) or plain (.xml) message file");
 
@@ -103,7 +104,10 @@ public class OpenAction extends AbstractAction
             else
                strContactDatabaseFilePath = null;
 
-            new LoadMessagesWorker(m_Frame, new Pair<>(strMessageFilePath, strContactDatabaseFilePath), messageReaderType).execute();
+            if (IMessageReader.MessageFileType.SKYPE == messageReaderType)
+               new LoadMessagesWorker(m_Frame, new Pair<>((String)null, strMessageFilePath), messageReaderType).execute();
+            else
+               new LoadMessagesWorker(m_Frame, new Pair<>(strMessageFilePath, strContactDatabaseFilePath), messageReaderType).execute();
          }
          else
             JOptionPane.showMessageDialog(m_Frame, "Specified file is a unknown backup message file", "Error", JOptionPane.ERROR_MESSAGE);

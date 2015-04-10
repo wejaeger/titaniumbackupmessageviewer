@@ -94,12 +94,15 @@ public class LoadMessagesWorker extends AbstractDisabelingUIWorker<Integer, Inte
 
          try
          {
-            final File messageFile = new File(m_Files2Open.getFirst());
+            if (null != m_Files2Open.getFirst() && !m_Files2Open.getFirst().trim().isEmpty())
+            {
+               final File messageFile = new File(m_Files2Open.getFirst());
 
-            if (m_Files2Open.getFirst().endsWith(".gz"))
-               is = new GZIPInputStream(new FileInputStream(messageFile));
-            else
-               is = new FileInputStream(messageFile);
+               if (m_Files2Open.getFirst().endsWith(".gz"))
+                  is = new GZIPInputStream(new FileInputStream(messageFile));
+               else
+                  is = new FileInputStream(messageFile);
+            }
 
             final File contactsDBFile;
             final String strContactsDBFileName = m_Files2Open.getSecond();
@@ -216,7 +219,7 @@ public class LoadMessagesWorker extends AbstractDisabelingUIWorker<Integer, Inte
    {
       if (null == m_Reader)
       {
-         final IMessageReader.MessageFileType messageReaderType = IMessageReader.MessageFileType.getMessageFileType(m_Files2Open.getFirst());
+         final IMessageReader.MessageFileType messageReaderType = IMessageReader.MessageFileType.getMessageFileType(null == m_Files2Open.getFirst() ? m_Files2Open.getSecond() : m_Files2Open.getFirst());
 
          if (null != messageReaderType)
             m_Reader = messageReaderType.reader();
